@@ -8,13 +8,13 @@
 		"Greenman999#8421"
 	],
 	"contact": {
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Greeenman999/LibrarianTradeFinder"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/librarian-trade-finder/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
+		"client": [
           "de.greenman999.LibrarianTradeFinder"
 		]
 	},
