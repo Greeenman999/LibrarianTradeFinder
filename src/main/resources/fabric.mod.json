@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "librarian-trade-finder",
+	"version": "${version}",
+	"name": "Librarian Trade Finder",
+	"description": "This is a mod that helps you find the trades of librarians.",
+	"authors": [
+		"Greenman999#8421"
+	],
+	"contact": {
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/librarian-trade-finder/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "de.greenman999.LibrarianTradeFinder"
+		]
+	},
+	"mixins": [
+		"librarian-trade-finder.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.13",
+		"minecraft": "~1.19.3",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
