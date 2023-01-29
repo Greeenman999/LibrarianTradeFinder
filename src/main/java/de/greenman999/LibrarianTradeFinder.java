@@ -83,7 +83,11 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 													RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
 													Enchantment enchantment = enchantmentRegistryEntry.value();
 
-													//TradeFinder.search(enchantment, 64);
+													if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+														context.getSource().sendFeedback(Text.literal("You have not selected a librarian and lectern. Use '/tradefinder select' to select the lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+														return 0;
+													}
+													TradeFinder.search(enchantment, 64);
 													context.getSource().sendFeedback(Text.literal("Started searching for ").append(Text.translatable(enchantment.getTranslationKey())).append(" with max price " + 64 + ".").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 													return 1;
 												})
@@ -92,6 +96,10 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 													RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
 													Enchantment enchantment = enchantmentRegistryEntry.value();
 
+													if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+														context.getSource().sendFeedback(Text.literal("You have not selected a librarian and lectern. Use '/tradefinder select' to select the lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+														return 0;
+													}
 													TradeFinder.search(enchantment, bookPrice);
 													context.getSource().sendFeedback(Text.literal("Started searching for ").append(Text.translatable(enchantment.getTranslationKey())).append(" with max price " + bookPrice + ".").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 													return 1;
