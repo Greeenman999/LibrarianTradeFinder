@@ -8,6 +8,7 @@ import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -73,7 +74,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 								return 0;
 							}
 
-							//TradeFinder.select(villager, blockPos);
+							TradeFinder.select(villager, blockPos);
 							context.getSource().sendFeedback(Text.literal("Selected lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 							return 1;
 						}))
@@ -91,7 +92,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 													RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
 													Enchantment enchantment = enchantmentRegistryEntry.value();
 
-													//TradeFinder.search(enchantment, bookPrice);
+													TradeFinder.search(enchantment, bookPrice);
 													context.getSource().sendFeedback(Text.literal("Started searching for ").append(Text.translatable(enchantment.getTranslationKey())).append(" with max price " + bookPrice + ".").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 													return 1;
 												}))
@@ -99,11 +100,15 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 						)
 						.then(literal("stop").executes(context -> {
 
-							//TradeFinder.stop();
+							TradeFinder.stop();
 							context.getSource().sendFeedback(Text.literal("Stopped searching.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 							return 1;
 						}))
 				));
+
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			TradeFinder.tick();
+		});
 
 		LOGGER.info("Librarian Trade Finder initialized.");
 	}
