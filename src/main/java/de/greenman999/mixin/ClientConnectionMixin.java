@@ -40,7 +40,12 @@ public class ClientConnectionMixin {
                     if(enchantment.equals(TradeFinder.enchantment) && tradeOffer.getOriginalFirstBuyItem().getCount() <= TradeFinder.maxBookPrice && level == enchantment.getMaxLevel()) {
                         TradeFinder.stop();
                         found.set(true);
-                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("Found enchantment ").formatted(Formatting.GREEN).append(enchantment.getName(enchantment.getMaxLevel())).formatted(Formatting.GREEN).append(Text.literal(" for " + tradeOffer.getOriginalFirstBuyItem().getCount() + " emeralds!")).formatted(Formatting.GREEN));
+                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
+                                Text.literal("Found enchantment ").formatted(Formatting.GREEN)
+                                .append(enchantment.getName(enchantment.getMaxLevel()))
+                                        .append(Text.literal(" for ").formatted(Formatting.GREEN))
+                                        .append(Text.literal(String.valueOf(tradeOffer.getOriginalFirstBuyItem().getCount())).formatted(Formatting.GRAY))
+                                        .append(Text.literal(" emeralds!")).formatted(Formatting.GREEN));
                     }
                 });
             }
