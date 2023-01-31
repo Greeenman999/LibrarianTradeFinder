@@ -3,14 +3,14 @@
 	"id": "librarian-trade-finder",
 	"version": "${version}",
 	"name": "Librarian Trade Finder",
-	"description": "This is a mod that helps you find the trades of librarians.",
+	"description": "A fabric mod that helps you find the enchantments you need from a Librarian Villager.",
 	"authors": [
 		"Greenman999#8421"
 	],
 	"contact": {
 		"sources": "https://github.com/Greeenman999/LibrarianTradeFinder"
 	},
-	"license": "CC0-1.0",
+	"license": "GPL-3.0",
 	"icon": "assets/librarian-trade-finder/icon.png",
 	"environment": "*",
 	"entrypoints": {
