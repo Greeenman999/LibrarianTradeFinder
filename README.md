@@ -30,3 +30,5 @@ The compiled jar should be under build/libs/.
    - Some anti-cheats can prevent breaking the lectern or interacting with the villager if you are not looking at it.
  - My Lecterns are disappearing.
    - Sometimes the lecterns dropped, can get behind the lectern or somewhere else. Stop the mod, break the lectern, and try to find all the items. Then start the search again.
+
+### If you have any further issues, create an issue on [my github](https://github.com/Greeenman999/LibrarianTradeFinder/issues) or message me on Discord `Greenman999#8421`.
