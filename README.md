@@ -3,7 +3,7 @@ A fabric mod that helps you find the enchantments you need from a Librarian Vill
 
 ## Demo
 
-https://user-images.githubusercontent.com/81023792/215834950-d5ed40c0-5e85-4401-8a0a-ac7bfa4facb1.mp4
+https://user-images.githubusercontent.com/81023792/215837935-cf4967b6-59c7-4fef-88cf-0eba47f0b69f.mp4
 
 ## Installation
 Download the jar from the [releases page](https://github.com/Greeenman999/LibrarianTradeFinder/releases/latest).
