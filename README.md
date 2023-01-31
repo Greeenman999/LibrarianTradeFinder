@@ -6,10 +6,12 @@ A fabric mod that helps you find the enchantments you need from a Librarian Vill
 https://user-images.githubusercontent.com/81023792/215837935-cf4967b6-59c7-4fef-88cf-0eba47f0b69f.mp4
 
 ## Installation
-Download the jar from the [releases page](https://github.com/Greeenman999/LibrarianTradeFinder/releases/latest).
+Download the jar from the [releases page](https://github.com/Greeenman999/LibrarianTradeFinder/releases/latest) or from [modrinth](https://modrinth.com/mod/librarian-trade-finder).
 
 Or clone the repository and run `./gradlew build`.
 The compiled jar should be under build/libs/.
+
+![](https://github.com/Prospector/badges/blob/master/modrinth-badge-72h-padded.png?raw=true)
 
 ## Usage
 
