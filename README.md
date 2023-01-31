@@ -2,7 +2,7 @@
 A fabric mod that helps you find the enchantments you need from a Librarian Villager.
 
 ## Demo
-![Demo](https://i.ibb.co/kgGT8YL/demo.gif)
+[demo_finally_finally.mp4](https://github.com/Greeenman999/LibrarianTradeFinder/blob/master/demo_finally_finally.mp4)
 
 ## Installation
 Download the jar from the [releases page](https://github.com/Greeenman999/LibrarianTradeFinder/releases/latest).
