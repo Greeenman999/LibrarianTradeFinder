@@ -1,31 +1,22 @@
 package de.greenman999;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import de.greenman999.config.TradeFinderConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
-import net.fabricmc.api.ModInitializer;
 
 
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.command.argument.RegistryEntryArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -123,7 +114,13 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			TradeFinder.tick();
 		});
 
+		getConfig().load();
+
 		LOGGER.info("Librarian Trade Finder initialized.");
+	}
+
+	public static TradeFinderConfig getConfig() {
+		return TradeFinderConfig.INSTANCE;
 	}
 
 }
