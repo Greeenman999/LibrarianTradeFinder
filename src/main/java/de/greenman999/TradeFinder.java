@@ -59,7 +59,7 @@ public class TradeFinder {
             case PLACE -> MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.literal("placing lectern --- attempt: " + tries).formatted(Formatting.GRAY), false);
         }
 
-        if(state == TradeState.CHECK && villager.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN)) {
+        if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN)) {
             ActionResult result = MinecraftClient.getInstance().interactionManager.interactEntity(MinecraftClient.getInstance().player, villager, Hand.MAIN_HAND);
             System.out.println(result);
             if(result == ActionResult.SUCCESS) {
