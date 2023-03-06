@@ -15,12 +15,21 @@ The compiled jar should be under build/libs/.
 
 ## Usage
 
+### Common Steps
 1. Encase the villager in a 1x1 area.
 2. Place down a Lectern in front of the villager.
 3. Look at the Lectern and execute `/tradefinder select`.
 4. Put enough lecterns in your off-hand and an axe in your main-hand. The faster the axe can break the lectern, the faster the mod will be able to search.
-5. Execute `/tradefinder search <enchantment> <maxPrice>` to start searching for you preferred enchantment. As soon as the mod found it, it will stop the search and message you.
+
+#### Continuation Single Search
+5. Execute `/tradefinder searchSingle <enchantment> <maxPrice>` to start searching for you preferred enchantment. As soon as the mod found it, it will stop the search and message you.
 6. If you want to stop the search before you found the enchantment, execute `/tradefinder stop`.
+
+#### Continuation List Search
+5. Execute `/tradefinder config` or open the config gui using modmenu.
+6. Switch to 'List Enchantments' Tab. Then select all the enchantments you want to search for.
+7. Execute `/tradefinder searchList` to start searching for the list. As soon as the mod found any enchantment you selected, it will stop the search and message you.
+8. If you want to stop the search before you found a enchantment, execute `/tradefinder stop`.
 
 ## Common Issues
 
