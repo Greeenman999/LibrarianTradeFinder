@@ -34,6 +34,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 public class LibrarianTradeFinder implements ClientModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("librarian-trade-finder");
+	private boolean openConfigScreen;
 
 	@Override
 	public void onInitializeClient() {
@@ -74,7 +75,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 							context.getSource().sendFeedback(Text.literal("Selected lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 							return 1;
 						}))
-						.then(literal("search")
+						.then(literal("searchSingle")
 								.then(argument("enchantment", RegistryEntryArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
 													RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
 													Enchantment enchantment = enchantmentRegistryEntry.value();
@@ -102,6 +103,25 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 												}))
 								)
 						)
+						.then(literal("searchList")
+								.executes(context -> {
+									if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+										context.getSource().sendFeedback(Text.literal("You have not selected a librarian and lectern. Use '/tradefinder select' to select the lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+										return 0;
+									}
+									if(!getConfig().enchantments.containsValue(true)) {
+										context.getSource().sendFeedback(Text.literal("You have not selected any enchantments. Select the enchantments in the config menu. You can open the gui either by clicking the config icon by ModMenu or run '/tradefinder config'.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+										return 0;
+									}
+									TradeFinder.searchList();
+									context.getSource().sendFeedback(Text.literal("Started searching for the list of enchantments you selected.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+									return 1;
+								})
+						)
+						.then(literal("config").executes(context -> {
+							openConfigScreen = true;
+							return 1;
+						}))
 						.then(literal("stop").executes(context -> {
 
 							TradeFinder.stop();
@@ -112,6 +132,10 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			TradeFinder.tick();
+			if(openConfigScreen) {
+				openConfigScreen = false;
+				client.setScreen(getConfig().createGui(client.currentScreen));
+			}
 		});
 
 		getConfig().load();
