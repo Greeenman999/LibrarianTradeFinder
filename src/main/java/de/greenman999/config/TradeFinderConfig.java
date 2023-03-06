@@ -41,7 +41,6 @@ public class TradeFinderConfig {
 
             JsonObject json = new JsonObject();
             json.addProperty("preventAxeBreaking", preventAxeBreaking);
-            json.addProperty("mode", mode.name());
 
             JsonObject enchantmentsJson = new JsonObject();
             enchantments.forEach((enchantment, enabled) -> enchantmentsJson.addProperty(Registries.ENCHANTMENT.getEntry(enchantment).getKey().get().getValue().toString(), enabled));
@@ -59,8 +58,6 @@ public class TradeFinderConfig {
 
             if (json.has("preventAxeBreaking"))
                 preventAxeBreaking = json.getAsJsonPrimitive("preventAxeBreaking").getAsBoolean();
-            if (json.has("mode"))
-                mode = TradeMode.valueOf(json.getAsJsonPrimitive("mode").getAsString());
             if (json.has("enchantments")) {
                 JsonObject enchantmentsJson = json.getAsJsonObject("enchantments");
                 enchantmentsJson.entrySet().forEach(entry -> {
@@ -106,17 +103,6 @@ public class TradeFinderConfig {
                                 )
                                 .controller(TickBoxController::new)
                                 .build())
-                        .option(Option.createBuilder(TradeMode.class)
-                                .name(Text.literal("Trade Finding Mode"))
-                                .tooltip(Text.literal("Single: Search for a single enchantment. \nList: Search for a list of enchantments."))
-                                .binding(
-                                        TradeMode.SINGLE,
-                                        () -> mode,
-                                        value -> mode = value
-                                )
-                                .controller(EnumController::new)
-                                .build()
-                        )
                         .build())
                 .category(ConfigCategory.createBuilder()
                         .name(Text.literal("List Enchantments"))

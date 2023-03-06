@@ -1,5 +1,6 @@
 package de.greenman999;
 
+import de.greenman999.config.TradeFinderConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
@@ -43,6 +44,13 @@ public class TradeFinder {
     public static void search(Enchantment enchantment, int bookPrice) {
         TradeFinder.enchantment = enchantment;
         TradeFinder.maxBookPrice = bookPrice;
+        LibrarianTradeFinder.getConfig().mode = TradeFinderConfig.TradeMode.SINGLE;
+        state = TradeState.CHECK;
+    }
+
+    public static void searchList() {
+        maxBookPrice = 64;
+        LibrarianTradeFinder.getConfig().mode = TradeFinderConfig.TradeMode.LIST;
         state = TradeState.CHECK;
     }
 
