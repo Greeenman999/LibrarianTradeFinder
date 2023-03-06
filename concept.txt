@@ -19,3 +19,11 @@ if found set state to idle
 Mixins needed:
 
 ClientConnectionMixin
+
+
+--------------
+Config order:
+
+read all values and save to memory
+if no values, set to default
+save all values
