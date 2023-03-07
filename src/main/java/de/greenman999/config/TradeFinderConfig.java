@@ -54,6 +54,10 @@ public class TradeFinderConfig {
 
     public void load() {
         try {
+            if(!Files.exists(configFile)) {
+                Files.createFile(configFile);
+                Files.writeString(configFile, "{}");
+            }
             JsonObject json = gson.fromJson(Files.readString(configFile), JsonObject.class);
 
             if (json.has("preventAxeBreaking"))
@@ -71,6 +75,7 @@ public class TradeFinderConfig {
 
             for(Enchantment enchantment : Registries.ENCHANTMENT) {
                 if(!enchantments.containsKey(enchantment)) {
+                    if(!enchantment.isAvailableForEnchantedBookOffer()) continue;
                     enchantments.put(enchantment, false);
                 }
             }
