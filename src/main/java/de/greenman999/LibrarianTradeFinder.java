@@ -2,6 +2,7 @@ package de.greenman999;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import de.greenman999.config.TradeFinderConfig;
+import de.greenman999.screens.ControlUi;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 
@@ -11,6 +12,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.command.argument.RegistryEntryArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
@@ -134,7 +136,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			TradeFinder.tick();
 			if(openConfigScreen) {
 				openConfigScreen = false;
-				client.setScreen(getConfig().createGui(client.currentScreen));
+				client.setScreen(new ControlUi(client.currentScreen));
 			}
 		});
 
