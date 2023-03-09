@@ -1,24 +1,19 @@
 package de.greenman999.screens;
 
-import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.systems.RenderCallStorage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.greenman999.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.util.List;
+import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 
 public class ControlUi extends Screen {
 
@@ -46,7 +41,9 @@ public class ControlUi extends Screen {
                         .dimensions(this.width - 107, this.height - 27, 100, 20)
                 .build());
         // create list of buttons with scrollbar
-        this.addDrawableChild(new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height, 25, this.height - 5, 20));
+        this.addDrawableChild(new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height, 21, this.height - 5, 20));
+        System.out.println(this.width / 2 - 10);
+        System.out.println(this.height);
 
         super.init();
     }
@@ -66,6 +63,7 @@ public class ControlUi extends Screen {
             for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
                 this.addEntry(new EnchantmentEntry(enchantment, width, height));
             }
+            //setLeftPos(-2);
         }
 
         @Override
@@ -88,49 +86,70 @@ public class ControlUi extends Screen {
         }
 
         @Override
+        public int getRowWidth() {
+            return this.width - 10;
+        }
+
+        @Override
         protected int getScrollbarPositionX() {
             return this.width;
+        }
+
+        @Override
+        public int getRowTop(int index) {
+            return this.top + 4 - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
+        }
+
+        @Override
+        public int getRowLeft() {
+            return this.left + this.width / 2 - this.getRowWidth() / 2;
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            this.updateScrollingState(mouseX, mouseY, button);
+            if (!this.isMouseOver(mouseX, mouseY)) {
+                return false;
+            } else {
+                EnchantmentEntry entry = this.getEntryAtPosition(mouseX, mouseY + 4);
+                if (entry != null) {
+                    if (entry.mouseClicked(mouseX, mouseY, button)) {
+                        this.setFocused(entry);
+                        this.setDragging(true);
+                        return true;
+                    }
+                } else if (button == 0) {
+                    this.clickedHeader((int)(mouseX - (double)(this.left + this.width / 2 - this.getRowWidth() / 2)), (int)(mouseY - (double)this.top) + (int)this.getScrollAmount() - 4);
+                    return true;
+                }
+
+                return button == 0 && mouseX >= (double)this.getScrollbarPositionX() && mouseX < (double)(this.getScrollbarPositionX() + 6);
+            }
         }
     }
 
     public static class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
         private final Enchantment enchantment;
-        private final int listWidth;
-        private final int listHeight;
-
-        private int y;
-        private int itemHeight;
-        private int index;
 
         public EnchantmentEntry(Enchantment enchantment, int listWidth, int listHeight) {
             super();
             this.enchantment = enchantment;
-            this.listWidth = listWidth;
-            this.listHeight = listHeight;
         }
 
         @Override
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            this.y = y;
-            this.itemHeight = entryHeight;
-            this.index = index;
-            if(y < 12) return;
+            if(y < 8) return;
             matrices.push();
             RenderSystem.enableDepthTest();
             matrices.translate(0, 0, -100);
 
-            //draw red dots at x y and x + entryWidth y + entryHeight
-            DrawableHelper.fill(matrices, x, y, x + 1, y + 1, 0xFFFF0000);
-            DrawableHelper.fill(matrices, x + entryWidth, y + entryHeight, x + entryWidth + 1, y + entryHeight + 1, 0xFF0000FF);
-
-
             if(LibrarianTradeFinder.getConfig().enchantments.get(enchantment)) {
-                DrawableHelper.fill(matrices, 5, y - 5, listWidth - 5, y + entryHeight - 4, 0x3F00FF00);
+                DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
             }else {
-                DrawableHelper.fill(matrices, 5, y - 5, listWidth - 5, y + entryHeight - 4, 0x0FC7C0C0);
+                DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x0FC7C0C0);
             }
-            DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, enchantment.getName(enchantment.getMaxLevel()).copy().formatted(Formatting.WHITE), 10, y, 0xFFFFFF);
+            DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, enchantment.getName(enchantment.getMaxLevel()).copy().formatted(Formatting.WHITE), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
             RenderSystem.disableDepthTest();
             matrices.pop();
@@ -138,24 +157,11 @@ public class ControlUi extends Screen {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-/*            System.out.println(mouseX + " " + mouseY);
-            System.out.println(this.y + " " + this.itemHeight);
-            System.out.println(this.y + this.itemHeight - 4);*/
+/*            if(mouseX > this.x && mouseX < this.x + this.entryWidth && mouseY > y && mouseY < y + entryHeight) {
+            }*/
 
-            System.out.println(mouseX > 5);
-            System.out.println(mouseX < listWidth - 5);
-            System.out.println(mouseY > this.y - 5);
-            System.out.println(mouseY < this.y + this.itemHeight - 4);
-            System.out.println(this.y + " + " + this.itemHeight + " - 4 = " + (this.y + this.itemHeight - 4));
-            System.out.println(button);
-            System.out.println(index);
-
-            // check if mouse is in the bounds of the DrawableHelper.fill
-            if(mouseX > 5 && mouseX < listWidth - 5 && mouseY > y - 5 && mouseY < y + itemHeight - 4) {
-                LibrarianTradeFinder.getConfig().enchantments.put(enchantment, !LibrarianTradeFinder.getConfig().enchantments.get(enchantment));
-            }
-
-            return super.mouseClicked(mouseX, mouseY, button);
+            LibrarianTradeFinder.getConfig().enchantments.put(enchantment, !LibrarianTradeFinder.getConfig().enchantments.get(enchantment));
+            return true;
         }
 
         private void drawOutline(MatrixStack matrices, int x1, int y1, int x2, int y2, int width, int color) {
