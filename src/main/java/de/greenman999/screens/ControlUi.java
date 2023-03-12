@@ -1,5 +1,6 @@
 package de.greenman999.screens;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.greenman999.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
@@ -77,13 +78,15 @@ public class ControlUi extends Screen {
 
     public static class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
+        private EnchantmentEntry hoveredEntry;
+
         public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
             super(client, width, height, top, bottom, itemHeight);
             setRenderBackground(false);
             setRenderHorizontalShadows(false);
 
             for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
-                this.addEntry(new EnchantmentEntry(enchantment));
+                this.addEntry(new EnchantmentEntry(enchantment, this.width, this.height));
             }
             //setLeftPos(-2);
         }
@@ -99,7 +102,45 @@ public class ControlUi extends Screen {
             RenderSystem.disableDepthTest();
             matrices.pop();
 
-            super.render(matrices, mouseX, mouseY, delta);
+            this.renderBackground(matrices);
+            int i = this.getScrollbarPositionX();
+            int j = i + 6;
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+            this.hoveredEntry = this.isMouseOver((double)mouseX, (double)mouseY) ? this.getEntryAtPosition((double)mouseX, (double)mouseY) : null;
+
+            int o = this.getMaxScroll();
+            if (o > 0) {
+                RenderSystem.disableTexture();
+                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                int m = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
+                m = MathHelper.clamp(m, 32, this.bottom - this.top - 8);
+                int n = (int)this.getScrollAmount() * (this.bottom - this.top - m) / o + this.top;
+                if (n < this.top) {
+                    n = this.top;
+                }
+
+                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+                bufferBuilder.vertex((double)i, (double)this.bottom, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)j, (double)this.bottom, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)j, (double)this.top, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)i, (double)this.top, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)i, (double)(n + m), 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)j, (double)(n + m), 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)j, (double)n, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)i, (double)n, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)i, (double)(n + m - 1), 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex((double)(j - 1), (double)(n + m - 1), 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex((double)(j - 1), (double)n, 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex((double)i, (double)n, 0.0).color(192, 192, 192, 255).next();
+                tessellator.draw();
+            }
+            this.renderList(matrices, mouseX, mouseY, delta);
+
+            this.renderDecorations(matrices, mouseX, mouseY);
+            RenderSystem.enableTexture();
+            RenderSystem.disableBlend();
         }
 
         @Override
@@ -154,15 +195,21 @@ public class ControlUi extends Screen {
 
         private final Enchantment enchantment;
         public final TextFieldWidget maxPriceField;
-        public final OrderedTextTooltipComponent tooltipComponent;
+        public final TextFieldWidget levelField;
+        private final int width;
+        private final int height;
         private int x;
         private int y;
         private int entryWidth;
         private int entryHeight;
 
-        public EnchantmentEntry(Enchantment enchantment) {
+        public boolean enabled = false;
+
+        public EnchantmentEntry(Enchantment enchantment, int width, int height) {
             super();
             this.enchantment = enchantment;
+            this.width = width;
+            this.height = height;
 
             //maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 50, 20, Text.of("Max Price"));
             maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.of("Max Price"));
@@ -170,7 +217,10 @@ public class ControlUi extends Screen {
             maxPriceField.setText("64");
             //maxPriceField.setDrawsBackground(false);
 
-            tooltipComponent = new OrderedTextTooltipComponent(Text.of("Max Price").asOrderedText());
+            levelField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.of("Level"));
+            levelField.setMaxLength(1);
+            levelField.setText(enchantment.getMaxLevel() + "");
+
         }
 
         @Override
@@ -179,17 +229,19 @@ public class ControlUi extends Screen {
             this.y = y;
             this.entryWidth = entryWidth;
             this.entryHeight = entryHeight;
+            this.enabled = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
             if(y < 8) return;
             matrices.push();
             RenderSystem.enableDepthTest();
             matrices.translate(0, 0, -100);
 
-            if(LibrarianTradeFinder.getConfig().enchantments.get(enchantment)) {
-                maxPriceField.setVisible(true);
+            maxPriceField.setVisible(enabled);
+            levelField.setVisible(enabled);
+            if(enabled) {
                 DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
-                DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("Max Price:"), x + entryWidth - 21 - 52, y + (entryHeight / 2 / 2), 0xFFFFFF);
+                DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("$:"), x + entryWidth - 21 - 10, y + (entryHeight / 2 / 2), 0xFFFFFF);
+                DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("LVL:"), x + entryWidth - 21 - 15 - 20 - 23, y + (entryHeight / 2 / 2), 0xFFFFFF);
             }else {
-                maxPriceField.setVisible(false);
                 DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x0FC7C0C0);
             }
             DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, enchantment.getName(enchantment.getMaxLevel()).copy().formatted(Formatting.WHITE), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
@@ -203,11 +255,23 @@ public class ControlUi extends Screen {
             maxPriceField.setX(x + entryWidth - 21);
             maxPriceField.setY(y + 1);
             maxPriceField.render(matrices, mouseX, mouseY, tickDelta);
+
+            levelField.setX(x + entryWidth - 21 - 15 - 20);
+            levelField.setY(y + 1);
+            levelField.render(matrices, mouseX, mouseY, tickDelta);
             RenderSystem.disableDepthTest();
             matrices.pop();
 
-            if(mouseX > this.x + entryWidth - 21 - 51 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight) {
-                renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer, Text.of("Max Price")), mouseX + 30, mouseY, y, this.entryWidth, this.entryHeight);
+            if(mouseX > this.x + entryWidth - 21 - 10 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight && enabled) {
+                renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                        Text.literal("Set the maximum price for this enchantment.").formatted(Formatting.GREEN),
+                        Text.literal(""),
+                        Text.literal("Enchantment Level 1: 5-19").formatted(Formatting.GRAY),
+                        Text.literal("Enchantment Level 2: 8-32").formatted(Formatting.GRAY),
+                        Text.literal("Enchantment Level 3: 11-45").formatted(Formatting.GRAY),
+                        Text.literal("Enchantment Level 4: 14-58").formatted(Formatting.GRAY),
+                        Text.literal("Enchantment Level 5: 17-64").formatted(Formatting.GRAY)
+                ), mouseX + 110, y - 5, y + 20, this.width, this.height);
             }
         }
 
@@ -215,7 +279,7 @@ public class ControlUi extends Screen {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             maxPriceField.mouseClicked(mouseX, mouseY, button);
             int i = 0;
-            if(LibrarianTradeFinder.getConfig().enchantments.get(enchantment)) {
+            if(enabled) {
                 i = 21;
             }
             if(mouseX > this.x && mouseX < this.x + this.entryWidth - i && mouseY > y && mouseY < y + entryHeight) {
