@@ -217,7 +217,7 @@ public class ControlUi extends Screen {
             maxPriceField.setText("64");
             //maxPriceField.setDrawsBackground(false);
 
-            levelField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.of("Level"));
+            levelField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 14, 14, Text.of("Level"));
             levelField.setMaxLength(1);
             levelField.setText(enchantment.getMaxLevel() + "");
 
@@ -240,11 +240,11 @@ public class ControlUi extends Screen {
             if(enabled) {
                 DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
                 DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("$:"), x + entryWidth - 21 - 10, y + (entryHeight / 2 / 2), 0xFFFFFF);
-                DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("LVL:"), x + entryWidth - 21 - 15 - 20 - 23, y + (entryHeight / 2 / 2), 0xFFFFFF);
+                DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("LVL:"), x + entryWidth - 21 - 15 - 14 - 23, y + (entryHeight / 2 / 2), 0xFFFFFF);
             }else {
                 DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x0FC7C0C0);
             }
-            DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, enchantment.getName(enchantment.getMaxLevel()).copy().formatted(Formatting.WHITE), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
+            DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
             RenderSystem.disableDepthTest();
             matrices.pop();
@@ -256,7 +256,7 @@ public class ControlUi extends Screen {
             maxPriceField.setY(y + 1);
             maxPriceField.render(matrices, mouseX, mouseY, tickDelta);
 
-            levelField.setX(x + entryWidth - 21 - 15 - 20);
+            levelField.setX(x + entryWidth - 21 - 15 - 14);
             levelField.setY(y + 1);
             levelField.render(matrices, mouseX, mouseY, tickDelta);
             RenderSystem.disableDepthTest();
@@ -271,6 +271,11 @@ public class ControlUi extends Screen {
                         Text.literal("Enchantment Level 3: 11-45").formatted(Formatting.GRAY),
                         Text.literal("Enchantment Level 4: 14-58").formatted(Formatting.GRAY),
                         Text.literal("Enchantment Level 5: 17-64").formatted(Formatting.GRAY)
+                ), mouseX + 110, y - 5, y + 20, this.width, this.height);
+            }
+            if(mouseX > this.x + entryWidth - 21 - 15 - 14 - 23 && mouseX < this.x + this.entryWidth - 21 - 15 - 14 && mouseY > y && mouseY < y + entryHeight && enabled) {
+                renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                        Text.literal("Set the level for this enchantment.").formatted(Formatting.GREEN)
                 ), mouseX + 110, y - 5, y + 20, this.width, this.height);
             }
         }
