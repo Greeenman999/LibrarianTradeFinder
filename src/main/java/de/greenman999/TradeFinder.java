@@ -2,6 +2,7 @@ package de.greenman999;
 
 import de.greenman999.config.TradeFinderConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -14,14 +15,15 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -41,6 +43,8 @@ public class TradeFinder {
 
     public static int placeDelay = 3;
     public static int interactDelay = 2;
+    private static boolean tpdToVillager = false;
+    public static Vec3d prevPos = null;
 
     public static void stop() {
         state = TradeState.IDLE;
@@ -70,6 +74,8 @@ public class TradeFinder {
     }
 
     public static void tick() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+
         if(state == TradeState.IDLE) return;
         switch (state) {
             case CHECK -> MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.literal("checking trade --- attempt: " + tries).formatted(Formatting.GRAY), false);
@@ -116,11 +122,46 @@ public class TradeFinder {
                         .sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             }else {
                 state = TradeState.PLACE;
+                prevPos = mc.player.getPos();
+                //mc.player.setPosition(villager.getPos());
+                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true));
             }
 
         } else if (state == TradeState.PLACE) {
+            //mc.player.setPosition(prevPos);
+            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(prevPos.x, prevPos.y, prevPos.z, true));
+
             BlockPos toPlace = lecternPos.down();
             MinecraftClient.getInstance().player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
+
+            if(!MinecraftClient.getInstance().player.getOffHandStack().getItem().equals(Items.LECTERN)) {
+                if (mc.player.playerScreenHandler == mc.player.currentScreenHandler) {
+                    for (int i = 9; i < 45; i++) {
+                        if (mc.player.getInventory().getStack(i >= 36 ? i - 36 : i).getItem() == Items.LECTERN) {
+                            boolean itemInOffhand = !mc.player.getOffHandStack().isEmpty();
+                            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, mc.player);
+                            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 45, 0, SlotActionType.PICKUP, mc.player);
+
+                            if (itemInOffhand)
+                                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, mc.player);
+
+                            break;
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < 9; i++) {
+                        if (mc.player.getInventory().getStack(i).getItem() == Items.LECTERN) {
+                            if (i != mc.player.getInventory().selectedSlot) {
+                                mc.player.getInventory().selectedSlot = i;
+                                mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(i));
+                            }
+
+                            mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+                            break;
+                        }
+                    }
+                }
+            }
 
             /*if(placeDelay > 0) {
                 placeDelay--;
