@@ -32,6 +32,7 @@ public class TradeFinderConfig {
 
     public boolean preventAxeBreaking = true;
     public TradeMode mode = TradeMode.SINGLE;
+    public boolean tpToVillager = false;
 
     public HashMap<Enchantment, Boolean> enchantments = new HashMap<>();
 
@@ -41,6 +42,7 @@ public class TradeFinderConfig {
 
             JsonObject json = new JsonObject();
             json.addProperty("preventAxeBreaking", preventAxeBreaking);
+            json.addProperty("tpToVillager", tpToVillager);
 
             JsonObject enchantmentsJson = new JsonObject();
             enchantments.forEach((enchantment, enabled) -> enchantmentsJson.addProperty(Registries.ENCHANTMENT.getEntry(enchantment).getKey().get().getValue().toString(), enabled));
@@ -62,6 +64,8 @@ public class TradeFinderConfig {
 
             if (json.has("preventAxeBreaking"))
                 preventAxeBreaking = json.getAsJsonPrimitive("preventAxeBreaking").getAsBoolean();
+            if (json.has("tpToVillager"))
+                tpToVillager = json.getAsJsonPrimitive("tpToVillager").getAsBoolean();
             if (json.has("enchantments")) {
                 JsonObject enchantmentsJson = json.getAsJsonObject("enchantments");
                 enchantmentsJson.entrySet().forEach(entry -> {
@@ -108,7 +112,18 @@ public class TradeFinderConfig {
                                 )
                                 .controller(TickBoxController::new)
                                 .build())
-                        .build())
+                        .option(Option.createBuilder(boolean.class)
+                                .name(Text.literal("Teleport to Villager"))
+                                .tooltip(Text.literal("Teleport to the villager before the lectern is placed, to pick up items that dropped behind the lectern."))
+                                .binding(
+                                        false,
+                                        () -> tpToVillager,
+                                        value -> tpToVillager = value
+                                )
+                                .controller(TickBoxController::new)
+                                .build())
+                        .build()
+                )
                 .category(ConfigCategory.createBuilder()
                         .name(Text.literal("List Enchantments"))
                         .options(getEnchantmentOptions())
