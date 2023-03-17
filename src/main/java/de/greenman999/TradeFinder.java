@@ -43,7 +43,6 @@ public class TradeFinder {
 
     public static int placeDelay = 3;
     public static int interactDelay = 2;
-    private static boolean tpdToVillager = false;
     public static Vec3d prevPos = null;
 
     public static void stop() {
@@ -122,14 +121,16 @@ public class TradeFinder {
                         .sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             }else {
                 state = TradeState.PLACE;
-                prevPos = mc.player.getPos();
-                //mc.player.setPosition(villager.getPos());
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true));
+                if(LibrarianTradeFinder.getConfig().tpToVillager) {
+                    prevPos = mc.player.getPos();
+                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true));
+                }
             }
 
         } else if (state == TradeState.PLACE) {
-            //mc.player.setPosition(prevPos);
-            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(prevPos.x, prevPos.y, prevPos.z, true));
+            if(LibrarianTradeFinder.getConfig().tpToVillager) {
+                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(prevPos.x, prevPos.y, prevPos.z, true));
+            }
 
             BlockPos toPlace = lecternPos.down();
             MinecraftClient.getInstance().player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
