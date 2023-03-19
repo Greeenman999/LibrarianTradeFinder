@@ -1,6 +1,5 @@
 package de.greenman999.screens;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.greenman999.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
@@ -9,9 +8,11 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
@@ -19,11 +20,8 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-
-import java.util.List;
 
 public class ControlUi extends Screen {
 
@@ -57,10 +55,13 @@ public class ControlUi extends Screen {
         // create list of buttons with scrollbar
         enchantmentsListWidget = new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height, 21, this.height - 5, 20);
         this.addDrawableChild(enchantmentsListWidget);
-        System.out.println(this.width / 2 - 10);
-        System.out.println(this.height);
 
         super.init();
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
@@ -79,6 +80,7 @@ public class ControlUi extends Screen {
     public static class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
         private EnchantmentEntry hoveredEntry;
+        public GrayButtonWidget resetButton;
 
         public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
             super(client, width, height, top, bottom, itemHeight);
@@ -88,6 +90,19 @@ public class ControlUi extends Screen {
             for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
                 this.addEntry(new EnchantmentEntry(enchantment, this.width, this.height));
             }
+
+            this.resetButton = GrayButtonWidget.builder(Text.of("Reset All"), (buttonWidget) -> {
+                for(EnchantmentEntry enchantmentEntry : this.children()) {
+                    enchantmentEntry.maxPriceField.setText("64");
+                    enchantmentEntry.levelField.setText(enchantmentEntry.enchantment.getMaxLevel() + "");
+                    enchantmentEntry.enabled = false;
+                }
+            })
+                    .color(0xAF000000)
+                    .dimensions(this.width - 55, 5, 50, 15)
+                    .tooltip(Tooltip.of(Text.of("Reset all enchantments to default values")))
+                    .build();
+
             //setLeftPos(-2);
         }
 
@@ -99,6 +114,7 @@ public class ControlUi extends Screen {
             // 0xBF3AA640
             DrawableHelper.fill(matrices, 5, 5, this.width - 5, 20, 0x5FC7C0C0);
             DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("Enchantments"), 9, 9, 0xFFFFFF);
+            resetButton.render(matrices, mouseX, mouseY, delta);
             RenderSystem.disableDepthTest();
             matrices.pop();
 
@@ -170,6 +186,7 @@ public class ControlUi extends Screen {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            resetButton.mouseClicked(mouseX, mouseY, button);
             this.updateScrollingState(mouseX, mouseY, button);
             if (!this.isMouseOver(mouseX, mouseY)) {
                 return false;
@@ -210,6 +227,7 @@ public class ControlUi extends Screen {
             this.enchantment = enchantment;
             this.width = width;
             this.height = height;
+            this.enabled = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
 
             //maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 50, 20, Text.of("Max Price"));
             maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.of("Max Price"));
@@ -229,7 +247,6 @@ public class ControlUi extends Screen {
             this.y = y;
             this.entryWidth = entryWidth;
             this.entryHeight = entryHeight;
-            this.enabled = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
             if(y < 8) return;
             matrices.push();
             RenderSystem.enableDepthTest();
@@ -288,7 +305,7 @@ public class ControlUi extends Screen {
                 i = 21;
             }
             if(mouseX > this.x && mouseX < this.x + this.entryWidth - i && mouseY > y && mouseY < y + entryHeight) {
-                LibrarianTradeFinder.getConfig().enchantments.put(enchantment, !LibrarianTradeFinder.getConfig().enchantments.get(enchantment));
+                enabled = !enabled;
             }
 
             return true;
@@ -385,6 +402,89 @@ public class ControlUi extends Screen {
 
                 matrices.pop();
                 RenderSystem.disableDepthTest();
+            }
+        }
+    }
+
+    public static class GrayButtonWidget extends ButtonWidget {
+        int color;
+
+        protected GrayButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress, NarrationSupplier narrationSupplier, int color) {
+            super(x, y, width, height, message, onPress, narrationSupplier);
+            color = color;
+        }
+
+        @Override
+        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+            DrawableHelper.fill(matrices, this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
+            int j = this.active ? 16777215 : 10526880;
+            drawCenteredText(matrices, MinecraftClient.getInstance().textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        }
+
+
+        public static GrayButtonWidget.Builder builder(Text message, PressAction onPress) {
+            return new GrayButtonWidget.Builder(message, onPress);
+        }
+
+        public static class Builder extends ButtonWidget.Builder {
+            private final Text message;
+            private final PressAction onPress;
+            @Nullable
+            private Tooltip tooltip;
+            private int x;
+            private int y;
+            private int width = 150;
+            private int height = 20;
+            private NarrationSupplier narrationSupplier;
+            private int color;
+
+            public Builder(Text message, PressAction onPress) {
+                super(message, onPress);
+                this.narrationSupplier = ButtonWidget.DEFAULT_NARRATION_SUPPLIER;
+                this.message = message;
+                this.onPress = onPress;
+            }
+
+            public GrayButtonWidget.Builder position(int x, int y) {
+                this.x = x;
+                this.y = y;
+                return this;
+            }
+
+            public GrayButtonWidget.Builder width(int width) {
+                this.width = width;
+                return this;
+            }
+
+            public GrayButtonWidget.Builder size(int width, int height) {
+                this.width = width;
+                this.height = height;
+                return this;
+            }
+
+            public GrayButtonWidget.Builder dimensions(int x, int y, int width, int height) {
+                return this.position(x, y).size(width, height);
+            }
+
+            public GrayButtonWidget.Builder tooltip(@Nullable Tooltip tooltip) {
+                this.tooltip = tooltip;
+                return this;
+            }
+
+            public GrayButtonWidget.Builder narrationSupplier(NarrationSupplier narrationSupplier) {
+                this.narrationSupplier = narrationSupplier;
+                return this;
+            }
+
+            public GrayButtonWidget.Builder color(int color) {
+                this.color = color;
+                return this;
+            }
+
+            public GrayButtonWidget build() {
+                GrayButtonWidget buttonWidget = new GrayButtonWidget(this.x, this.y, this.width, this.height, this.message, this.onPress, this.narrationSupplier, this.color);
+                buttonWidget.setTooltip(this.tooltip);
+                return buttonWidget;
             }
         }
     }
