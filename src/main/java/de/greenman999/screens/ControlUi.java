@@ -263,7 +263,7 @@ public class ControlUi extends Screen {
             }
             DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
-            RenderSystem.disableDepthTest();
+            //RenderSystem.disableDepthTest();
             matrices.pop();
 
             matrices.push();
@@ -273,10 +273,11 @@ public class ControlUi extends Screen {
             maxPriceField.setY(y + 1);
             maxPriceField.render(matrices, mouseX, mouseY, tickDelta);
 
+            RenderSystem.enableDepthTest();
             levelField.setX(x + entryWidth - 21 - 15 - 14);
             levelField.setY(y + 1);
             levelField.render(matrices, mouseX, mouseY, tickDelta);
-            RenderSystem.disableDepthTest();
+            //RenderSystem.disableDepthTest();
             matrices.pop();
 
             if(mouseX > this.x + entryWidth - 21 - 10 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight && enabled) {
@@ -300,14 +301,16 @@ public class ControlUi extends Screen {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             maxPriceField.mouseClicked(mouseX, mouseY, button);
+            levelField.mouseClicked(mouseX, mouseY, button);
             int i = 0;
             if(enabled) {
-                i = 21;
+                i = 21 + 15 + 14;
             }
             if(mouseX > this.x && mouseX < this.x + this.entryWidth - i && mouseY > y && mouseY < y + entryHeight) {
                 enabled = !enabled;
+            } else if(mouseX > this.x + entryWidth - 21 - 10 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight && enabled) {
+                enabled = false;
             }
-
             return true;
         }
 
