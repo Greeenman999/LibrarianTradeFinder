@@ -3,6 +3,7 @@ package de.greenman999.mixin;
 import de.greenman999.LibrarianTradeFinder;
 import de.greenman999.TradeFinder;
 import de.greenman999.TradeState;
+import de.greenman999.config.TradeFinderConfig;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.Enchantment;
@@ -39,19 +40,9 @@ public class ClientConnectionMixin {
             for(TradeOffer tradeOffer : setTradeOffersS2CPacket.getOffers()) {
                 if(!tradeOffer.getSellItem().getItem().equals(Items.ENCHANTED_BOOK)) continue;
                 EnchantmentHelper.get(tradeOffer.getSellItem()).forEach((enchantment, level) -> {
-                    if(tradeOffer.getOriginalFirstBuyItem().getCount() <= TradeFinder.maxBookPrice && level == enchantment.getMaxLevel()) {
-                        switch (LibrarianTradeFinder.getConfig().mode) {
-                            case SINGLE ->  {
-                                if(enchantment.equals(TradeFinder.enchantment)) {
-                                    foundEnchantment(found, tradeOffer, enchantment);
-                                }
-                            }
-                            case LIST -> {
-                                if(LibrarianTradeFinder.getConfig().enchantments.get(enchantment)) {
-                                    foundEnchantment(found, tradeOffer, enchantment);
-                                }
-                            }
-                        }
+                    TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
+                    if(tradeOffer.getOriginalFirstBuyItem().getCount() <= enchantmentOption.getMaxPrice() && level == enchantmentOption.getLevel() && enchantmentOption.isEnabled()) {
+                        foundEnchantment(found, tradeOffer, enchantment);
                     }
                 });
             }

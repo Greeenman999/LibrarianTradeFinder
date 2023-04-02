@@ -1,24 +1,16 @@
 package de.greenman999;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import de.greenman999.config.TradeFinderConfig;
 import de.greenman999.screens.ControlUi;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
-
-
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.command.argument.RegistryEntryArgumentType;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -30,7 +22,7 @@ import net.minecraft.village.VillagerProfession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 @Environment(net.fabricmc.api.EnvType.CLIENT)
 public class LibrarianTradeFinder implements ClientModInitializer {
@@ -77,46 +69,13 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 							context.getSource().sendFeedback(Text.literal("Selected lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 							return 1;
 						}))
-						.then(literal("searchSingle")
-								.then(argument("enchantment", RegistryEntryArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
-													RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-													Enchantment enchantment = enchantmentRegistryEntry.value();
-
-													if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-														context.getSource().sendFeedback(Text.literal("You have not selected a librarian and lectern. Use '/tradefinder select' to select the lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
-														return 0;
-													}
-													TradeFinder.search(enchantment, 64);
-													context.getSource().sendFeedback(Text.literal("Started searching for ").append(Text.translatable(enchantment.getTranslationKey())).append(" with max price " + 64 + ".").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
-													return 1;
-												})
-												.then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
-													int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
-													RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-													Enchantment enchantment = enchantmentRegistryEntry.value();
-
-													if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-														context.getSource().sendFeedback(Text.literal("You have not selected a librarian and lectern. Use '/tradefinder select' to select the lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
-														return 0;
-													}
-													TradeFinder.search(enchantment, bookPrice);
-													context.getSource().sendFeedback(Text.literal("Started searching for ").append(Text.translatable(enchantment.getTranslationKey())).append(" with max price " + bookPrice + ".").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
-													return 1;
-												}))
-								)
-						)
-						.then(literal("searchList")
-								.executes(context -> {
+						.then(literal("searchSingle").executes(context -> {
 									if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
 										context.getSource().sendFeedback(Text.literal("You have not selected a librarian and lectern. Use '/tradefinder select' to select the lectern and librarian.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
 										return 0;
 									}
-									if(!getConfig().enchantments.containsValue(true)) {
-										context.getSource().sendFeedback(Text.literal("You have not selected any enchantments. Select the enchantments in the config menu. You can open the gui either by clicking the config icon by ModMenu or run '/tradefinder config'.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
-										return 0;
-									}
-									TradeFinder.searchList();
-									context.getSource().sendFeedback(Text.literal("Started searching for the list of enchantments you selected.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+									TradeFinder.search();
+									context.getSource().sendFeedback(Text.literal("Started searching for the list").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
 									return 1;
 								})
 						)

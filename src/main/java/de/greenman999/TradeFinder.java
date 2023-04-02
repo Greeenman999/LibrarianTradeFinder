@@ -36,8 +36,6 @@ public class TradeFinder {
     public static TradeState state = TradeState.IDLE;
     public static VillagerEntity villager = null;
     public static BlockPos lecternPos = null;
-    public static Enchantment enchantment = null;
-    public static int maxBookPrice = 0;
 
     public static int tries = 0;
 
@@ -49,21 +47,10 @@ public class TradeFinder {
         state = TradeState.IDLE;
         villager = null;
         lecternPos = null;
-        enchantment = null;
-        maxBookPrice = 0;
         tries = 0;
     }
 
-    public static void search(Enchantment enchantment, int bookPrice) {
-        TradeFinder.enchantment = enchantment;
-        TradeFinder.maxBookPrice = bookPrice;
-        LibrarianTradeFinder.getConfig().mode = TradeFinderConfig.TradeMode.SINGLE;
-        state = TradeState.CHECK;
-    }
-
-    public static void searchList() {
-        maxBookPrice = 64;
-        LibrarianTradeFinder.getConfig().mode = TradeFinderConfig.TradeMode.LIST;
+    public static void search() {
         state = TradeState.CHECK;
     }
 

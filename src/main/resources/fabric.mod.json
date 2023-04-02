@@ -16,8 +16,7 @@
 	"entrypoints": {
 		"client": [
           "de.greenman999.LibrarianTradeFinder"
-		],
-		"modmenu": [ "de.greenman999.integrations.ModMenuIntegration" ]
+		]
 	},
 	"mixins": [
 		"librarian-trade-finder.mixins.json"
