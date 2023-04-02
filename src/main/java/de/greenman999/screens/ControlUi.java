@@ -167,6 +167,36 @@ public class ControlUi extends Screen {
             this.renderDecorations(matrices, mouseX, mouseY);
             RenderSystem.enableTexture();
             RenderSystem.disableBlend();
+
+            for(EnchantmentEntry enchantmentEntry : this.children()) {
+                if(enchantmentEntry.maxPriceField.isActive()) {
+                    EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                            Text.literal("Enchantment Level 1: 5 - 19").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 2: 8 - 32").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 3: 11 - 45").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 4: 14 - 58").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 5: 17 - 64").formatted(Formatting.GRAY)
+
+                    ), enchantmentEntry.maxPriceField.getX() + 75, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.width, this.height, 580);
+                }
+
+                if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 10 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
+                    EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                            Text.literal("Set the maximum price for this enchantment.").formatted(Formatting.GREEN),
+                            Text.literal(""),
+                            Text.literal("Enchantment Level 1: 5-19").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 2: 8-32").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 3: 11-45").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 4: 14-58").formatted(Formatting.GRAY),
+                            Text.literal("Enchantment Level 5: 17-64").formatted(Formatting.GRAY)
+                    ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.width, this.height, 600);
+                }
+                if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 23 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
+                    EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                            Text.literal("Set the level for this enchantment.").formatted(Formatting.GREEN)
+                    ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.width, this.height, 600);
+                }
+            }
         }
 
         @Override
@@ -299,43 +329,6 @@ public class ControlUi extends Screen {
             levelField.render(matrices, mouseX, mouseY, tickDelta);
             RenderSystem.disableDepthTest();
             matrices.pop();
-
-            matrices.push();
-            //RenderSystem.enableDepthTest();
-            //matrices.translate(0, 0, 180);
-            if(maxPriceField.isActive()) {
-                renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
-                        Text.literal("Enchantment Level 1: 5 - 19").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 2: 8 - 32").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 3: 11 - 45").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 4: 14 - 58").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 5: 17 - 64").formatted(Formatting.GRAY)
-
-                ), maxPriceField.getX() + 75, y - 5, y + 20, this.width, this.height, 580);
-            }
-            matrices.pop();
-            matrices.push();
-
-            //RenderSystem.enableDepthTest();
-            //matrices.translate(0, 0, 200);
-            if(mouseX > this.x + entryWidth - 21 - 10 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.isActive()) {
-                renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
-                        Text.literal("Set the maximum price for this enchantment.").formatted(Formatting.GREEN),
-                        Text.literal(""),
-                        Text.literal("Enchantment Level 1: 5-19").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 2: 8-32").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 3: 11-45").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 4: 14-58").formatted(Formatting.GRAY),
-                        Text.literal("Enchantment Level 5: 17-64").formatted(Formatting.GRAY)
-                ), mouseX + 110, y - 5, y + 20, this.width, this.height, 600);
-            }
-            //RenderSystem.enableDepthTest();
-            if(mouseX > this.x + entryWidth - 21 - 15 - 14 - 23 && mouseX < this.x + this.entryWidth - 21 - 15 - 14 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.isActive()) {
-                renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
-                        Text.literal("Set the level for this enchantment.").formatted(Formatting.GREEN)
-                ), mouseX + 110, y - 5, y + 20, this.width, this.height, 600);
-            }
-            matrices.pop();
         }
 
         @Override
@@ -434,7 +427,7 @@ public class ControlUi extends Screen {
                 int drawY = y - 12;
 
                 matrices.push();
-                //RenderSystem.enableDepthTest();
+                RenderSystem.enableDepthTest();
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder bufferBuilder = tessellator.getBuffer();
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -450,15 +443,19 @@ public class ControlUi extends Screen {
                         height,
                         z
                 );
-                RenderSystem.disableDepthTest();
+                RenderSystem.enableDepthTest();
+                RenderSystem.disableTexture();
                 RenderSystem.enableBlend();
                 RenderSystem.defaultBlendFunc();
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-                matrices.translate(0, 0, z + 10);
+                RenderSystem.disableBlend();
+                RenderSystem.enableTexture();
+                matrices.translate(0.0, 0.0, z + 10.0);
 
                 text.drawWithShadow(matrices, drawX, drawY, lineHeight, -1);
 
                 matrices.pop();
+                RenderSystem.disableDepthTest();
             }
         }
     }
