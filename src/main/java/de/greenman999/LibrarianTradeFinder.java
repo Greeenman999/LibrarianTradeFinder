@@ -36,13 +36,22 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(literal("tradefinder")
 						.then(literal("select").executes(context -> {
-							HitResult hitResult = MinecraftClient.getInstance().player.raycast(3.0, 0.0F, false);
-							if(!(hitResult.getType().equals(HitResult.Type.BLOCK)) || hitResult.getType().equals(HitResult.Type.ENTITY)) {
+							HitResult hitResult = null;
+							if (MinecraftClient.getInstance().player != null) {
+								hitResult = MinecraftClient.getInstance().player.raycast(3.0, 0.0F, false);
+							}
+							if (hitResult != null && (!(hitResult.getType().equals(HitResult.Type.BLOCK)) || hitResult.getType().equals(HitResult.Type.ENTITY))) {
 								context.getSource().sendFeedback(Text.literal("You are not looking at a lectern.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
 								return 0;
 							}
-							BlockPos blockPos = ((BlockHitResult) hitResult).getBlockPos();
-							Block block = MinecraftClient.getInstance().world.getBlockState(blockPos).getBlock();
+							BlockPos blockPos = null;
+							if (hitResult != null) {
+								blockPos = ((BlockHitResult) hitResult).getBlockPos();
+							}
+							Block block = null;
+							if (MinecraftClient.getInstance().world != null) {
+								block = MinecraftClient.getInstance().world.getBlockState(blockPos).getBlock();
+							}
 							if(!(block instanceof LecternBlock)) {
 								context.getSource().sendFeedback(Text.literal("You are not looking at a lectern.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
 								return 0;
@@ -53,7 +62,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 
 							for(Entity entity : MinecraftClient.getInstance().world.getEntities()) {
 								Vec3d entityPos = entity.getPos();
-								if(entity instanceof VillagerEntity && ((VillagerEntity)entity).getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
+								if (blockPos != null && entity instanceof VillagerEntity && ((VillagerEntity) entity).getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
 									closestDistance = entityPos.distanceTo(blockPos.toCenterPos());
 									closestEntity = entity;
 								}

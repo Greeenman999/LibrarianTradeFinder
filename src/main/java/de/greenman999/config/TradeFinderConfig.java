@@ -3,25 +3,20 @@ package de.greenman999.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import dev.isxander.yacl.api.ConfigCategory;
-import dev.isxander.yacl.api.Option;
-import dev.isxander.yacl.api.YetAnotherConfigLib;
-import dev.isxander.yacl.gui.controllers.TickBoxController;
-import dev.isxander.yacl.gui.controllers.cycling.EnumController;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TradeFinderConfig {
@@ -32,6 +27,7 @@ public class TradeFinderConfig {
 
     public boolean preventAxeBreaking = true;
     public boolean tpToVillager = false;
+    public boolean legitMode = true;
 
     public HashMap<Enchantment, EnchantmentOption> enchantments = new HashMap<>();
 
@@ -43,9 +39,10 @@ public class TradeFinderConfig {
             json.addProperty("configVersion", 1);
             json.addProperty("preventAxeBreaking", preventAxeBreaking);
             json.addProperty("tpToVillager", tpToVillager);
+            json.addProperty("legitMode", legitMode);
 
             JsonObject enchantmentsJson = new JsonObject();
-            enchantments.forEach((enchantment, enchantmentOption) -> enchantmentsJson.add(Registries.ENCHANTMENT.getEntry(enchantment).getKey().get().getValue().toString(), enchantmentOption.toJson()));
+            enchantments.forEach((enchantment, enchantmentOption) -> enchantmentsJson.add(Registries.ENCHANTMENT.getEntry(enchantment).getKey().orElseThrow().getValue().toString(), enchantmentOption.toJson()));
             json.add("enchantments", enchantmentsJson);
 
             Files.writeString(configFile, gson.toJson(json));
@@ -67,6 +64,8 @@ public class TradeFinderConfig {
                     preventAxeBreaking = json.getAsJsonPrimitive("preventAxeBreaking").getAsBoolean();
                 if (json.has("tpToVillager"))
                     tpToVillager = json.getAsJsonPrimitive("tpToVillager").getAsBoolean();
+                if (json.has("legitMode"))
+                    legitMode = json.getAsJsonPrimitive("legitMode").getAsBoolean();
                 if (json.has("enchantments")) {
                     JsonObject enchantmentsJson = json.getAsJsonObject("enchantments");
                     enchantmentsJson.entrySet().forEach(entry -> {
@@ -99,55 +98,6 @@ public class TradeFinderConfig {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
-    /*public Screen createGui(Screen parent) {
-        return YetAnotherConfigLib.createBuilder()
-                .title(Text.literal("Librarian Trade Finder Config"))
-                .category(ConfigCategory.createBuilder()
-                        .name(Text.literal("General"))
-                        .option(Option.createBuilder(boolean.class)
-                                .name(Text.literal("Prevent axe breaking"))
-                                .tooltip(Text.literal("Stop the searching process if your axe is about to break."))
-                                .binding(
-                                        true,
-                                        () -> preventAxeBreaking,
-                                        value -> preventAxeBreaking = value
-                                )
-                                .controller(TickBoxController::new)
-                                .build())
-                        .option(Option.createBuilder(boolean.class)
-                                .name(Text.literal("Teleport to Villager"))
-                                .tooltip(Text.literal("Teleport to the villager before the lectern is placed, to pick up items that dropped behind the lectern."))
-                                .binding(
-                                        false,
-                                        () -> tpToVillager,
-                                        value -> tpToVillager = value
-                                )
-                                .controller(TickBoxController::new)
-                                .build())
-                        .build()
-                )
-                .category(ConfigCategory.createBuilder()
-                        .name(Text.literal("List Enchantments"))
-                        .options(getEnchantmentOptions())
-                        .build())
-                .save(this::save)
-                .build()
-                .generateScreen(parent);
-    }
-
-    public @NotNull Collection<Option<?>> getEnchantmentOptions() {
-        return enchantments.entrySet().stream().map(entry -> Option.createBuilder(boolean.class)
-                .name(entry.getKey().getName(entry.getKey().getMaxLevel()).copy().formatted(Formatting.WHITE))
-                .tooltip(Text.literal("Search for this enchantment."))
-                .binding(
-                        false,
-                        entry::getValue,
-                        entry::setValue
-                )
-                .controller(TickBoxController::new)
-                .build()).collect(Collectors.toList());
-    }*/
-
     public static class EnchantmentOption {
 
         public Enchantment enchantment;
@@ -175,7 +125,7 @@ public class TradeFinderConfig {
 
         public JsonObject toJson() {
             JsonObject json = new JsonObject();
-            json.addProperty("enchantment", Registries.ENCHANTMENT.getEntry(enchantment).getKey().get().getValue().toString());
+            json.addProperty("enchantment", Registries.ENCHANTMENT.getEntry(enchantment).getKey().orElseThrow().getValue().toString());
             json.addProperty("enabled", enabled);
             json.addProperty("level", level);
             json.addProperty("maxPrice", maxPrice);
@@ -204,10 +154,6 @@ public class TradeFinderConfig {
 
         public int getMaxPrice() {
             return maxPrice;
-        }
-
-        public Enchantment getEnchantment() {
-            return enchantment;
         }
 
         public String getName() {

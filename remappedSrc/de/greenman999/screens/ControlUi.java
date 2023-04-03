@@ -24,6 +24,8 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+import java.text.Normalizer;
+
 public class ControlUi extends Screen {
 
     private final Screen parent;
@@ -36,10 +38,10 @@ public class ControlUi extends Screen {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawVerticalLine(matrices, this.width / 2, 5, this.height - 5, 0xFFC7C0C0);
+        this.drawVerticalLine(matrices, this.width / 2, 5, this.height - 5, 0xFFC7C0C0);
         super.renderBackground(matrices);
 
-        DrawableHelper.fill(matrices, this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
+        DrawableHelper.fill(matrices, this.width / 2 + 6, 5, this.width - 5, 20, 0x5FC7C0C0);
         DrawableHelper.drawTextWithShadow(matrices, this.textRenderer, Text.of("Options"), this.width / 2 + 10, 9, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
     }
@@ -47,9 +49,7 @@ public class ControlUi extends Screen {
     @Override
     protected void init() {
         this.addDrawableChild(GrayButtonWidget.builder(ScreenTexts.DONE, (buttonWidget) -> {
-                    if (this.client != null) {
-                        this.client.setScreen(this.parent);
-                    }
+                    this.client.setScreen(this.parent);
                     LibrarianTradeFinder.getConfig().save();
                 })
                         .dimensions(this.width - 107, this.height - 27, 100, 20)
@@ -66,7 +66,6 @@ public class ControlUi extends Screen {
                 })
                 .dimensions(this.width / 2 + 6, 25, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
-                .tooltip(Tooltip.of(Text.of("Teleports you to the villager when the lectern is broken to try to pickup the lecterns dropped there.")))
                 .build());
         this.addDrawableChild(GrayButtonWidget.builder(getButtonText("Prevent the axe from breaking", LibrarianTradeFinder.getConfig().preventAxeBreaking), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().preventAxeBreaking = !LibrarianTradeFinder.getConfig().preventAxeBreaking;
@@ -75,16 +74,6 @@ public class ControlUi extends Screen {
                 })
                 .dimensions(this.width / 2 + 6 , 50, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
-                .tooltip(Tooltip.of(Text.of("Stops the search process when your axe is about to break.")))
-                .build());
-        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("Legit Mode", LibrarianTradeFinder.getConfig().legitMode), (buttonWidget) -> {
-                    LibrarianTradeFinder.getConfig().legitMode = !LibrarianTradeFinder.getConfig().legitMode;
-
-                    buttonWidget.setMessage(getButtonText("Legit Mode", LibrarianTradeFinder.getConfig().legitMode));
-                })
-                .dimensions(this.width / 2 + 6, 75, this.width / 2 - 10, 20)
-                .color(0x4FC7C0C0)
-                .tooltip(Tooltip.of(Text.of("When enabled automatically look at the lectern or villager to prevent getting flagged by some anti cheats.")))
                 .build());
 
         super.init();
@@ -100,9 +89,7 @@ public class ControlUi extends Screen {
             return true;
         }else if (keyCode == 256) {
             LibrarianTradeFinder.getConfig().save();
-            if (this.client != null) {
-                this.client.setScreen(parent);
-            }
+            this.client.setScreen(parent);
             return true;
         }else {
             return false;
@@ -125,6 +112,7 @@ public class ControlUi extends Screen {
 
     public static class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
+        private EnchantmentEntry hoveredEntry;
         public GrayButtonWidget resetButton;
 
         public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
@@ -133,7 +121,7 @@ public class ControlUi extends Screen {
             setRenderHorizontalShadows(false);
 
             for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
-                this.addEntry(new EnchantmentEntry(enchantment));
+                this.addEntry(new EnchantmentEntry(enchantment, this.width, this.height));
             }
 
             this.resetButton = GrayButtonWidget.builder(Text.of("Reset All"), (buttonWidget) -> {
@@ -143,7 +131,7 @@ public class ControlUi extends Screen {
                     enchantmentEntry.enabled = false;
                 }
             })
-                    .color(0x5FC7C0C0)
+                    .color(0x4FC7C0C0)
                     .dimensions(this.width - 55, 5, 50, 15)
                     .tooltip(Tooltip.of(Text.of("Reset all enchantments to default values")))
                     .build();
@@ -157,7 +145,7 @@ public class ControlUi extends Screen {
             RenderSystem.enableDepthTest();
             matrices.translate(0, 0, 100);
             // 0xBF3AA640
-            DrawableHelper.fill(matrices, 5, 5, this.width - 5, 20, 0xAFC7C0C0);
+            DrawableHelper.fill(matrices, 5, 5, this.width - 5, 20, 0x5FC7C0C0);
             DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("Enchantments"), 9, 9, 0xFFFFFF);
             resetButton.render(matrices, mouseX, mouseY, delta);
             RenderSystem.disableDepthTest();
@@ -169,9 +157,11 @@ public class ControlUi extends Screen {
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferBuilder = tessellator.getBuffer();
             RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+            this.hoveredEntry = this.isMouseOver((double)mouseX, (double)mouseY) ? this.getEntryAtPosition((double)mouseX, (double)mouseY) : null;
 
             int o = this.getMaxScroll();
             if (o > 0) {
+                RenderSystem.disableTexture();
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                 int m = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
                 m = MathHelper.clamp(m, 32, this.bottom - this.top - 8);
@@ -181,23 +171,24 @@ public class ControlUi extends Screen {
                 }
 
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-                bufferBuilder.vertex(i, this.bottom, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(j, this.bottom, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(j, this.top, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(i, this.top, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(i, n + m, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(j, n + m, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(j, n, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(i, n, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(i, n + m - 1, 0.0).color(192, 192, 192, 255).next();
-                bufferBuilder.vertex(j - 1, n + m - 1, 0.0).color(192, 192, 192, 255).next();
-                bufferBuilder.vertex(j - 1, n, 0.0).color(192, 192, 192, 255).next();
-                bufferBuilder.vertex(i, n, 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex((double)i, (double)this.bottom, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)j, (double)this.bottom, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)j, (double)this.top, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)i, (double)this.top, 0.0).color(0, 0, 0, 100).next();
+                bufferBuilder.vertex((double)i, (double)(n + m), 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)j, (double)(n + m), 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)j, (double)n, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)i, (double)n, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex((double)i, (double)(n + m - 1), 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex((double)(j - 1), (double)(n + m - 1), 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex((double)(j - 1), (double)n, 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex((double)i, (double)n, 0.0).color(192, 192, 192, 255).next();
                 tessellator.draw();
             }
             this.renderList(matrices, mouseX, mouseY, delta);
 
             this.renderDecorations(matrices, mouseX, mouseY);
+            RenderSystem.enableTexture();
             RenderSystem.disableBlend();
 
             for(EnchantmentEntry enchantmentEntry : this.children()) {
@@ -209,7 +200,7 @@ public class ControlUi extends Screen {
                             Text.literal("Enchantment Level 4: 14 - 58").formatted(Formatting.GRAY),
                             Text.literal("Enchantment Level 5: 17 - 64").formatted(Formatting.GRAY)
 
-                    ), enchantmentEntry.maxPriceField.getX() + 75, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 580);
+                    ), enchantmentEntry.maxPriceField.getX() + 75, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.width, this.height, 580);
                 }
 
                 if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 10 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
@@ -221,12 +212,12 @@ public class ControlUi extends Screen {
                             Text.literal("Enchantment Level 3: 11-45").formatted(Formatting.GRAY),
                             Text.literal("Enchantment Level 4: 14-58").formatted(Formatting.GRAY),
                             Text.literal("Enchantment Level 5: 17-64").formatted(Formatting.GRAY)
-                    ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
+                    ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.width, this.height, 600);
                 }
                 if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 23 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
                     EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
                             Text.literal("Set the level for this enchantment.").formatted(Formatting.GREEN)
-                    ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
+                    ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.width, this.height, 600);
                 }
             }
         }
@@ -285,17 +276,21 @@ public class ControlUi extends Screen {
         private final Enchantment enchantment;
         public final TextFieldWidget maxPriceField;
         public final TextFieldWidget levelField;
+        private final int width;
+        private final int height;
         private int x;
         private int y;
         private int entryWidth;
         private int entryHeight;
 
-        public boolean enabled;
+        public boolean enabled = false;
         public TradeFinderConfig.EnchantmentOption enchantmentOption;
 
-        public EnchantmentEntry(Enchantment enchantment) {
+        public EnchantmentEntry(Enchantment enchantment, int width, int height) {
             super();
             this.enchantment = enchantment;
+            this.width = width;
+            this.height = height;
             this.enabled = LibrarianTradeFinder.getConfig().enchantments.get(enchantment).isEnabled();
             this.enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
 
@@ -347,13 +342,13 @@ public class ControlUi extends Screen {
             matrices.push();
             RenderSystem.enableDepthTest();
             matrices.translate(0, 0, 50);
-            maxPriceField.setX(x + entryWidth - 21);
-            maxPriceField.setY(y + 1);
+            maxPriceField.method_46421(x + entryWidth - 21);
+            maxPriceField.method_46419(y + 1);
             maxPriceField.render(matrices, mouseX, mouseY, tickDelta);
 
             RenderSystem.enableDepthTest();
-            levelField.setX(x + entryWidth - 21 - 15 - 14);
-            levelField.setY(y + 1);
+            levelField.method_46421(x + entryWidth - 21 - 15 - 14);
+            levelField.method_46419(y + 1);
             levelField.render(matrices, mouseX, mouseY, tickDelta);
             RenderSystem.disableDepthTest();
             matrices.pop();
@@ -428,7 +423,14 @@ public class ControlUi extends Screen {
             return maxPriceFieldReturn || levelFieldReturn;
         }
 
-        public static void renderMultilineTooltip(MatrixStack matrices, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenHeight, int z) {
+        private void drawOutline(MatrixStack matrices, int x1, int y1, int x2, int y2, int width, int color) {
+            DrawableHelper.fill(matrices, x1, y1, x2, y1 + width, color);
+            DrawableHelper.fill(matrices, x2, y1, x2 - width, y2, color);
+            DrawableHelper.fill(matrices, x1, y2, x2, y2 - width, color);
+            DrawableHelper.fill(matrices, x1, y1, x1 + width, y2, color);
+        }
+
+        public static void renderMultilineTooltip(MatrixStack matrices, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenWidth, int screenHeight, int z) {
             if (text.count() > 0) {
                 int maxWidth = text.getMaxWidth();
                 int lineHeight = textRenderer.fontHeight + 1;
@@ -465,10 +467,12 @@ public class ControlUi extends Screen {
                         z
                 );
                 RenderSystem.enableDepthTest();
+                RenderSystem.disableTexture();
                 RenderSystem.enableBlend();
                 RenderSystem.defaultBlendFunc();
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
                 RenderSystem.disableBlend();
+                RenderSystem.enableTexture();
                 matrices.translate(0.0, 0.0, z + 10.0);
 
                 text.drawWithShadow(matrices, drawX, drawY, lineHeight, -1);
@@ -491,7 +495,7 @@ public class ControlUi extends Screen {
         public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             DrawableHelper.fill(matrices, this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
             int j = this.active ? 16777215 : 10526880;
-            drawCenteredTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+            drawCenteredText(matrices, MinecraftClient.getInstance().textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
         }
 
 
