@@ -2,6 +2,7 @@ package de.greenman999.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.greenman999.LibrarianTradeFinder;
+import de.greenman999.TradeFinder;
 import de.greenman999.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
@@ -36,7 +36,7 @@ public class ControlUi extends Screen {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawVerticalLine(matrices, this.width / 2, 5, this.height - 5, 0xFFC7C0C0);
+        drawVerticalLine(matrices, this.width / 2, 4, this.height - 5, 0xFFC7C0C0);
         super.renderBackground(matrices);
 
         DrawableHelper.fill(matrices, this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
@@ -46,14 +46,18 @@ public class ControlUi extends Screen {
 
     @Override
     protected void init() {
-        this.addDrawableChild(GrayButtonWidget.builder(ScreenTexts.DONE, (buttonWidget) -> {
+        this.addDrawableChild(GrayButtonWidget.builder(Text.of("Save"), (buttonWidget) -> {
                     if (this.client != null) {
                         this.client.setScreen(this.parent);
                     }
                     LibrarianTradeFinder.getConfig().save();
                 })
-                        .dimensions(this.width - 107, this.height - 27, 100, 20)
+                        .dimensions(this.width / 2 + 6, this.height - 25, width / 2 / 2 - 6 - 3, 20)
                         .color(0x4FC7C0C0)
+                .build());
+        this.addDrawableChild(GrayButtonWidget.builder(Text.of(Formatting.GREEN + "Start Search"), (buttonWidget) -> TradeFinder.search())
+                .dimensions(this.width / 2 + this.width / 2 / 2 + 3, this.height - 25, width / 2 / 2 - 6, 20)
+                .color(0x4FC7C0C0)
                 .build());
 
         enchantmentsListWidget = new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height, 21, this.height - 5, 20);
@@ -144,7 +148,7 @@ public class ControlUi extends Screen {
                 }
             })
                     .color(0x5FC7C0C0)
-                    .dimensions(this.width - 55, 5, 50, 15)
+                    .dimensions(this.width - 45, 5, 50, 15)
                     .tooltip(Tooltip.of(Text.of("Reset all enchantments to default values")))
                     .build();
 
@@ -157,7 +161,7 @@ public class ControlUi extends Screen {
             RenderSystem.enableDepthTest();
             matrices.translate(0, 0, 100);
             // 0xBF3AA640
-            DrawableHelper.fill(matrices, 5, 5, this.width - 5, 20, 0xAFC7C0C0);
+            DrawableHelper.fill(matrices, 5, 5, this.width + 5, 20, 0xAFC7C0C0);
             DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("Enchantments"), 9, 9, 0xFFFFFF);
             resetButton.render(matrices, mouseX, mouseY, delta);
             RenderSystem.disableDepthTest();
@@ -181,18 +185,18 @@ public class ControlUi extends Screen {
                 }
 
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-                bufferBuilder.vertex(i, this.bottom, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(j, this.bottom, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(j, this.top, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(i, this.top, 0.0).color(0, 0, 0, 100).next();
-                bufferBuilder.vertex(i, n + m, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(j, n + m, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(j, n, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(i, n, 0.0).color(128, 128, 128, 255).next();
-                bufferBuilder.vertex(i, n + m - 1, 0.0).color(192, 192, 192, 255).next();
-                bufferBuilder.vertex(j - 1, n + m - 1, 0.0).color(192, 192, 192, 255).next();
-                bufferBuilder.vertex(j - 1, n, 0.0).color(192, 192, 192, 255).next();
-                bufferBuilder.vertex(i, n, 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex(i - 1, this.bottom, 0.0).color(0xFF3A3A3A).next();
+                bufferBuilder.vertex(j - 1, this.bottom, 0.0).color(0xFF3A3A3A).next();
+                bufferBuilder.vertex(j - 1, this.top + 4, 0.0).color(0xFF3A3A3A).next();
+                bufferBuilder.vertex(i - 1, this.top + 4, 0.0).color(0xFF3A3A3A).next();
+                bufferBuilder.vertex(i - 1, n + m, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex(j - 1, n + m, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex(j - 1, n + 4, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex(i - 1, n + 4, 0.0).color(128, 128, 128, 255).next();
+                bufferBuilder.vertex(i - 1, n + m - 1, 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex(j - 1 - 1, n + m - 1, 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex(j - 1 - 1, n + 4, 0.0).color(192, 192, 192, 255).next();
+                bufferBuilder.vertex(i - 1, n + 4, 0.0).color(192, 192, 192, 255).next();
                 tessellator.draw();
             }
             this.renderList(matrices, mouseX, mouseY, delta);
@@ -212,7 +216,7 @@ public class ControlUi extends Screen {
                     ), enchantmentEntry.maxPriceField.getX() + 75, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 580);
                 }
 
-                if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 10 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
+                if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 10 - 2 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 2 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
                     EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
                             Text.literal("Set the maximum price for this enchantment.").formatted(Formatting.GREEN),
                             Text.literal(""),
@@ -223,7 +227,7 @@ public class ControlUi extends Screen {
                             Text.literal("Enchantment Level 5: 17-64").formatted(Formatting.GRAY)
                     ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
                 }
-                if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 23 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
+                if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 23 - 2 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 2 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
                     EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
                             Text.literal("Set the level for this enchantment.").formatted(Formatting.GREEN)
                     ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
@@ -238,7 +242,7 @@ public class ControlUi extends Screen {
 
         @Override
         public int getRowWidth() {
-            return this.width - 10;
+            return this.width - 12;
         }
 
         @Override
@@ -266,7 +270,7 @@ public class ControlUi extends Screen {
                 EnchantmentEntry entry = this.getEntryAtPosition(mouseX, mouseY + 4);
                 if (entry != null) {
                     if (entry.mouseClicked(mouseX, mouseY, button)) {
-                        this.setFocused(entry);
+                        //this.setFocused(entry);
                         this.setDragging(true);
                         return true;
                     }
@@ -370,7 +374,7 @@ public class ControlUi extends Screen {
             if(mouseX > this.x && mouseX < this.x + this.entryWidth - i && mouseY > y && mouseY < y + entryHeight) {
                 enabled = !enabled;
                 return true;
-            } else if(mouseX > this.x + entryWidth - 21 - 10 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight && enabled) {
+            } else if(mouseX > this.x + entryWidth - 21 - 10 - 4 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight && enabled) {
                 enabled = false;
                 return true;
             }
@@ -489,9 +493,14 @@ public class ControlUi extends Screen {
 
         @Override
         public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+            matrices.push();
+            RenderSystem.enableDepthTest();
+            matrices.translate(0, 0, 200);
             DrawableHelper.fill(matrices, this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
             int j = this.active ? 16777215 : 10526880;
             drawCenteredTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+            matrices.pop();
+            RenderSystem.disableDepthTest();
         }
 
 
