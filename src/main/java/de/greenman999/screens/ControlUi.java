@@ -339,11 +339,11 @@ public class ControlUi extends Screen {
             maxPriceField.setVisible(enabled);
             levelField.setVisible(enabled);
             if(enabled) {
-                context.fill(x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
+                context.fill(RenderLayer.getGui(), x, x + entryWidth, y, y + entryHeight, 0x3F00FF00);
                 context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("$:"), x + entryWidth - 21 - 10, y + (entryHeight / 2 / 2), 0xFFFFFF);
                 context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("LVL:"), x + entryWidth - 21 - 15 - 14 - 23, y + (entryHeight / 2 / 2), 0xFFFFFF);
             }else {
-                context.fill(x, y, x + entryWidth, y + entryHeight, 0x1AC7C0C0);
+                context.fill(RenderLayer.getGui(), x, x + entryWidth, y, y + entryHeight, 0x1AC7C0C0);
             }
             context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
