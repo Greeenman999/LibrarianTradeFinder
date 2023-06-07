@@ -40,7 +40,7 @@ dependencies {
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
-	modImplementation 'dev.isxander:yet-another-config-lib:2.2.0'
+	//modImplementation 'dev.isxander:yet-another-config-lib:2.2.0'
 }
 
 processResources {

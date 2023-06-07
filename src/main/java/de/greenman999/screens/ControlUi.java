@@ -7,7 +7,7 @@ import de.greenman999.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -22,7 +22,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
+
 
 public class ControlUi extends Screen {
 
@@ -35,13 +35,13 @@ public class ControlUi extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        drawVerticalLine(matrices, this.width / 2, 4, this.height - 5, 0xFFC7C0C0);
-        super.renderBackground(matrices);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        context.drawVerticalLine(this.width / 2, 4, this.height - 5, 0xFFC7C0C0);
+        super.renderBackground(context);
 
-        DrawableHelper.fill(matrices, this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
-        DrawableHelper.drawTextWithShadow(matrices, this.textRenderer, Text.of("Options"), this.width / 2 + 10, 9, 0xFFFFFF);
-        super.render(matrices, mouseX, mouseY, delta);
+        context.fill(this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
+        context.drawTextWithShadow(this.textRenderer, Text.of("Options"), this.width / 2 + 10, 9, 0xFFFFFF);
+        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class ControlUi extends Screen {
             this.resetButton = GrayButtonWidget.builder(Text.of("Reset All"), (buttonWidget) -> {
                 for(EnchantmentEntry enchantmentEntry : this.children()) {
                     enchantmentEntry.maxPriceField.setText("64");
-                    enchantmentEntry.levelField.setText(enchantmentEntry.enchantment.getMaxLevel() + "");
+                    enchantmentEntry.levelField.setText(String.valueOf(enchantmentEntry.enchantment.getMaxLevel()));
                     enchantmentEntry.enabled = false;
                 }
             })
@@ -156,18 +156,19 @@ public class ControlUi extends Screen {
         }
 
         @Override
-        public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+            MatrixStack matrices = context.getMatrices();
             matrices.push();
             RenderSystem.enableDepthTest();
             matrices.translate(0, 0, 100);
             // 0xBF3AA640
-            DrawableHelper.fill(matrices, 5, 5, this.width + 5, 20, 0xAFC7C0C0);
-            DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("Enchantments"), 9, 9, 0xFFFFFF);
-            resetButton.render(matrices, mouseX, mouseY, delta);
+            context.fill(5, 5, this.width + 5, 20, 0xAFC7C0C0);
+            context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("Enchantments"), 9, 9, 0xFFFFFF);
+            resetButton.render(context, mouseX, mouseY, delta);
             RenderSystem.disableDepthTest();
             matrices.pop();
 
-            this.renderBackground(matrices);
+            this.renderBackground(context);
             int i = this.getScrollbarPositionX();
             int j = i + 6;
             Tessellator tessellator = Tessellator.getInstance();
@@ -199,14 +200,14 @@ public class ControlUi extends Screen {
                 bufferBuilder.vertex(i - 1, n + 4, 0.0).color(192, 192, 192, 255).next();
                 tessellator.draw();
             }
-            this.renderList(matrices, mouseX, mouseY, delta);
+            this.renderList(context, mouseX, mouseY, delta);
 
-            this.renderDecorations(matrices, mouseX, mouseY);
+            this.renderDecorations(context, mouseX, mouseY);
             RenderSystem.disableBlend();
 
             for(EnchantmentEntry enchantmentEntry : this.children()) {
                 if(enchantmentEntry.maxPriceField.isActive()) {
-                    EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                    EnchantmentEntry.renderMultilineTooltip(context, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
                             Text.literal("Enchantment Level 1: 5 - 19").formatted(Formatting.GRAY),
                             Text.literal("Enchantment Level 2: 8 - 32").formatted(Formatting.GRAY),
                             Text.literal("Enchantment Level 3: 11 - 45").formatted(Formatting.GRAY),
@@ -217,7 +218,7 @@ public class ControlUi extends Screen {
                 }
 
                 if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 10 - 2 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 2 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
-                    EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                    EnchantmentEntry.renderMultilineTooltip(context, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
                             Text.literal("Set the maximum price for this enchantment.").formatted(Formatting.GREEN),
                             Text.literal(""),
                             Text.literal("Enchantment Level 1: 5-19").formatted(Formatting.GRAY),
@@ -228,7 +229,7 @@ public class ControlUi extends Screen {
                     ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
                 }
                 if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 23 - 2 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 2 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
-                    EnchantmentEntry.renderMultilineTooltip(matrices, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
+                    EnchantmentEntry.renderMultilineTooltip(context, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
                             Text.literal("Set the level for this enchantment.").formatted(Formatting.GREEN)
                     ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
                 }
@@ -306,24 +307,25 @@ public class ControlUi extends Screen {
             //maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 50, 20, Text.of("Max Price"));
             maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.of("Max Price"));
             maxPriceField.setMaxLength(2);
-            maxPriceField.setText(enchantmentOption.getMaxPrice() + "");
+            maxPriceField.setText(String.valueOf(enchantmentOption.getMaxPrice()));
             //maxPriceField.setDrawsBackground(false);
 
             levelField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 14, 14, Text.of("Level"));
             levelField.setMaxLength(1);
-            levelField.setText(enchantmentOption.getLevel() + "");
+            levelField.setText(String.valueOf(enchantmentOption.getLevel()));
 
         }
 
         @Override
-        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            MatrixStack matrices = context.getMatrices();
             this.x = x;
             this.y = y;
             this.entryWidth = entryWidth;
             this.entryHeight = entryHeight;
 
             if(!maxPriceField.getText().equals("") && !maxPriceField.isActive() && (Integer.parseInt(maxPriceField.getText()) > 64 || Integer.parseInt(maxPriceField.getText()) < 5)) maxPriceField.setText("64");
-            if(!levelField.getText().equals("") && !levelField.isActive() && (Integer.parseInt(levelField.getText()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getText()) < 1)) levelField.setText(enchantment.getMaxLevel() + "");
+            if(!levelField.getText().equals("") && !levelField.isActive() && (Integer.parseInt(levelField.getText()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getText()) < 1)) levelField.setText(String.valueOf(enchantment.getMaxLevel()));
 
             enchantmentOption.setEnabled(enabled);
             enchantmentOption.setMaxPrice(!maxPriceField.getText().equals("") ? Integer.parseInt(maxPriceField.getText()) : 64);
@@ -337,13 +339,13 @@ public class ControlUi extends Screen {
             maxPriceField.setVisible(enabled);
             levelField.setVisible(enabled);
             if(enabled) {
-                DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
-                DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("$:"), x + entryWidth - 21 - 10, y + (entryHeight / 2 / 2), 0xFFFFFF);
-                DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.of("LVL:"), x + entryWidth - 21 - 15 - 14 - 23, y + (entryHeight / 2 / 2), 0xFFFFFF);
+                context.fill(x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
+                context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("$:"), x + entryWidth - 21 - 10, y + (entryHeight / 2 / 2), 0xFFFFFF);
+                context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("LVL:"), x + entryWidth - 21 - 15 - 14 - 23, y + (entryHeight / 2 / 2), 0xFFFFFF);
             }else {
-                DrawableHelper.fill(matrices, x, y, x + entryWidth, y + entryHeight, 0x0FC7C0C0);
+                context.fill(x, y, x + entryWidth, y + entryHeight, 0x1AC7C0C0);
             }
-            DrawableHelper.drawTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
+            context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
             //RenderSystem.disableDepthTest();
             matrices.pop();
@@ -353,12 +355,12 @@ public class ControlUi extends Screen {
             matrices.translate(0, 0, 50);
             maxPriceField.setX(x + entryWidth - 21);
             maxPriceField.setY(y + 1);
-            maxPriceField.render(matrices, mouseX, mouseY, tickDelta);
+            maxPriceField.render(context, mouseX, mouseY, tickDelta);
 
             RenderSystem.enableDepthTest();
             levelField.setX(x + entryWidth - 21 - 15 - 14);
             levelField.setY(y + 1);
-            levelField.render(matrices, mouseX, mouseY, tickDelta);
+            levelField.render(context, mouseX, mouseY, tickDelta);
             RenderSystem.disableDepthTest();
             matrices.pop();
         }
@@ -383,6 +385,7 @@ public class ControlUi extends Screen {
 
         @Override
         public boolean charTyped(char chr, int modifiers) {
+            System.out.println(chr);
             if(!Character.isDigit(chr)) return false;
             boolean maxPriceFieldReturn = maxPriceField.charTyped(chr, modifiers);
             boolean levelFieldReturn = levelField.charTyped(chr, modifiers);
@@ -398,7 +401,8 @@ public class ControlUi extends Screen {
 
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            if(keyCode >= 320 && keyCode <= 329) return false;
+            System.out.println(keyCode);
+            if(keyCode != 259 && (keyCode < 320 || keyCode > 329)) return false;
             boolean maxPriceFieldReturn = maxPriceField.keyPressed(keyCode, scanCode, modifiers);
             boolean levelFieldReturn = levelField.keyPressed(keyCode, scanCode, modifiers);
             return maxPriceFieldReturn || levelFieldReturn;
@@ -412,7 +416,7 @@ public class ControlUi extends Screen {
 
         @Override
         public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-            if(keyCode >= 320 && keyCode <= 329) return false;
+            if(keyCode != 259 && (keyCode < 320 || keyCode > 329)) return false;
             boolean maxPriceFieldReturn = maxPriceField.keyReleased(keyCode, scanCode, modifiers);
             boolean levelFieldReturn = levelField.keyReleased(keyCode, scanCode, modifiers);
             return maxPriceFieldReturn || levelFieldReturn;
@@ -432,7 +436,8 @@ public class ControlUi extends Screen {
             return maxPriceFieldReturn || levelFieldReturn;
         }
 
-        public static void renderMultilineTooltip(MatrixStack matrices, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenHeight, int z) {
+        public static void renderMultilineTooltip(DrawContext context, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenHeight, int z) {
+            MatrixStack matrices = context.getMatrices();
             if (text.count() > 0) {
                 int maxWidth = text.getMaxWidth();
                 int lineHeight = textRenderer.fontHeight + 1;
@@ -457,11 +462,8 @@ public class ControlUi extends Screen {
                 BufferBuilder bufferBuilder = tessellator.getBuffer();
                 RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-                Matrix4f matrix4f = matrices.peek().getPositionMatrix();
                 TooltipBackgroundRenderer.render(
-                        DrawableHelper::fillGradient,
-                        matrix4f,
-                        bufferBuilder,
+                        context,
                         drawX,
                         drawY,
                         maxWidth,
@@ -475,7 +477,7 @@ public class ControlUi extends Screen {
                 RenderSystem.disableBlend();
                 matrices.translate(0.0, 0.0, z + 10.0);
 
-                text.drawWithShadow(matrices, drawX, drawY, lineHeight, -1);
+                text.drawWithShadow(context, drawX, drawY, lineHeight, -1);
 
                 matrices.pop();
                 RenderSystem.disableDepthTest();
@@ -492,13 +494,14 @@ public class ControlUi extends Screen {
         }
 
         @Override
-        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+            MatrixStack matrices = context.getMatrices();
             matrices.push();
             RenderSystem.enableDepthTest();
             matrices.translate(0, 0, 200);
-            DrawableHelper.fill(matrices, this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
+            context.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
             int j = this.active ? 16777215 : 10526880;
-            drawCenteredTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+            context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
             matrices.pop();
             RenderSystem.disableDepthTest();
         }
