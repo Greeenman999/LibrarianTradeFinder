@@ -26,6 +26,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.VillagerProfession;
 
+import java.util.Objects;
+
 public class TradeFinder {
 
     public static TradeState state = TradeState.IDLE;
@@ -109,6 +111,12 @@ public class TradeFinder {
                 mc.interactionManager.updateBlockBreakingProgress(lecternPos, Direction.UP);
                 player.networkHandler
                         .sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            }else {
+                state = TradeState.PLACE;
+                if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getNetworkHandler() != null) {
+                    prevPos = mc.player.getPos();
+                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true));
+                }
             }
 
         } else if (state == TradeState.PLACE) {
