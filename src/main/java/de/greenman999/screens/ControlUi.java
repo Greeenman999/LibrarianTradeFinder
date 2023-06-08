@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -16,6 +17,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;
@@ -100,6 +102,7 @@ public class ControlUi extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        enchantmentsListWidget.keyPressed(keyCode, scanCode, modifiers);
         if(super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }else if (keyCode == 256) {
@@ -114,6 +117,12 @@ public class ControlUi extends Screen {
     }
 
     @Override
+    public boolean charTyped(char chr, int modifiers) {
+        enchantmentsListWidget.charTyped(chr, modifiers);
+        return super.charTyped(chr, modifiers);
+    }
+
+    @Override
     public void tick() {
         super.tick();
     }
@@ -121,8 +130,10 @@ public class ControlUi extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for(EnchantmentEntry enchantmentEntry : enchantmentsListWidget.children()) {
-            enchantmentEntry.maxPriceField.mouseClicked(mouseX, mouseY, button);
-            enchantmentEntry.levelField.mouseClicked(mouseX, mouseY, button);
+            boolean maxPriceFieldSuccess = enchantmentEntry.maxPriceField.mouseClicked(mouseX, mouseY, button);
+            boolean levelFieldSuccess = enchantmentEntry.levelField.mouseClicked(mouseX, mouseY, button);
+            enchantmentEntry.maxPriceField.setFocused(maxPriceFieldSuccess);
+            enchantmentEntry.levelField.setFocused(levelFieldSuccess);
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -283,6 +294,36 @@ public class ControlUi extends Screen {
                 return button == 0 && mouseX >= (double)this.getScrollbarPositionX() && mouseX < (double)(this.getScrollbarPositionX() + 6);
             }
         }
+
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            if(!(keyCode == InputUtil.GLFW_KEY_BACKSPACE || (keyCode >= InputUtil.GLFW_KEY_0 && keyCode <= InputUtil.GLFW_KEY_9) || keyCode == InputUtil.GLFW_KEY_LEFT || keyCode == InputUtil.GLFW_KEY_RIGHT)) return false;
+            for (EnchantmentEntry enchantmentEntry : this.children()) {
+                enchantmentEntry.maxPriceField.keyPressed(keyCode, scanCode, modifiers);
+                enchantmentEntry.levelField.keyPressed(keyCode, scanCode, modifiers);
+            }
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        @Override
+        public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+            if(!(keyCode == InputUtil.GLFW_KEY_BACKSPACE || (keyCode >= InputUtil.GLFW_KEY_0 && keyCode <= InputUtil.GLFW_KEY_9) || keyCode == InputUtil.GLFW_KEY_LEFT || keyCode == InputUtil.GLFW_KEY_RIGHT)) return false;
+            for (EnchantmentEntry enchantmentEntry : this.children()) {
+                enchantmentEntry.maxPriceField.keyReleased(keyCode, scanCode, modifiers);
+                enchantmentEntry.levelField.keyReleased(keyCode, scanCode, modifiers);
+            }
+            return super.keyReleased(keyCode, scanCode, modifiers);
+        }
+
+        @Override
+        public boolean charTyped(char chr, int modifiers) {
+            if(!Character.isDigit(chr)) return false;
+            for (EnchantmentEntry enchantmentEntry : this.children()) {
+                enchantmentEntry.maxPriceField.charTyped(chr, modifiers);
+                enchantmentEntry.levelField.charTyped(chr, modifiers);
+            }
+            return super.charTyped(chr, modifiers);
+        }
     }
 
     public static class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
@@ -332,23 +373,17 @@ public class ControlUi extends Screen {
             enchantmentOption.setLevel(!levelField.getText().equals("") ? Integer.parseInt(levelField.getText()) : enchantment.getMaxLevel());
 
             if(y < 8) return;
-            matrices.push();
-            RenderSystem.enableDepthTest();
-            matrices.translate(0, 0, -100);
 
             maxPriceField.setVisible(enabled);
             levelField.setVisible(enabled);
             if(enabled) {
-                context.fill(RenderLayer.getGui(), x, x + entryWidth, y, y + entryHeight, 0x3F00FF00);
+                context.fill(x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
                 context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("$:"), x + entryWidth - 21 - 10, y + (entryHeight / 2 / 2), 0xFFFFFF);
                 context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("LVL:"), x + entryWidth - 21 - 15 - 14 - 23, y + (entryHeight / 2 / 2), 0xFFFFFF);
             }else {
-                context.fill(RenderLayer.getGui(), x, x + entryWidth, y, y + entryHeight, 0x1AC7C0C0);
+                context.fill(x, y, x + entryWidth, y + entryHeight, 0x1AC7C0C0);
             }
             context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
-
-            //RenderSystem.disableDepthTest();
-            matrices.pop();
 
             matrices.push();
             RenderSystem.enableDepthTest();
@@ -367,8 +402,12 @@ public class ControlUi extends Screen {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            boolean maxPriceFieldReturn = maxPriceField.mouseClicked(mouseX, mouseY, button);
-            boolean levelFieldReturn = levelField.mouseClicked(mouseX, mouseY, button);
+            /*boolean b = maxPriceField.mouseClicked(mouseX, mouseY, button);
+            boolean b1 = levelField.mouseClicked(mouseX, mouseY, button);
+            System.out.println(b + " " + b1);
+            maxPriceField.setFocused(b);
+            levelField.setFocused(b1);*/
+
             int i = 0;
             if(enabled) {
                 i = 21 + 15 + 14;
@@ -380,16 +419,7 @@ public class ControlUi extends Screen {
                 enabled = false;
                 return true;
             }
-            return maxPriceFieldReturn || levelFieldReturn;
-        }
-
-        @Override
-        public boolean charTyped(char chr, int modifiers) {
-            System.out.println(chr);
-            if(!Character.isDigit(chr)) return false;
-            boolean maxPriceFieldReturn = maxPriceField.charTyped(chr, modifiers);
-            boolean levelFieldReturn = levelField.charTyped(chr, modifiers);
-            return maxPriceFieldReturn || levelFieldReturn;
+            return false;
         }
 
         @Override
@@ -400,26 +430,9 @@ public class ControlUi extends Screen {
         }
 
         @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            System.out.println(keyCode);
-            if(keyCode != 259 && (keyCode < 320 || keyCode > 329)) return false;
-            boolean maxPriceFieldReturn = maxPriceField.keyPressed(keyCode, scanCode, modifiers);
-            boolean levelFieldReturn = levelField.keyPressed(keyCode, scanCode, modifiers);
-            return maxPriceFieldReturn || levelFieldReturn;
-        }
-
-        @Override
         public void mouseMoved(double mouseX, double mouseY) {
             maxPriceField.mouseMoved(mouseX, mouseY);
             levelField.mouseMoved(mouseX, mouseY);
-        }
-
-        @Override
-        public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-            if(keyCode != 259 && (keyCode < 320 || keyCode > 329)) return false;
-            boolean maxPriceFieldReturn = maxPriceField.keyReleased(keyCode, scanCode, modifiers);
-            boolean levelFieldReturn = levelField.keyReleased(keyCode, scanCode, modifiers);
-            return maxPriceFieldReturn || levelFieldReturn;
         }
 
         @Override
@@ -495,6 +508,7 @@ public class ControlUi extends Screen {
 
         @Override
         public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+            this.setFocused(false);
             MatrixStack matrices = context.getMatrices();
             matrices.push();
             RenderSystem.enableDepthTest();
@@ -506,6 +520,13 @@ public class ControlUi extends Screen {
             RenderSystem.disableDepthTest();
         }
 
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            if(keyCode == InputUtil.GLFW_KEY_ENTER || keyCode == InputUtil.GLFW_KEY_SPACE || keyCode == InputUtil.GLFW_KEY_UP || keyCode == InputUtil.GLFW_KEY_DOWN || keyCode == InputUtil.GLFW_KEY_LEFT || keyCode == InputUtil.GLFW_KEY_RIGHT) {
+                return false;
+            }
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
 
         public static GrayButtonWidget.Builder builder(Text message, PressAction onPress) {
             return new GrayButtonWidget.Builder(message, onPress);
