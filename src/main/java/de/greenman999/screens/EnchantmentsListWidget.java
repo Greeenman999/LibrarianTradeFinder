@@ -5,17 +5,14 @@ import de.greenman999.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.render.*;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.MathHelper;
 
 public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
@@ -53,49 +50,14 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         matrices.push();
         RenderSystem.enableDepthTest();
         matrices.translate(0, 0, 100);
-        // 0xBF3AA640
+
         context.fill(5, 5, this.width + 5, 20, 0xAFC7C0C0);
         context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("tradefinderui.enchantments.title"), 9, 9, 0xFFFFFF);
         resetButton.render(context, mouseX, mouseY, delta);
+
         RenderSystem.disableDepthTest();
         matrices.pop();
 
-        /*this.renderBackground(context);
-        int i = this.getScrollbarPositionX();
-        int j = i + 6;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-
-        int o = this.getMaxScroll();
-        if (o > 0) {
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            int m = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
-            m = MathHelper.clamp(m, 32, this.bottom - this.top - 8);
-            int n = (int)this.getScrollAmount() * (this.bottom - this.top - m) / o + this.top;
-            if (n < this.top) {
-                n = this.top;
-            }
-
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-            bufferBuilder.vertex(i - 1, this.bottom, 0.0).color(0xFF3A3A3A).next();
-            bufferBuilder.vertex(j - 1, this.bottom, 0.0).color(0xFF3A3A3A).next();
-            bufferBuilder.vertex(j - 1, this.top + 4, 0.0).color(0xFF3A3A3A).next();
-            bufferBuilder.vertex(i - 1, this.top + 4, 0.0).color(0xFF3A3A3A).next();
-            bufferBuilder.vertex(i - 1, n + m, 0.0).color(128, 128, 128, 255).next();
-            bufferBuilder.vertex(j - 1, n + m, 0.0).color(128, 128, 128, 255).next();
-            bufferBuilder.vertex(j - 1, n + 4, 0.0).color(128, 128, 128, 255).next();
-            bufferBuilder.vertex(i - 1, n + 4, 0.0).color(128, 128, 128, 255).next();
-            bufferBuilder.vertex(i - 1, n + m - 1, 0.0).color(192, 192, 192, 255).next();
-            bufferBuilder.vertex(j - 1 - 1, n + m - 1, 0.0).color(192, 192, 192, 255).next();
-            bufferBuilder.vertex(j - 1 - 1, n + 4, 0.0).color(192, 192, 192, 255).next();
-            bufferBuilder.vertex(i - 1, n + 4, 0.0).color(192, 192, 192, 255).next();
-            tessellator.draw();
-        }
-        this.renderList(context, mouseX, mouseY, delta);
-
-        this.renderDecorations(context, mouseX, mouseY);
-        RenderSystem.disableBlend();*/
         super.render(context, mouseX, mouseY, delta);
 
         for(EnchantmentEntry enchantmentEntry : this.children()) {
@@ -159,24 +121,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         resetButton.mouseClicked(mouseX, mouseY, button);
 
         return super.mouseClicked(mouseX, mouseY, button);
-        /*this.updateScrollingState(mouseX, mouseY, button);
-        if (!this.isMouseOver(mouseX, mouseY)) {
-            return false;
-        } else {
-            EnchantmentEntry entry = this.getEntryAtPosition(mouseX, mouseY + 4);
-            if (entry != null) {
-                if (entry.mouseClicked(mouseX, mouseY, button)) {
-                    //this.setFocused(entry);
-                    this.setDragging(true);
-                    return true;
-                }
-            } else if (button == 0) {
-                this.clickedHeader((int)(mouseX - (double)(this.left + this.width / 2 - this.getRowWidth() / 2)), (int)(mouseY - (double)this.top) + (int)this.getScrollAmount() - 4);
-                return true;
-            }
-
-            return button == 0 && mouseX >= (double)this.getScrollbarPositionX() && mouseX < (double)(this.getScrollbarPositionX() + 6);
-        }*/
     }
 
     @Override
