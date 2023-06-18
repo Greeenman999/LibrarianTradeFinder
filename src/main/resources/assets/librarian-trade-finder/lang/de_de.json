@@ -25,7 +25,7 @@
   "tradefinderui.options.prevent-axe-break.tooltip": "Stoppt den Suchvorgang, wenn Ihre Axt zu zerbrechen droht.",
   "tradefinderui.options.legit-mode": "Legitimer Modus: %d",
   "tradefinderui.options.legit-mode.tooltip": "Wenn diese Funktion aktiviert ist, schauen Sie automatisch auf das Lesepult oder den Dorfbewohner, um zu verhindern, dass Sie von einigen Anti-Cheats markiert werden.",
-  "tradefinderui.reset": "Alle zurücksetzen",
+  "tradefinderui.reset": "Reset All",
   "tradefinderui.reset.tooltip": "Alle Verzauberungen auf Standardwerte zurücksetzen",
   "tradefinderui.enchantments.title": "Verzauberungen",
   "tradefinderui.enchantments.price.tooltip.1": "Verzauberung Stufe 1: 5 - 19",
