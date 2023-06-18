@@ -31,7 +31,7 @@ public class ControlUi extends Screen {
     private EnchantmentsListWidget enchantmentsListWidget;
 
     public ControlUi(Screen parent) {
-        super(Text.literal("Librarian Trade Finder"));
+        super(Text.translatable("tradefinderui.screen.title"));
         this.parent = parent;
     }
 
@@ -41,13 +41,13 @@ public class ControlUi extends Screen {
         super.renderBackground(context);
 
         context.fill(this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
-        context.drawTextWithShadow(this.textRenderer, Text.of("Options"), this.width / 2 + 10, 9, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("tradefinderui.options.title"), this.width / 2 + 10, 9, 0xFFFFFF);
         super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
     protected void init() {
-        this.addDrawableChild(GrayButtonWidget.builder(Text.of("Save"), (buttonWidget) -> {
+        this.addDrawableChild(GrayButtonWidget.builder(Text.translatable("tradefinderui.buttons.save"), (buttonWidget) -> {
                     if (this.client != null) {
                         this.client.setScreen(this.parent);
                     }
@@ -56,7 +56,13 @@ public class ControlUi extends Screen {
                         .dimensions(this.width / 2 + 6, this.height - 25, width / 2 / 2 - 6 - 3, 20)
                         .color(0x4FC7C0C0)
                 .build());
-        this.addDrawableChild(GrayButtonWidget.builder(Text.of(Formatting.GREEN + "Start Search"), (buttonWidget) -> TradeFinder.search())
+        this.addDrawableChild(GrayButtonWidget.builder(Text.translatable("tradefinderui.buttons.start").formatted(Formatting.GREEN), (buttonWidget) -> {
+                            TradeFinder.search();
+                            if (this.client != null) {
+                                this.client.setScreen(this.parent);
+                            }
+                            LibrarianTradeFinder.getConfig().save();
+                        })
                 .dimensions(this.width / 2 + this.width / 2 / 2 + 3, this.height - 25, width / 2 / 2 - 6, 20)
                 .color(0x4FC7C0C0)
                 .build());
@@ -64,39 +70,39 @@ public class ControlUi extends Screen {
         enchantmentsListWidget = new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height, 21, this.height - 5, 20);
         this.addDrawableChild(enchantmentsListWidget);
 
-        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("Teleport to the villager", LibrarianTradeFinder.getConfig().tpToVillager), (buttonWidget) -> {
+        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().tpToVillager = !LibrarianTradeFinder.getConfig().tpToVillager;
 
-                    buttonWidget.setMessage(getButtonText("Teleport to the villager", LibrarianTradeFinder.getConfig().tpToVillager));
+                    buttonWidget.setMessage(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager));
                 })
                 .dimensions(this.width / 2 + 6, 25, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
-                .tooltip(Tooltip.of(Text.of("Teleports you to the villager when the lectern is broken to try to pickup the lecterns dropped there.")))
+                .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.tp-to-villager.tooltip")))
                 .build());
-        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("Prevent the axe from breaking", LibrarianTradeFinder.getConfig().preventAxeBreaking), (buttonWidget) -> {
+        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.prevent-axe-break", LibrarianTradeFinder.getConfig().preventAxeBreaking), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().preventAxeBreaking = !LibrarianTradeFinder.getConfig().preventAxeBreaking;
 
-                    buttonWidget.setMessage(getButtonText("Prevent the axe from breaking", LibrarianTradeFinder.getConfig().preventAxeBreaking));
+                    buttonWidget.setMessage(getButtonText("tradefinderui.options.prevent-axe-break", LibrarianTradeFinder.getConfig().preventAxeBreaking));
                 })
                 .dimensions(this.width / 2 + 6 , 50, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
-                .tooltip(Tooltip.of(Text.of("Stops the search process when your axe is about to break.")))
+                .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.prevent-axe-break.tooltip")))
                 .build());
-        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("Legit Mode", LibrarianTradeFinder.getConfig().legitMode), (buttonWidget) -> {
+        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.legit-mode", LibrarianTradeFinder.getConfig().legitMode), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().legitMode = !LibrarianTradeFinder.getConfig().legitMode;
 
-                    buttonWidget.setMessage(getButtonText("Legit Mode", LibrarianTradeFinder.getConfig().legitMode));
+                    buttonWidget.setMessage(getButtonText("tradefinderui.options.legit-mode", LibrarianTradeFinder.getConfig().legitMode));
                 })
                 .dimensions(this.width / 2 + 6, 75, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
-                .tooltip(Tooltip.of(Text.of("When enabled automatically look at the lectern or villager to prevent getting flagged by some anti cheats.")))
+                .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.legit-mode.tooltip")))
                 .build());
 
         super.init();
     }
 
-    public Text getButtonText(String text, boolean enabled) {
-        return Text.of(text + ": " + (enabled ? Formatting.GREEN + "Enabled" : Formatting.RED + "Disabled"));
+    public Text getButtonText(String key, boolean enabled) {
+        return Text.translatable(key, (enabled ? Formatting.GREEN + "Enabled" : Formatting.RED + "Disabled"));
     }
 
     @Override
@@ -150,7 +156,7 @@ public class ControlUi extends Screen {
                 this.addEntry(new EnchantmentEntry(enchantment));
             }
 
-            this.resetButton = GrayButtonWidget.builder(Text.of("Reset All"), (buttonWidget) -> {
+            this.resetButton = GrayButtonWidget.builder(Text.translatable("tradefinderui.reset"), (buttonWidget) -> {
                 for(EnchantmentEntry enchantmentEntry : this.children()) {
                     enchantmentEntry.maxPriceField.setText("64");
                     enchantmentEntry.levelField.setText(String.valueOf(enchantmentEntry.enchantment.getMaxLevel()));
@@ -159,7 +165,7 @@ public class ControlUi extends Screen {
             })
                     .color(0x5FC7C0C0)
                     .dimensions(this.width - 45, 5, 50, 15)
-                    .tooltip(Tooltip.of(Text.of("Reset all enchantments to default values")))
+                    .tooltip(Tooltip.of(Text.translatable("tradefinderui.reset.tooltip")))
                     .build();
 
             //setLeftPos(-2);
@@ -173,7 +179,7 @@ public class ControlUi extends Screen {
             matrices.translate(0, 0, 100);
             // 0xBF3AA640
             context.fill(5, 5, this.width + 5, 20, 0xAFC7C0C0);
-            context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("Enchantments"), 9, 9, 0xFFFFFF);
+            context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("tradefinderui.enchantments.title"), 9, 9, 0xFFFFFF);
             resetButton.render(context, mouseX, mouseY, delta);
             RenderSystem.disableDepthTest();
             matrices.pop();
@@ -218,29 +224,29 @@ public class ControlUi extends Screen {
             for(EnchantmentEntry enchantmentEntry : this.children()) {
                 if(enchantmentEntry.maxPriceField.isActive()) {
                     EnchantmentEntry.renderMultilineTooltip(context, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
-                            Text.literal("Enchantment Level 1: 5 - 19").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 2: 8 - 32").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 3: 11 - 45").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 4: 14 - 58").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 5: 17 - 64").formatted(Formatting.GRAY)
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.1").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.2").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.3").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.4").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.5").formatted(Formatting.GRAY)
 
                     ), enchantmentEntry.maxPriceField.getX() + 75, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 580);
                 }
 
                 if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 10 - 2 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 2 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
                     EnchantmentEntry.renderMultilineTooltip(context, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
-                            Text.literal("Set the maximum price for this enchantment.").formatted(Formatting.GREEN),
-                            Text.literal(""),
-                            Text.literal("Enchantment Level 1: 5-19").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 2: 8-32").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 3: 11-45").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 4: 14-58").formatted(Formatting.GRAY),
-                            Text.literal("Enchantment Level 5: 17-64").formatted(Formatting.GRAY)
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.title").formatted(Formatting.GREEN),
+                            Text.empty(),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.1").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.2").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.3").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.4").formatted(Formatting.GRAY),
+                            Text.translatable("tradefinderui.enchantments.price.tooltip.5").formatted(Formatting.GRAY)
                     ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
                 }
                 if(mouseX > enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 23 - 2 && mouseX < enchantmentEntry.x + enchantmentEntry.entryWidth - 21 - 15 - 14 - 2 && mouseY > enchantmentEntry.y && mouseY < enchantmentEntry.y + enchantmentEntry.entryHeight && enchantmentEntry.enabled && !enchantmentEntry.maxPriceField.isActive()) {
                     EnchantmentEntry.renderMultilineTooltip(context, MinecraftClient.getInstance().textRenderer, MultilineText.create(MinecraftClient.getInstance().textRenderer,
-                            Text.literal("Set the level for this enchantment.").formatted(Formatting.GREEN)
+                            Text.translatable("tradefinderui.enchantments.level.tooltip").formatted(Formatting.GREEN)
                     ), mouseX + 110, enchantmentEntry.y - 5, enchantmentEntry.y + 20, this.height, 600);
                 }
             }
@@ -345,12 +351,12 @@ public class ControlUi extends Screen {
             this.enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
 
             //maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 50, 20, Text.of("Max Price"));
-            maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.of("Max Price"));
+            maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.translatable("tradefinderui.enchantments.price.name"));
             maxPriceField.setMaxLength(2);
             maxPriceField.setText(String.valueOf(enchantmentOption.getMaxPrice()));
             //maxPriceField.setDrawsBackground(false);
 
-            levelField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 14, 14, Text.of("Level"));
+            levelField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 14, 14, Text.translatable("tradefinderui.enchantments.level.name"));
             levelField.setMaxLength(1);
             levelField.setText(String.valueOf(enchantmentOption.getLevel()));
 

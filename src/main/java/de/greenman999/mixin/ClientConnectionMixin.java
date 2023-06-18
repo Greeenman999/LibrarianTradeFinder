@@ -48,7 +48,7 @@ public class ClientConnectionMixin {
                 EnchantmentHelper.get(tradeOffer.getSellItem()).forEach((enchantment, level) -> {
                     TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
                     if(tradeOffer.getOriginalFirstBuyItem().getCount() <= enchantmentOption.getMaxPrice() && level == enchantmentOption.getLevel() && enchantmentOption.isEnabled()) {
-                        foundEnchantment(found, tradeOffer, enchantment);
+                        foundEnchantment(found, tradeOffer, enchantment, level);
                     }
                 });
             }
@@ -59,15 +59,10 @@ public class ClientConnectionMixin {
         }
     }
 
-    private void foundEnchantment(AtomicBoolean found, TradeOffer tradeOffer, Enchantment enchantment) {
+    private void foundEnchantment(AtomicBoolean found, TradeOffer tradeOffer, Enchantment enchantment, int level) {
         TradeFinder.stop();
         found.set(true);
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
-                Text.literal("Found enchantment ").formatted(Formatting.GREEN)
-                        .append(enchantment.getName(enchantment.getMaxLevel()))
-                        .append(Text.literal(" for ").formatted(Formatting.GREEN))
-                        .append(Text.literal(String.valueOf(tradeOffer.getOriginalFirstBuyItem().getCount())).formatted(Formatting.GRAY))
-                        .append(Text.literal(" emeralds!")).formatted(Formatting.GREEN));
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.found", enchantment.getName(level), tradeOffer.getOriginalFirstBuyItem().getCount()).formatted(Formatting.GREEN));
     }
 
 }

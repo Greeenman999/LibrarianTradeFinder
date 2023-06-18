@@ -1,9 +1,11 @@
 package de.greenman999;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -21,6 +23,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -50,9 +53,50 @@ public class TradeFinder {
         state = TradeState.CHECK;
     }
 
-    public static void select(VillagerEntity villagerEntity, BlockPos blockPos) {
-        villager = villagerEntity;
+    public static boolean select() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        HitResult hitResult = null;
+        if (MinecraftClient.getInstance().player != null) {
+            hitResult = MinecraftClient.getInstance().player.raycast(3.0, 0.0F, false);
+        }
+        if (hitResult != null && (!(hitResult.getType().equals(HitResult.Type.BLOCK)) || hitResult.getType().equals(HitResult.Type.ENTITY))) {
+            mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.not-looking-at-lectern").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            return false;
+        }
+        BlockPos blockPos = null;
+        if (hitResult != null) {
+            blockPos = ((BlockHitResult) hitResult).getBlockPos();
+        }
+        Block block = null;
+        if (MinecraftClient.getInstance().world != null) {
+            block = MinecraftClient.getInstance().world.getBlockState(blockPos).getBlock();
+        }
+        if(!(block instanceof LecternBlock)) {
+            mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.not-looking-at-lectern").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            return false;
+        }
+
+        double closestDistance = Double.POSITIVE_INFINITY;
+        Entity closestEntity = null;
+
+        for(Entity entity : MinecraftClient.getInstance().world.getEntities()) {
+            Vec3d entityPos = entity.getPos();
+            if (blockPos != null && entity instanceof VillagerEntity && ((VillagerEntity) entity).getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
+                closestDistance = entityPos.distanceTo(blockPos.toCenterPos());
+                closestEntity = entity;
+            }
+        }
+
+        VillagerEntity foundVillager = (VillagerEntity) closestEntity;
+        if(foundVillager == null) {
+            mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.no-librarian-found").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            return false;
+        }
+
+
+        villager = foundVillager;
         lecternPos = blockPos;
+        return true;
     }
 
     public static void tick() {
@@ -62,9 +106,9 @@ public class TradeFinder {
         ClientPlayerEntity player = mc.player;
         if(player == null) return;
         switch (state) {
-            case CHECK -> mc.inGameHud.setOverlayMessage(Text.literal("checking trade --- attempt: " + tries).formatted(Formatting.GRAY), false);
-            case BREAK -> mc.inGameHud.setOverlayMessage(Text.literal("breaking lectern --- attempt: " + tries).formatted(Formatting.GRAY), false);
-            case PLACE -> mc.inGameHud.setOverlayMessage(Text.literal("placing lectern --- attempt: " + tries).formatted(Formatting.GRAY), false);
+            case CHECK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.check", tries).formatted(Formatting.GRAY), false);
+            case BREAK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.break", tries).formatted(Formatting.GRAY), false);
+            case PLACE -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.place", tries).formatted(Formatting.GRAY), false);
         }
 
         if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN)) {
@@ -86,7 +130,7 @@ public class TradeFinder {
             if(result == ActionResult.SUCCESS) {
                 state = TradeState.WAITING_FOR_PACKET;
             }else {
-                mc.inGameHud.getChatHud().addMessage(Text.literal("Failed to interact with villager. Try again.").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+                mc.inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.check.interact.failed").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
                 stop();
             }
 
@@ -101,7 +145,7 @@ public class TradeFinder {
                 int remainingDurability = mainHand.getMaxDamage() - mainHand.getDamage();
                 if(remainingDurability <= 5 && LibrarianTradeFinder.getConfig().preventAxeBreaking) {
                     stop();
-                    mc.inGameHud.getChatHud().addMessage(Text.literal("The searching process was stopped because your axe is about to break.").formatted(Formatting.RED));
+                    mc.inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.break.axe.breaking").formatted(Formatting.RED));
                     return;
                 }
             }
