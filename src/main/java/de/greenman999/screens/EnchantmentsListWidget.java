@@ -5,6 +5,7 @@ import de.greenman999.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.EntryListWidget;
@@ -23,6 +24,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
         super(client, width, height, top, bottom, itemHeight);
         setRenderBackground(false);
+        setRenderSelection(false);
         setRenderHorizontalShadows(false);
 
         for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
@@ -46,6 +48,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.setSelected(null);
         MatrixStack matrices = context.getMatrices();
         matrices.push();
         RenderSystem.enableDepthTest();
@@ -57,7 +60,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         RenderSystem.disableDepthTest();
         matrices.pop();
 
-        this.renderBackground(context);
+        /*this.renderBackground(context);
         int i = this.getScrollbarPositionX();
         int j = i + 6;
         Tessellator tessellator = Tessellator.getInstance();
@@ -92,7 +95,8 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         this.renderList(context, mouseX, mouseY, delta);
 
         this.renderDecorations(context, mouseX, mouseY);
-        RenderSystem.disableBlend();
+        RenderSystem.disableBlend();*/
+        super.render(context, mouseX, mouseY, delta);
 
         for(EnchantmentEntry enchantmentEntry : this.children()) {
             if(enchantmentEntry.maxPriceField.isActive()) {
@@ -137,23 +141,25 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     @Override
     protected int getScrollbarPositionX() {
-        return this.width;
+        return this.width - 1;
     }
 
     @Override
     public int getRowTop(int index) {
-        return this.top + 4 - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
+        return this.top - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
     }
 
     @Override
     public int getRowLeft() {
-        return this.left + this.width / 2 - this.getRowWidth() / 2;
+        return this.left + this.width / 2 - this.getRowWidth() / 2 - 1;
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         resetButton.mouseClicked(mouseX, mouseY, button);
-        this.updateScrollingState(mouseX, mouseY, button);
+
+        return super.mouseClicked(mouseX, mouseY, button);
+        /*this.updateScrollingState(mouseX, mouseY, button);
         if (!this.isMouseOver(mouseX, mouseY)) {
             return false;
         } else {
@@ -170,7 +176,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
             }
 
             return button == 0 && mouseX >= (double)this.getScrollbarPositionX() && mouseX < (double)(this.getScrollbarPositionX() + 6);
-        }
+        }*/
     }
 
     @Override
