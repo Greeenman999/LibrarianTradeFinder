@@ -91,12 +91,6 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            /*boolean b = maxPriceField.mouseClicked(mouseX, mouseY, button);
-            boolean b1 = levelField.mouseClicked(mouseX, mouseY, button);
-            System.out.println(b + " " + b1);
-            maxPriceField.setFocused(b);
-            levelField.setFocused(b1);*/
-
         int i = 0;
         if(enabled) {
             i = 21 + 15 + 14;

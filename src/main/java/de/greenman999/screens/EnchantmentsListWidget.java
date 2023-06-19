@@ -13,6 +13,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 
 public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
@@ -40,7 +42,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.reset.tooltip")))
                 .build();
 
-        //setLeftPos(-2);
+        this.right = this.width + 7;
     }
 
     @Override
@@ -151,5 +153,17 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
             enchantmentEntry.levelField.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
+    }
+
+    @Nullable
+    @Override
+    protected EnchantmentEntry getEntryAtPosition(double x, double y) {
+        int i = this.getRowWidth() / 2;
+        int j = this.left + this.width / 2;
+        int k = j - i;
+        int l = j + i;
+        int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollAmount();
+        int n = m / this.itemHeight;
+        return x < (double)this.getScrollbarPositionX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
     }
 }

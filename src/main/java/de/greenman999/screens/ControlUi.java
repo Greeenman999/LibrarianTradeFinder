@@ -126,5 +126,4 @@ public class ControlUi extends Screen {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
 }
