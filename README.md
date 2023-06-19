@@ -29,7 +29,7 @@ The compiled jar should be under build/libs/.
 
 <details>
 <summary><u>Usage Demo Video</u></summary>
-https://github.com/Greeenman999/LibrarianTradeFinder/assets/81023792/4be7caf6-e5a3-4ee1-9bfa-bb13b7a3aa8e
+https://youtu.be/yM-0zCL1qAw
 </details>
 
 ### 1.19.4 and below
