@@ -121,7 +121,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         resetButton.mouseClicked(mouseX, mouseY, button);
-
+        System.out.println();
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

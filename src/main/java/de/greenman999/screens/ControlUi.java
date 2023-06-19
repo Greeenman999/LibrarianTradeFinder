@@ -8,7 +8,6 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-
 public class ControlUi extends Screen {
 
     private final Screen parent;
@@ -91,7 +90,6 @@ public class ControlUi extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        enchantmentsListWidget.keyPressed(keyCode, scanCode, modifiers);
         if(super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }else if (keyCode == 256) {
@@ -103,17 +101,6 @@ public class ControlUi extends Screen {
         }else {
             return false;
         }
-    }
-
-    @Override
-    public boolean charTyped(char chr, int modifiers) {
-        enchantmentsListWidget.charTyped(chr, modifiers);
-        return super.charTyped(chr, modifiers);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
     }
 
     @Override

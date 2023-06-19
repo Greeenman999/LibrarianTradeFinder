@@ -105,12 +105,12 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         return false;
     }
 
-    @Override
+/*    @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         boolean maxPriceFieldReturn = maxPriceField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         boolean levelFieldReturn = levelField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         return maxPriceFieldReturn || levelFieldReturn;
-    }
+    }*/
 
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
