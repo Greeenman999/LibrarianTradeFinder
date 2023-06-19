@@ -38,8 +38,6 @@ public class TradeFinder {
 
     public static int tries = 0;
 
-    //public static int placeDelay = 3;
-    //public static int interactDelay = 2;
     public static Vec3d prevPos = null;
 
     public static void stop() {
@@ -117,11 +115,6 @@ public class TradeFinder {
             if(LibrarianTradeFinder.getConfig().legitMode) {
                 player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, villagerPosition);
             }
-            /*if(interactDelay > 0) {
-                interactDelay--;
-                return;
-            }
-            interactDelay = 2;*/
 
             ActionResult result = null;
             if (mc.interactionManager != null) {
@@ -201,11 +194,6 @@ public class TradeFinder {
                 }
             }
 
-            /*if(placeDelay > 0) {
-                placeDelay--;
-                return;
-            }
-            placeDelay = 3;*/
             BlockHitResult hit = new BlockHitResult(new Vec3d(lecternPos.getX(), lecternPos.getY(),
                     lecternPos.getZ()), Direction.UP, lecternPos.down(), false);
             if (mc.interactionManager != null) {
