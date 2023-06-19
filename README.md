@@ -23,7 +23,7 @@ The compiled jar should be under build/libs/.
 6. Open Config Screen with the keybinding (Default: `C`) or execute `/tradefinder config`.
 7. On the left side, select the enchantments you want to search for, by simply clicking on them. Then enter the maximum price and level you want to search for.
 8. Configure the other settings on the right to your liking.
-9. Either press the Button `Start Search`, exit the config screen and press the keybinding to start the search (Default: `O`) or execute `/tradefinder search`.
+9. Either press the Button `Start Search`, exit the config screen and press the keybinding to start the search (Default: `O`) or execute `/tradefinder start`.
 10. If you want to stop the search before you found the enchantment, execute `/tradefinder stop` or press the keybinding (Default: `O`).
 
 
