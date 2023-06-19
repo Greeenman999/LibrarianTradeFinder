@@ -26,8 +26,15 @@ The compiled jar should be under build/libs/.
 9. Either press the Button `Start Search`, exit the config screen and press the keybinding to start the search (Default: `O`) or execute `/tradefinder search`.
 10. If you want to stop the search before you found the enchantment, execute `/tradefinder stop` or press the keybinding (Default: `O`).
 
+
 <details>
-<summary>1.19.4 and below</summary>
+<summary><u>Usage Demo Video</u></summary>
+https://github.com/Greeenman999/LibrarianTradeFinder/assets/81023792/4be7caf6-e5a3-4ee1-9bfa-bb13b7a3aa8e
+</details>
+
+### 1.19.4 and below
+<details>
+<summary>click to view</summary>
 ### Common Steps
 1. Encase the villager in a 1x1 area.
 2. Place down a Lectern in front of the villager.
