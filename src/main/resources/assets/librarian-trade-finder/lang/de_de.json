@@ -6,6 +6,7 @@
   "commands.tradefinder.select.success": "Lesepult und Bibliothekar wurden ausgewählt.",
   "commands.tradefinder.start.not-selected": "Sie haben keinen Bibliothekar und kein Lesepult ausgewählt. Verwenden Sie '/tradefinder select' oder eine Tastenkombination, um das Lesepult und den Bibliothekar auszuwählen.",
   "commands.tradefinder.start.success": "Die Suche wurde begonnen.",
+  "commands.tradefinder.search.no-enchantments": "Sie müssen mindestens eine Verzauberung, die gesucht werden soll, auswählen.",
   "commands.tradefinder.stop.success": "Die Suche wurde gestoppt.",
   "commands.tradefinder.select.not-looking-at-lectern": "Sie schauen kein Lesepult an.",
   "commands.tradefinder.select.no-librarian-found": "Es wurde kein Bibliothekar gefunden.",

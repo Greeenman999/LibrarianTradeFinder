@@ -1,5 +1,6 @@
 package de.greenman999;
 
+import de.greenman999.config.TradeFinderConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
@@ -48,7 +49,11 @@ public class TradeFinder {
     }
 
     public static void search() {
-        state = TradeState.CHECK;
+        if(TradeFinderConfig.INSTANCE.enchantments.values().stream().anyMatch(e -> e.enabled)) {
+            state = TradeState.CHECK;
+        }else {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.search.no-enchantments").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+        }
     }
 
     public static boolean select() {

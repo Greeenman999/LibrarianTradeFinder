@@ -2,10 +2,12 @@ package de.greenman999.screens;
 
 import de.greenman999.LibrarianTradeFinder;
 import de.greenman999.TradeFinder;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 
 public class ControlUi extends Screen {
@@ -40,11 +42,16 @@ public class ControlUi extends Screen {
                         .color(0x4FC7C0C0)
                 .build());
         this.addDrawableChild(GrayButtonWidget.builder(Text.translatable("tradefinderui.buttons.start").formatted(Formatting.GREEN), (buttonWidget) -> {
-                            TradeFinder.search();
-                            if (this.client != null) {
-                                this.client.setScreen(this.parent);
+                            if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && client != null) {
+                                client.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+                                client.setScreen(this.parent);
+                            }else {
+                                TradeFinder.search();
+                                if (this.client != null) {
+                                    this.client.setScreen(this.parent);
+                                }
+                                LibrarianTradeFinder.getConfig().save();
                             }
-                            LibrarianTradeFinder.getConfig().save();
                         })
                 .dimensions(this.width / 2 + this.width / 2 / 2 + 3, this.height - 25, width / 2 / 2 - 6, 20)
                 .color(0x4FC7C0C0)

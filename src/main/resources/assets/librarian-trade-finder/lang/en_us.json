@@ -6,6 +6,7 @@
   "commands.tradefinder.select.success": "Selected lectern and librarian.",
   "commands.tradefinder.start.not-selected": "You have not selected a librarian and lectern. Use '/tradefinder select' or keybinding to select the lectern and librarian.",
   "commands.tradefinder.start.success": "Started searching.",
+  "commands.tradefinder.search.no-enchantments": "You need to select at least one enchantment to search for.",
   "commands.tradefinder.stop.success": "Stopped searching.",
   "commands.tradefinder.select.not-looking-at-lectern": "You are not looking at a lectern.",
   "commands.tradefinder.select.no-librarian-found": "No librarian found.",
