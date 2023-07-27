@@ -2,7 +2,6 @@ package de.greenman999.screens;
 
 import de.greenman999.LibrarianTradeFinder;
 import de.greenman999.TradeFinder;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
