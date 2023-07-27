@@ -106,9 +106,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			if(player == null) return;
 
 			while (selectKeyBinding.wasPressed()) {
-				if(TradeFinder.select()) {
-					player.sendMessage(Text.translatable("commands.tradefinder.select.success").formatted(Formatting.GREEN), false);
-				}
+				TradeFinder.select();
 			}
 
 			while (toggleKeyBinding.wasPressed()) {
