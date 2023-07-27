@@ -2,27 +2,34 @@ package de.greenman999;
 
 import de.greenman999.config.TradeFinderConfig;
 import net.minecraft.block.Block;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -37,6 +44,13 @@ public class TradeFinder {
     public static VillagerEntity villager = null;
     public static BlockPos lecternPos = null;
 
+    public static boolean searchAll = true;
+
+    // When searching a single enchantment
+    public static Enchantment enchantment = null;
+    public static int maxBookPrice = 0;
+    public static int minLevel = 0;
+
     public static int tries = 0;
 
     public static Vec3d prevPos = null;
@@ -45,15 +59,48 @@ public class TradeFinder {
         state = TradeState.IDLE;
         villager = null;
         lecternPos = null;
+
+        enchantment = null;
+        maxBookPrice = 0;
+        minLevel = 0;
         tries = 0;
     }
 
-    public static void search() {
+    public static int searchList() {
         if(TradeFinderConfig.INSTANCE.enchantments.values().stream().anyMatch(e -> e.enabled)) {
             state = TradeState.CHECK;
         }else {
             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.search.no-enchantments").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            return 0;
         }
+        searchAll = true;
+        state = TradeState.CHECK;
+        if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            stop();
+            return 0;
+        }
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-list").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        tries = 0;
+        return 1;
+    }
+
+    public static int searchSingle(Enchantment enchantment, int minLevel, int maxBookPrice) {
+        TradeFinder.enchantment = enchantment;
+        TradeFinder.minLevel = (int) Math.min(minLevel, enchantment.getMaxLevel());
+        TradeFinder.maxBookPrice = maxBookPrice;
+
+        searchAll = false;
+        state = TradeState.CHECK;
+        tries = 0;
+
+		if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            stop();
+            return 0;
+        }
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-single", enchantment.getName(minLevel), maxBookPrice).styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        return 1;
     }
 
     public static boolean select() {
@@ -108,6 +155,12 @@ public class TradeFinder {
         if(state == TradeState.IDLE) return;
         ClientPlayerEntity player = mc.player;
         if(player == null) return;
+
+        if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            return;
+        }
+        
         switch (state) {
             case CHECK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.check", tries).formatted(Formatting.GRAY), false);
             case BREAK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.break", tries).formatted(Formatting.GRAY), false);

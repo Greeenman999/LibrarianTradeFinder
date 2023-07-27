@@ -46,7 +46,7 @@ public class ControlUi extends Screen {
                                 client.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
                                 client.setScreen(this.parent);
                             }else {
-                                TradeFinder.search();
+                                TradeFinder.searchList();
                                 if (this.client != null) {
                                     this.client.setScreen(this.parent);
                                 }

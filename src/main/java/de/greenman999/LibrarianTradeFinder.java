@@ -1,5 +1,6 @@
 package de.greenman999;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import de.greenman999.config.TradeFinderConfig;
 import de.greenman999.screens.ControlUi;
 import net.fabricmc.api.ClientModInitializer;
@@ -9,14 +10,28 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.block.Block;
+import net.minecraft.block.LecternBlock;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.argument.RegistryEntryArgumentType;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.village.VillagerProfession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 @Environment(net.fabricmc.api.EnvType.CLIENT)
 public class LibrarianTradeFinder implements ClientModInitializer {
@@ -52,22 +67,33 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(literal("tradefinder")
 						.then(literal("select").executes(context -> {
-							if(TradeFinder.select()) {
-								context.getSource().sendFeedback(Text.translatable("commands.tradefinder.select.success").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
-								return 1;
-							}else {
-								return 0;
-							}
+							return (TradeFinder.select() ? 1 : 0);
 						}))
-						.then(literal("start").executes(context -> {
-									if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-										context.getSource().sendFeedback(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
-										return 0;
-									}
-									TradeFinder.search();
-									context.getSource().sendFeedback(Text.translatable("commands.tradefinder.start.success").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
-									return 1;
+						.then(literal("search").executes(context -> {
+							return TradeFinder.searchList();
+						})
+							.then(argument("enchantment", RegistryEntryArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
+								RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+								Enchantment enchantment = enchantmentRegistryEntry.value();
+
+								return TradeFinder.searchSingle(enchantment, 1, 64);
+							})
+								.then(argument("level", IntegerArgumentType.integer(1, 5)).executes(context -> {
+									RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+									Enchantment enchantment = enchantmentRegistryEntry.value();
+									int level = IntegerArgumentType.getInteger(context, "level");
+
+									return TradeFinder.searchSingle(enchantment, level, 64);
 								})
+									.then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
+										RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+										Enchantment enchantment = enchantmentRegistryEntry.value();
+										int level = IntegerArgumentType.getInteger(context, "level");
+										int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
+
+										return TradeFinder.searchSingle(enchantment, level, bookPrice);
+									})))
+							)
 						)
 						.then(literal("config").executes(context -> {
 							openConfigScreen = true;
@@ -97,12 +123,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 
 			while (toggleKeyBinding.wasPressed()) {
 				if(TradeFinder.state == TradeState.IDLE) {
-					if(TradeFinder.villager != null || TradeFinder.lecternPos != null) {
-						TradeFinder.search();
-						player.sendMessage(Text.translatable("commands.tradefinder.start.success").formatted(Formatting.GREEN), false);
-					} else {
-						player.sendMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
-					}
+					TradeFinder.searchList();
 				} else {
 					TradeFinder.stop();
 					player.sendMessage(Text.translatable("commands.tradefinder.stop.success").formatted(Formatting.GREEN), false);
