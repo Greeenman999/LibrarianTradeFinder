@@ -139,9 +139,11 @@ public class TradeFinder {
             return false;
         }
 
-
         villager = foundVillager;
         lecternPos = blockPos;
+
+        mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.success").formatted(Formatting.GREEN));
+
         return true;
     }
 
