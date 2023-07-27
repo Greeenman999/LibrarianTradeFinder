@@ -58,6 +58,8 @@ public class TradeFinder {
         maxBookPrice = 0;
         minLevel = 0;
         tries = 0;
+
+        MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.literal(""), false);
     }
 
     public static int searchList() {
