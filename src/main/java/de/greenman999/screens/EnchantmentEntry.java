@@ -14,6 +14,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 
 public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
@@ -127,9 +128,20 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        boolean maxPriceFieldReturn = maxPriceField.mouseScrolled(mouseX, mouseY, amount);
-        boolean levelFieldReturn = levelField.mouseScrolled(mouseX, mouseY, amount);
-        return maxPriceFieldReturn || levelFieldReturn;
+        // Adjust options by hovering the mouse over the text field and scrolling
+        // 'amount' is +1.0 or -1.0, sometimes +2.0 or +3.0 for mouse wheels that (physically) snap to positions.
+        // There are also mouse wheels that scroll smoothly; the current implementation maybe doesn't work properly with them
+        if (maxPriceField.isMouseOver(mouseX, mouseY)){
+            enchantmentOption.setMaxPrice(MathHelper.clamp((int) (enchantmentOption.getMaxPrice() + amount), 5, 64));
+            maxPriceField.setText(String.valueOf(enchantmentOption.getMaxPrice()));
+            return true;
+        }
+        else if (levelField.isMouseOver(mouseX, mouseY)){
+            enchantmentOption.setLevel(MathHelper.clamp((int) (enchantmentOption.getLevel() + amount), 1, enchantment.getMaxLevel()));
+            levelField.setText(String.valueOf(enchantmentOption.getLevel()));
+            return true;
+        }
+        return false;
     }
 
     public static void renderMultilineTooltip(DrawContext context, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenHeight, int z) {

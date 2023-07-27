@@ -119,4 +119,12 @@ public class ControlUi extends Screen {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        for(EnchantmentEntry enchantmentEntry : enchantmentsListWidget.children()) {
+            if (enchantmentEntry.mouseScrolled(mouseX, mouseY, amount)) return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
 }
