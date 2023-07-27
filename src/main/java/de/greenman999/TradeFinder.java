@@ -51,8 +51,8 @@ public class TradeFinder {
 
     public static void stop() {
         state = TradeState.IDLE;
-        villager = null;
-        lecternPos = null;
+        // villager = null;
+        // lecternPos = null;
 
         enchantment = null;
         maxBookPrice = 0;
