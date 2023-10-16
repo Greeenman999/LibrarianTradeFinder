@@ -98,15 +98,14 @@ public class ControlUi extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if(super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
-        }else if (keyCode == 256) {
-            LibrarianTradeFinder.getConfig().save();
-            if (this.client != null) {
-                this.client.setScreen(parent);
-            }
-            return true;
         }else {
-            return false;
+            return enchantmentsListWidget.keyPressed(keyCode, scanCode, modifiers);
         }
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        return enchantmentsListWidget.charTyped(chr, modifiers);
     }
 
     @Override
@@ -126,5 +125,11 @@ public class ControlUi extends Screen {
             if (enchantmentEntry.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)) return true;
         }
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
+
+    @Override
+    public void close() {
+        LibrarianTradeFinder.getConfig().save();
+        super.close();
     }
 }
