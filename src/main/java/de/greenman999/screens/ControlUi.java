@@ -45,7 +45,7 @@ public class ControlUi extends Screen {
                                 client.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
                                 client.setScreen(this.parent);
                             }else {
-                                TradeFinder.search();
+                                TradeFinder.searchList();
                                 if (this.client != null) {
                                     this.client.setScreen(this.parent);
                                 }
@@ -118,5 +118,13 @@ public class ControlUi extends Screen {
             enchantmentEntry.levelField.setFocused(levelFieldSuccess);
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        for(EnchantmentEntry enchantmentEntry : enchantmentsListWidget.children()) {
+            if (enchantmentEntry.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)) return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 }

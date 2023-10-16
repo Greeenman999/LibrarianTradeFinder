@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -37,23 +38,65 @@ public class TradeFinder {
     public static VillagerEntity villager = null;
     public static BlockPos lecternPos = null;
 
+    public static boolean searchAll = true;
+
+    // When searching a single enchantment
+    public static Enchantment enchantment = null;
+    public static int maxBookPrice = 0;
+    public static int minLevel = 0;
+
     public static int tries = 0;
 
     public static Vec3d prevPos = null;
 
     public static void stop() {
         state = TradeState.IDLE;
-        villager = null;
-        lecternPos = null;
+        // villager = null;
+        // lecternPos = null;
+
+        enchantment = null;
+        maxBookPrice = 0;
+        minLevel = 0;
         tries = 0;
+
+        MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.literal(""), false);
     }
 
-    public static void search() {
+    public static int searchList() {
         if(TradeFinderConfig.INSTANCE.enchantments.values().stream().anyMatch(e -> e.enabled)) {
             state = TradeState.CHECK;
         }else {
             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.search.no-enchantments").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            return 0;
         }
+        searchAll = true;
+        state = TradeState.CHECK;
+        if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            stop();
+            return 0;
+        }
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-list").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        tries = 0;
+        return 1;
+    }
+
+    public static int searchSingle(Enchantment enchantment, int minLevel, int maxBookPrice) {
+        TradeFinder.enchantment = enchantment;
+        TradeFinder.minLevel = (int) Math.min(minLevel, enchantment.getMaxLevel());
+        TradeFinder.maxBookPrice = maxBookPrice;
+
+        searchAll = false;
+        state = TradeState.CHECK;
+        tries = 0;
+
+		if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            stop();
+            return 0;
+        }
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-single", enchantment.getName(minLevel), maxBookPrice).styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        return 1;
     }
 
     public static boolean select() {
@@ -96,9 +139,11 @@ public class TradeFinder {
             return false;
         }
 
-
         villager = foundVillager;
         lecternPos = blockPos;
+
+        mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.success").formatted(Formatting.GREEN));
+
         return true;
     }
 
@@ -108,6 +153,12 @@ public class TradeFinder {
         if(state == TradeState.IDLE) return;
         ClientPlayerEntity player = mc.player;
         if(player == null) return;
+
+        if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            return;
+        }
+        
         switch (state) {
             case CHECK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.check", tries).formatted(Formatting.GRAY), false);
             case BREAK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.break", tries).formatted(Formatting.GRAY), false);

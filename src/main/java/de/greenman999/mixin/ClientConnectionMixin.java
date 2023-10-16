@@ -47,8 +47,20 @@ public class ClientConnectionMixin {
             for(TradeOffer tradeOffer : setTradeOffersS2CPacket.getOffers()) {
                 if(!tradeOffer.getSellItem().getItem().equals(Items.ENCHANTED_BOOK)) continue;
                 EnchantmentHelper.get(tradeOffer.getSellItem()).forEach((enchantment, level) -> {
-                    TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
-                    if(tradeOffer.getOriginalFirstBuyItem().getCount() <= enchantmentOption.getMaxPrice() && level == enchantmentOption.getLevel() && enchantmentOption.isEnabled()) {
+                    int maxBookPrice;
+                    int minLevel;
+                    if (TradeFinder.searchAll) {
+                        TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
+                        if (enchantmentOption == null || !enchantmentOption.isEnabled()) return;
+                        maxBookPrice = enchantmentOption.getMaxPrice();
+                        minLevel = enchantmentOption.getLevel();
+                    }
+                    else {
+                        if (!enchantment.getName(enchantment.getMaxLevel()).equals(TradeFinder.enchantment.getName(enchantment.getMaxLevel()))) return;
+                        maxBookPrice = TradeFinder.maxBookPrice;
+                        minLevel = TradeFinder.minLevel;
+                    }
+                    if(tradeOffer.getOriginalFirstBuyItem().getCount() <= maxBookPrice && level >= minLevel) {
                         foundEnchantment(found, tradeOffer, enchantment, level);
                     }
                 });
