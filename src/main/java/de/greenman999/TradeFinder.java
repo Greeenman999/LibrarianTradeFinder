@@ -63,9 +63,7 @@ public class TradeFinder {
     }
 
     public static int searchList() {
-        if(TradeFinderConfig.INSTANCE.enchantments.values().stream().anyMatch(e -> e.enabled)) {
-            state = TradeState.CHECK;
-        }else {
+        if(TradeFinderConfig.INSTANCE.enchantments.values().stream().noneMatch(e -> e.enabled)) {
             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.search.no-enchantments").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
             return 0;
         }
@@ -83,7 +81,7 @@ public class TradeFinder {
 
     public static int searchSingle(Enchantment enchantment, int minLevel, int maxBookPrice) {
         TradeFinder.enchantment = enchantment;
-        TradeFinder.minLevel = (int) Math.min(minLevel, enchantment.getMaxLevel());
+        TradeFinder.minLevel = Math.min(minLevel, enchantment.getMaxLevel());
         TradeFinder.maxBookPrice = maxBookPrice;
 
         searchAll = false;
@@ -254,6 +252,7 @@ public class TradeFinder {
                     lecternPos.getZ()), Direction.UP, lecternPos.down(), false);
             if (mc.interactionManager != null) {
                 mc.interactionManager.interactBlock(mc.player, Hand.OFF_HAND, hit);
+                player.swingHand(Hand.OFF_HAND, true);
             }
 
             state = TradeState.CHECK;
