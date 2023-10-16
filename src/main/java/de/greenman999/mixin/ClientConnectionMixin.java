@@ -34,7 +34,7 @@ public class ClientConnectionMixin {
     @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"), cancellable = true)
     private void onChannelRead0(ChannelHandlerContext channelHandlerContext, Packet<?> packet, CallbackInfo ci) {
         if(packet instanceof OpenScreenS2CPacket openScreenS2CPacket) {
-            if(openScreenS2CPacket.getScreenHandlerType() == ScreenHandlerType.MERCHANT && (TradeFinder.state.equals(TradeState.CHECK) || TradeFinder.state.equals(TradeState.WAITING_FOR_PACKET))) {
+            if(openScreenS2CPacket.getScreenHandlerType() == ScreenHandlerType.MERCHANT && !(TradeFinder.state.equals(TradeState.IDLE))) {
                 ClientPlayNetworkHandler networkHandler = MinecraftClient.getInstance().getNetworkHandler();
                 if(networkHandler != null) {
                     networkHandler.sendPacket(new CloseHandledScreenC2SPacket(openScreenS2CPacket.getSyncId()));
