@@ -125,6 +125,6 @@ public class ControlUi extends Screen {
         for(EnchantmentEntry enchantmentEntry : enchantmentsListWidget.children()) {
             if (enchantmentEntry.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)) return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, horizontalAmount, verticalAmount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 }
