@@ -132,12 +132,12 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         // 'amount' is +1.0 or -1.0, sometimes +2.0 or +3.0 for mouse wheels that (physically) snap to positions.
         // There are also mouse wheels that scroll smoothly; the current implementation maybe doesn't work properly with them
         if (maxPriceField.isMouseOver(mouseX, mouseY)){
-            enchantmentOption.setMaxPrice(MathHelper.clamp((int) (enchantmentOption.getMaxPrice() + amount), 5, 64));
+            enchantmentOption.setMaxPrice(MathHelper.clamp((int) (enchantmentOption.getMaxPrice() + verticalAmount), 5, 64));
             maxPriceField.setText(String.valueOf(enchantmentOption.getMaxPrice()));
             return true;
         }
         else if (levelField.isMouseOver(mouseX, mouseY)){
-            enchantmentOption.setLevel(MathHelper.clamp((int) (enchantmentOption.getLevel() + amount), 1, enchantment.getMaxLevel()));
+            enchantmentOption.setLevel(MathHelper.clamp((int) (enchantmentOption.getLevel() + verticalAmount), 1, enchantment.getMaxLevel()));
             levelField.setText(String.valueOf(enchantmentOption.getLevel()));
             return true;
         }
