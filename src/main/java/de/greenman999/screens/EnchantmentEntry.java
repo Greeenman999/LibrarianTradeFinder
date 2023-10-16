@@ -55,12 +55,12 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         this.entryWidth = entryWidth;
         this.entryHeight = entryHeight;
 
-        if(!maxPriceField.getText().equals("") && !maxPriceField.isActive() && (Integer.parseInt(maxPriceField.getText()) > 64 || Integer.parseInt(maxPriceField.getText()) < 5)) maxPriceField.setText("64");
-        if(!levelField.getText().equals("") && !levelField.isActive() && (Integer.parseInt(levelField.getText()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getText()) < 1)) levelField.setText(String.valueOf(enchantment.getMaxLevel()));
+        if(!maxPriceField.getText().isEmpty() && !maxPriceField.isActive() && (Integer.parseInt(maxPriceField.getText()) > 64 || Integer.parseInt(maxPriceField.getText()) < 5)) maxPriceField.setText("64");
+        if(!levelField.getText().isEmpty() && !levelField.isActive() && (Integer.parseInt(levelField.getText()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getText()) < 1)) levelField.setText(String.valueOf(enchantment.getMaxLevel()));
 
         enchantmentOption.setEnabled(enabled);
-        enchantmentOption.setMaxPrice(!maxPriceField.getText().equals("") ? Integer.parseInt(maxPriceField.getText()) : 64);
-        enchantmentOption.setLevel(!levelField.getText().equals("") ? Integer.parseInt(levelField.getText()) : enchantment.getMaxLevel());
+        enchantmentOption.setMaxPrice(!maxPriceField.getText().isEmpty() ? Integer.parseInt(maxPriceField.getText()) : 64);
+        enchantmentOption.setLevel(!levelField.getText().isEmpty() ? Integer.parseInt(levelField.getText()) : enchantment.getMaxLevel());
 
         if(y < 8) return;
 
@@ -127,7 +127,7 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         // Adjust options by hovering the mouse over the text field and scrolling
         // 'amount' is +1.0 or -1.0, sometimes +2.0 or +3.0 for mouse wheels that (physically) snap to positions.
         // There are also mouse wheels that scroll smoothly; the current implementation maybe doesn't work properly with them

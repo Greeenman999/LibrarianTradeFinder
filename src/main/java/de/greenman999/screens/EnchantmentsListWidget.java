@@ -23,8 +23,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
         super(client, width, height, top, bottom, itemHeight);
         setRenderBackground(false);
-        setRenderSelection(false);
-        setRenderHorizontalShadows(false);
 
         for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
             this.addEntry(new EnchantmentEntry(enchantment));
@@ -43,6 +41,10 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
                 .build();
 
         this.right = this.width + 7;
+    }
+
+    @Override
+    protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
     }
 
     @Override
