@@ -8,6 +8,8 @@ https://user-images.githubusercontent.com/81023792/215837935-cf4967b6-59c7-4fef-
 ## Installation
 Download the jar from [modrinth](https://modrinth.com/mod/librarian-trade-finder).
 
+### If you are playing on a server using an old minecraft version concider using [ViaFabric](https://modrinth.com/mod/viafabric) to use the latest client version.
+
 [![](https://github.com/Prospector/badges/blob/master/modrinth-badge-72h-padded.png?raw=true)](https://modrinth.com/mod/librarian-trade-finder)
 
 Or clone the repository and run `./gradlew build`.
