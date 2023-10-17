@@ -253,6 +253,8 @@ public class TradeFinder {
             if (mc.interactionManager != null) {
                 mc.interactionManager.interactBlock(mc.player, Hand.OFF_HAND, hit);
                 player.swingHand(Hand.OFF_HAND, true);
+                player.networkHandler
+                        .sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
             }
 
             state = TradeState.CHECK;
