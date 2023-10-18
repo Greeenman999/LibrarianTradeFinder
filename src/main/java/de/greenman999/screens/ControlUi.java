@@ -86,6 +86,15 @@ public class ControlUi extends Screen {
                 .color(0x4FC7C0C0)
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.legit-mode.tooltip")))
                 .build());
+        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.slow-mode", LibrarianTradeFinder.getConfig().slowMode), (buttonWidget) -> {
+                    LibrarianTradeFinder.getConfig().slowMode = !LibrarianTradeFinder.getConfig().slowMode;
+
+                    buttonWidget.setMessage(getButtonText("tradefinderui.options.slow-mode", LibrarianTradeFinder.getConfig().slowMode));
+                })
+                .dimensions(this.width / 2 + 6, 100, this.width / 2 - 10, 20)
+                .color(0x4FC7C0C0)
+                .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.slow-mode.tooltip")))
+                .build());
 
         super.init();
     }

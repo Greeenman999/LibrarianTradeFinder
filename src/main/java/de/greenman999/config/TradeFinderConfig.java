@@ -28,6 +28,7 @@ public class TradeFinderConfig {
     public boolean preventAxeBreaking = true;
     public boolean tpToVillager = false;
     public boolean legitMode = true;
+    public boolean slowMode = false;
 
     public HashMap<Enchantment, EnchantmentOption> enchantments = new HashMap<>();
 
@@ -40,6 +41,7 @@ public class TradeFinderConfig {
             json.addProperty("preventAxeBreaking", preventAxeBreaking);
             json.addProperty("tpToVillager", tpToVillager);
             json.addProperty("legitMode", legitMode);
+            json.addProperty("slowMode", slowMode);
 
             JsonObject enchantmentsJson = new JsonObject();
             enchantments.forEach((enchantment, enchantmentOption) -> enchantmentsJson.add(Registries.ENCHANTMENT.getEntry(enchantment).getKey().orElseThrow().getValue().toString(), enchantmentOption.toJson()));
@@ -66,6 +68,8 @@ public class TradeFinderConfig {
                     tpToVillager = json.getAsJsonPrimitive("tpToVillager").getAsBoolean();
                 if (json.has("legitMode"))
                     legitMode = json.getAsJsonPrimitive("legitMode").getAsBoolean();
+                if (json.has("slowMode"))
+                    slowMode = json.getAsJsonPrimitive("slowMode").getAsBoolean();
                 if (json.has("enchantments")) {
                     JsonObject enchantmentsJson = json.getAsJsonObject("enchantments");
                     enchantmentsJson.entrySet().forEach(entry -> {

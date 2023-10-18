@@ -8,6 +8,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.command.argument.RegistryEntryArgumentType;
@@ -124,6 +125,8 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 				}
 			}
 		});
+
+		WorldRenderEvents.END.register(RotationTools::render);
 
 		getConfig().load();
 
