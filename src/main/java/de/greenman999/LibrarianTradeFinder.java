@@ -34,6 +34,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 	private static KeyBinding toggleKeyBinding;
 	private static KeyBinding configKeyBinding;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onInitializeClient() {
 
@@ -57,12 +58,8 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(literal("tradefinder")
-						.then(literal("select").executes(context -> {
-							return (TradeFinder.select() ? 1 : 0);
-						}))
-						.then(literal("search").executes(context -> {
-							return TradeFinder.searchList();
-						})
+						.then(literal("select").executes(context -> (TradeFinder.select() ? 1 : 0)))
+						.then(literal("search").executes(context -> TradeFinder.searchList())
 							.then(argument("enchantment", RegistryEntryArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
 								RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
 								Enchantment enchantment = enchantmentRegistryEntry.value();
