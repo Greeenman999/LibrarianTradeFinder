@@ -3,6 +3,7 @@ package de.greenman999.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import de.greenman999.LibrarianTradeFinder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.Registries;
@@ -49,7 +50,7 @@ public class TradeFinderConfig {
 
             Files.writeString(configFile, gson.toJson(json));
         } catch (IOException e) {
-            e.printStackTrace();
+            LibrarianTradeFinder.LOGGER.error("Failed to save config file", e);
         }
     }
 
@@ -92,7 +93,7 @@ public class TradeFinderConfig {
 
             save();
         } catch (IOException e) {
-            e.printStackTrace();
+            LibrarianTradeFinder.LOGGER.error("Failed to load config file", e);
         }
     }
 
