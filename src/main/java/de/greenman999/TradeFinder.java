@@ -172,7 +172,6 @@ public class TradeFinder {
             case BREAK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.break", tries).formatted(Formatting.GRAY), false);
             case PLACE -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.place", tries).formatted(Formatting.GRAY), false);
         }
-        System.out.println("state: " + state);
 
         if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN)) {
             /*if(interactDelay > 0) {
@@ -185,28 +184,12 @@ public class TradeFinder {
 
             if(LibrarianTradeFinder.getConfig().legitMode) {
                 //player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, villagerPosition);
-                /*if(!startedCheckLook && !finishedCheckLook) {
-                    RotationTools.smoothLookAt(villagerPosition, 10);
-                    System.out.println("Look: CHECK");
-                    startedCheckLook = true;
-                    return;
-                }else if(RotationTools.isRotated) {
-                    System.out.println("finished check look");
-                    startedCheckLook = false;
-                    finishedCheckLook = true;
-                }else if(!finishedCheckLook) {
-                    return;
-                }*/
-                System.out.println("isRotated: " + RotationTools.isRotated);
-                System.out.println("startedCheckLook: " + startedCheckLook);
-                System.out.println("finishedCheckLook: " + finishedCheckLook);
                 if(RotationTools.isRotated && !finishedCheckLook) {
                     finishedCheckLook = true;
                     startedCheckLook = false;
                     RotationTools.isRotated = false;
                 }else if(!startedCheckLook && !finishedCheckLook) {
-                    RotationTools.smoothLookAt(villagerPosition, 10);
-                    System.out.println("Look: CHECK");
+                    RotationTools.smoothLookAt(villagerPosition, 3);
                     startedCheckLook = true;
                     return;
                 }else if(!finishedCheckLook) {
@@ -234,27 +217,13 @@ public class TradeFinder {
             BlockPos toPlace = lecternPos.down();
             if(LibrarianTradeFinder.getConfig().legitMode) {
                 //player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
-                /*if(!startedBreakLook) {
-                    RotationTools.smoothLookAt(new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5), 10);
-                    System.out.println("Look: BREAK");
-                    startedBreakLook = true;
-                    return;
-                }else if(RotationTools.isRotated) {
-                    System.out.println("finished break look");
-                    startedBreakLook = false;
-                }else {
-                    return;
-                }*/
-                System.out.println("isRotated: " + RotationTools.isRotated);
-                System.out.println("startedBreakLook: " + startedBreakLook);
-                System.out.println("finishedBreakLook: " + finishedBreakLook);
+
                 if(RotationTools.isRotated && !finishedBreakLook) {
                     finishedBreakLook = true;
                     startedBreakLook = false;
                     RotationTools.isRotated = false;
                 }else if(!startedBreakLook && !finishedBreakLook) {
-                    RotationTools.smoothLookAt(new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5), 10);
-                    System.out.println("Look: BREAK");
+                    RotationTools.smoothLookAt(new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5), 3);
                     startedBreakLook = true;
                     return;
                 }else if(!finishedBreakLook) {
@@ -293,27 +262,12 @@ public class TradeFinder {
             BlockPos toPlace = lecternPos.down();
             if(LibrarianTradeFinder.getConfig().legitMode) {
                 //mc.player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
-                /*if(!startedPlaceLook) {
-                    RotationTools.smoothLookAt(new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5), 10);
-                    System.out.println("Look: PLACE");
-                    startedPlaceLook = true;
-                    return;
-                }else if(RotationTools.isRotated) {
-                    System.out.println("finished place look");
-                    startedPlaceLook = false;
-                }else {
-                    return;
-                }*/
-                System.out.println("isRotated: " + RotationTools.isRotated);
-                System.out.println("startedPlaceLook: " + startedPlaceLook);
-                System.out.println("finishedPlaceLook: " + finishedPlaceLook);
                 if(RotationTools.isRotated && !finishedPlaceLook) {
                     finishedPlaceLook = true;
                     startedPlaceLook = false;
                     RotationTools.isRotated = false;
                 }else if(!startedPlaceLook && !finishedPlaceLook) {
-                    RotationTools.smoothLookAt(new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5), 10);
-                    System.out.println("Look: BREAK");
+                    RotationTools.smoothLookAt(new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5), 3);
                     startedPlaceLook = true;
                     return;
                 }else if(!finishedPlaceLook) {
