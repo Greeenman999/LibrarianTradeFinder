@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityPose;
@@ -31,6 +32,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.VillagerProfession;
 
 
+@SuppressWarnings("DuplicatedCode")
 public class TradeFinder {
 
     public static TradeState state = TradeState.IDLE;
@@ -48,8 +50,8 @@ public class TradeFinder {
 
     private static Vec3d prevPos = null;
 
-    //private static int placeDelay = 3;
-    //private static int interactDelay = 2;
+    private static int placeDelay = 3;
+    private static int interactDelay = 2;
 
     private static boolean startedBreakLook = false;
     private static boolean startedPlaceLook = false;
@@ -174,16 +176,9 @@ public class TradeFinder {
         }
 
         if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN)) {
-            /*if(interactDelay > 0) {
-                interactDelay--;
-                return;
-            }
-            interactDelay = 2;*/
-
             Vec3d villagerPosition = new Vec3d(villager.getX(), villager.getY() + (double) villager.getEyeHeight(EntityPose.STANDING), villager.getZ());
 
-            if(LibrarianTradeFinder.getConfig().legitMode) {
-                //player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, villagerPosition);
+            if(LibrarianTradeFinder.getConfig().legitMode && LibrarianTradeFinder.getConfig().slowMode) {
                 if(RotationTools.isRotated && !finishedCheckLook) {
                     finishedCheckLook = true;
                     startedCheckLook = false;
@@ -195,7 +190,16 @@ public class TradeFinder {
                 }else if(!finishedCheckLook) {
                     return;
                 }
+            } else if (LibrarianTradeFinder.getConfig().legitMode) {
+                player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, villagerPosition);
+            }
 
+            if(LibrarianTradeFinder.getConfig().slowMode) {
+                if(interactDelay > 0) {
+                    interactDelay--;
+                    return;
+                }
+                interactDelay = 2;
             }
 
             ActionResult result = null;
@@ -215,9 +219,7 @@ public class TradeFinder {
 
         } else if(state == TradeState.BREAK) {
             BlockPos toPlace = lecternPos.down();
-            if(LibrarianTradeFinder.getConfig().legitMode) {
-                //player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
-
+            if(LibrarianTradeFinder.getConfig().legitMode && LibrarianTradeFinder.getConfig().slowMode) {
                 if(RotationTools.isRotated && !finishedBreakLook) {
                     finishedBreakLook = true;
                     startedBreakLook = false;
@@ -229,6 +231,8 @@ public class TradeFinder {
                 }else if(!finishedBreakLook) {
                     return;
                 }
+            } else if (LibrarianTradeFinder.getConfig().legitMode) {
+                player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
             }
             PlayerInventory inventory = player.getInventory();
             ItemStack mainHand = inventory.getMainHandStack();
@@ -260,7 +264,7 @@ public class TradeFinder {
             }
 
             BlockPos toPlace = lecternPos.down();
-            if(LibrarianTradeFinder.getConfig().legitMode) {
+            if(LibrarianTradeFinder.getConfig().legitMode && LibrarianTradeFinder.getConfig().slowMode) {
                 //mc.player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
                 if(RotationTools.isRotated && !finishedPlaceLook) {
                     finishedPlaceLook = true;
@@ -274,14 +278,18 @@ public class TradeFinder {
                     return;
                 }
 
+            } else if (LibrarianTradeFinder.getConfig().legitMode) {
+                player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
             }
 
-
-            /*if(placeDelay > 0) {
-                placeDelay--;
-                return;
+            if(LibrarianTradeFinder.getConfig().slowMode) {
+                if(placeDelay > 0) {
+                    placeDelay--;
+                    return;
+                }
+                placeDelay = 3;
             }
-            placeDelay = 3;*/
+
 
             if(!mc.player.getOffHandStack().getItem().equals(Items.LECTERN) && mc.interactionManager != null) {
                 if (mc.player.playerScreenHandler == mc.player.currentScreenHandler) {
