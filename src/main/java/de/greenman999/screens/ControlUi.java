@@ -3,6 +3,7 @@ package de.greenman999.screens;
 import de.greenman999.LibrarianTradeFinder;
 import de.greenman999.TradeFinder;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
@@ -39,6 +40,7 @@ public class ControlUi extends Screen {
                 })
                         .dimensions(this.width / 2 + 6, this.height - 25, width / 2 / 2 - 6 - 3, 20)
                         .color(0x4FC7C0C0)
+                        .id(0)
                 .build());
         this.addDrawableChild(GrayButtonWidget.builder(Text.translatable("tradefinderui.buttons.start").formatted(Formatting.GREEN), (buttonWidget) -> {
                             if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && client != null) {
@@ -54,6 +56,7 @@ public class ControlUi extends Screen {
                         })
                 .dimensions(this.width / 2 + this.width / 2 / 2 + 3, this.height - 25, width / 2 / 2 - 6, 20)
                 .color(0x4FC7C0C0)
+                .id(1)
                 .build());
 
         enchantmentsListWidget = new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height, 25, this.height - 5, 20);
@@ -62,41 +65,65 @@ public class ControlUi extends Screen {
         this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().tpToVillager = !LibrarianTradeFinder.getConfig().tpToVillager;
 
-                    buttonWidget.setMessage(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager));
+                    updateButtonTexts();
                 })
                 .dimensions(this.width / 2 + 6, 25, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
+                .id(2)
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.tp-to-villager.tooltip")))
                 .build());
         this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.prevent-axe-break", LibrarianTradeFinder.getConfig().preventAxeBreaking), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().preventAxeBreaking = !LibrarianTradeFinder.getConfig().preventAxeBreaking;
 
-                    buttonWidget.setMessage(getButtonText("tradefinderui.options.prevent-axe-break", LibrarianTradeFinder.getConfig().preventAxeBreaking));
+                    updateButtonTexts();
                 })
                 .dimensions(this.width / 2 + 6 , 50, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
+                .id(3)
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.prevent-axe-break.tooltip")))
                 .build());
         this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.legit-mode", LibrarianTradeFinder.getConfig().legitMode), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().legitMode = !LibrarianTradeFinder.getConfig().legitMode;
+                    if(!LibrarianTradeFinder.getConfig().legitMode) {
+                        LibrarianTradeFinder.getConfig().slowMode = false;
+                    }
 
-                    buttonWidget.setMessage(getButtonText("tradefinderui.options.legit-mode", LibrarianTradeFinder.getConfig().legitMode));
+                    updateButtonTexts();
                 })
                 .dimensions(this.width / 2 + 6, 75, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
+                .id(4)
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.legit-mode.tooltip")))
                 .build());
         this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.slow-mode", LibrarianTradeFinder.getConfig().slowMode), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().slowMode = !LibrarianTradeFinder.getConfig().slowMode;
+                    LibrarianTradeFinder.getConfig().legitMode = LibrarianTradeFinder.getConfig().slowMode || LibrarianTradeFinder.getConfig().legitMode;
 
-                    buttonWidget.setMessage(getButtonText("tradefinderui.options.slow-mode", LibrarianTradeFinder.getConfig().slowMode));
+                    updateButtonTexts();
                 })
                 .dimensions(this.width / 2 + 6, 100, this.width / 2 - 10, 20)
                 .color(0x4FC7C0C0)
+                .id(5)
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.slow-mode.tooltip")))
                 .build());
 
         super.init();
+    }
+
+    private void updateButtonTexts() {
+        for(Element element : this.children()) {
+            if(!(element instanceof GrayButtonWidget buttonWidget)) continue;
+            switch (buttonWidget.getId()) {
+                case 2 ->
+                        buttonWidget.setMessage(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager));
+                case 3 ->
+                        buttonWidget.setMessage(getButtonText("tradefinderui.options.prevent-axe-break", LibrarianTradeFinder.getConfig().preventAxeBreaking));
+                case 4 ->
+                        buttonWidget.setMessage(getButtonText("tradefinderui.options.legit-mode", LibrarianTradeFinder.getConfig().legitMode));
+                case 5 ->
+                        buttonWidget.setMessage(getButtonText("tradefinderui.options.slow-mode", LibrarianTradeFinder.getConfig().slowMode));
+            }
+        }
     }
 
     public Text getButtonText(String key, boolean enabled) {
