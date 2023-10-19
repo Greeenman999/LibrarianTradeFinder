@@ -13,10 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class GrayButtonWidget extends ButtonWidget {
     int color;
+    int id;
 
-    protected GrayButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress, NarrationSupplier narrationSupplier, int color) {
+    protected GrayButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress, NarrationSupplier narrationSupplier, int color, int id) {
         super(x, y, width, height, message, onPress, narrationSupplier);
         this.color = color;
+        this.id = id;
     }
 
     @Override
@@ -45,6 +47,10 @@ public class GrayButtonWidget extends ButtonWidget {
         return new GrayButtonWidget.Builder(message, onPress);
     }
 
+    public int getId() {
+        return id;
+    }
+
     public static class Builder extends ButtonWidget.Builder {
         private final Text message;
         private final PressAction onPress;
@@ -56,6 +62,7 @@ public class GrayButtonWidget extends ButtonWidget {
         private int height = 20;
         private NarrationSupplier narrationSupplier;
         private int color;
+        private int id;
 
         public Builder(Text message, PressAction onPress) {
             super(message, onPress);
@@ -100,8 +107,13 @@ public class GrayButtonWidget extends ButtonWidget {
             return this;
         }
 
+        public GrayButtonWidget.Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
         public GrayButtonWidget build() {
-            GrayButtonWidget buttonWidget = new GrayButtonWidget(this.x, this.y, this.width, this.height, this.message, this.onPress, this.narrationSupplier, this.color);
+            GrayButtonWidget buttonWidget = new GrayButtonWidget(this.x, this.y, this.width, this.height, this.message, this.onPress, this.narrationSupplier, this.color, this.id);
             buttonWidget.setTooltip(this.tooltip);
             return buttonWidget;
         }
