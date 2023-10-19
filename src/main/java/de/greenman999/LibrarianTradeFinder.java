@@ -123,7 +123,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			}
 		});
 
-		WorldRenderEvents.END.register(RotationTools::render);
+		WorldRenderEvents.END.register(context -> RotationTools.render());
 
 		getConfig().load();
 

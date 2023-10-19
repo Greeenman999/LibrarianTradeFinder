@@ -1,6 +1,5 @@
 package de.greenman999;
 
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.util.math.MathHelper;
@@ -36,14 +35,13 @@ public class RotationTools {
         isRotated = false;
     }
 
-    public static void render(WorldRenderContext context) {
+    public static void render() {
         MinecraftClient mc = MinecraftClient.getInstance();
         if(mc.player == null || isRotated || speed == 0) return;
         float delta = (System.currentTimeMillis() - (prevTimeMillis == 0 ? System.currentTimeMillis() : prevTimeMillis )) / 1000f;
         prevTimeMillis = System.currentTimeMillis();
         elapsedTime += delta;
         float percentageComplete = elapsedTime / speed;
-        System.out.println("delta: " + delta + ", elapsedTime: " + elapsedTime + ", percentageComplete: " + percentageComplete + ", speed: " + speed);
         if(percentageComplete >= 1) {
             isRotated = true;
             speed = 0;
