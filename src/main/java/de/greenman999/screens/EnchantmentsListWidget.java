@@ -19,9 +19,12 @@ import org.jetbrains.annotations.Nullable;
 public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     public GrayButtonWidget resetButton;
+    public int top;
 
     public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
-        super(client, width, height, top, bottom, itemHeight);
+        super(client, width, height, top, itemHeight);
+        this.top = top;
+
         setRenderBackground(false);
 
         for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
@@ -40,7 +43,8 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.reset.tooltip")))
                 .build();
 
-        this.right = this.width + 7;
+        //this.right = this.width + 7;
+        //this.getRight() = this.width + 7;
     }
 
     @Override
@@ -48,7 +52,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         this.setSelected(null);
         MatrixStack matrices = context.getMatrices();
         matrices.push();
@@ -62,7 +66,9 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         RenderSystem.disableDepthTest();
         matrices.pop();
 
-        super.render(context, mouseX, mouseY, delta);
+        super.renderWidget(context, mouseX, mouseY, delta);
+        //this.renderList(context, mouseX, mouseY, delta);
+        //context.disableScissor();
 
         for(EnchantmentEntry enchantmentEntry : this.children()) {
             if(enchantmentEntry.maxPriceField.isActive()) {
@@ -95,8 +101,9 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         }
     }
 
+
     @Override
-    public void appendNarrations(NarrationMessageBuilder builder) {
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
 
     }
 
@@ -112,12 +119,12 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     @Override
     public int getRowTop(int index) {
-        return this.top - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
+        return this.getY() - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
     }
 
     @Override
     public int getRowLeft() {
-        return this.left + this.width / 2 - this.getRowWidth() / 2 - 1;
+        return this.getX() + this.width / 2 - this.getRowWidth() / 2 - 1;
     }
 
     @Override
@@ -161,7 +168,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     @Override
     protected EnchantmentEntry getEntryAtPosition(double x, double y) {
         int i = this.getRowWidth() / 2;
-        int j = this.left + this.width / 2;
+        int j = this.getX() + this.width / 2;
         int k = j - i;
         int l = j + i;
         int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollAmount();
