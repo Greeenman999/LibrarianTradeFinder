@@ -43,13 +43,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.reset.tooltip")))
                 .build();
 
-        //this.right = this.width + 7;
-        //this.getRight() = this.width + 7;
-    }
-
-    @Override
-    public int getRight() {
-        return this.width + 7;
     }
 
     @Override
@@ -72,8 +65,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         matrices.pop();
 
         super.renderWidget(context, mouseX, mouseY, delta);
-        //this.renderList(context, mouseX, mouseY, delta);
-        //context.disableScissor();
 
         for(EnchantmentEntry enchantmentEntry : this.children()) {
             if(enchantmentEntry.maxPriceField.isActive()) {
@@ -115,6 +106,11 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     @Override
     public int getRowWidth() {
         return this.width - 12;
+    }
+
+    @Override
+    public int getRight() {
+        return this.width + 7;
     }
 
     @Override
