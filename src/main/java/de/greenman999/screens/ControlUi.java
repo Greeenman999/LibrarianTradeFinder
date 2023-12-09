@@ -59,7 +59,7 @@ public class ControlUi extends Screen {
                 .id(1)
                 .build());
 
-        enchantmentsListWidget = new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height - 30, 25, this.height - 5, 20);
+        enchantmentsListWidget = new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height - 30, 25, 20);
         this.addDrawableChild(enchantmentsListWidget);
 
         this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager), (buttonWidget) -> {

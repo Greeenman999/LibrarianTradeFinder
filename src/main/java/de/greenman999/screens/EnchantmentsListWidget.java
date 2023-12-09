@@ -21,7 +21,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     public GrayButtonWidget resetButton;
     public int top;
 
-    public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
+    public EnchantmentsListWidget(MinecraftClient client, int width, int height, int top, int itemHeight) {
         super(client, width, height, top, itemHeight);
         this.top = top;
 
