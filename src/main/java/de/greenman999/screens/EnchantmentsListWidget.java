@@ -48,6 +48,11 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     }
 
     @Override
+    public int getRight() {
+        return this.width + 7;
+    }
+
+    @Override
     protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
     }
 
@@ -114,7 +119,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     @Override
     protected int getScrollbarPositionX() {
-        return this.width - 1;
+        return this.width - 1 ;
     }
 
     @Override
@@ -130,7 +135,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         resetButton.mouseClicked(mouseX, mouseY, button);
-        System.out.println();
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
