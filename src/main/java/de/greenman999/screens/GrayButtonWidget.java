@@ -22,7 +22,7 @@ public class GrayButtonWidget extends ButtonWidget {
     }
 
     @Override
-    public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         this.setFocused(false);
         MatrixStack matrices = context.getMatrices();
         matrices.push();
