@@ -115,7 +115,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     @Override
     protected int getScrollbarPositionX() {
-        return this.width - 1 ;
+        return this.width - 1;
     }
 
     @Override
