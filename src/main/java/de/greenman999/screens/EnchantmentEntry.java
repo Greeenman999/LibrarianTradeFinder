@@ -10,9 +10,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
@@ -29,11 +31,11 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
     public boolean enabled;
     public TradeFinderConfig.EnchantmentOption enchantmentOption;
 
-    public EnchantmentEntry(Enchantment enchantment) {
+    public EnchantmentEntry(RegistryEntry<Enchantment> enchantment) {
         super();
-        this.enchantment = enchantment;
-        this.enabled = LibrarianTradeFinder.getConfig().enchantments.get(enchantment).isEnabled();
-        this.enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
+        this.enchantment = enchantment.value();
+        this.enabled = LibrarianTradeFinder.getConfig().enchantments.get(enchantment.getIdAsString()).isEnabled();
+        this.enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment.getIdAsString());
 
         //maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 50, 20, Text.of("Max Price"));
         maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.translatable("tradefinderui.enchantments.price.name"));
@@ -73,7 +75,7 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         }else {
             context.fill(x, y, x + entryWidth, y + entryHeight, 0x1AC7C0C0);
         }
-        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
+        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, enchantment.description(), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
         matrices.push();
         RenderSystem.enableDepthTest();
@@ -160,9 +162,9 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
             matrices.push();
             RenderSystem.enableDepthTest();
             Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            //BufferBuilder bufferBuilder = tessellator.getBuffer();
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            //bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             TooltipBackgroundRenderer.render(
                     context,
                     drawX,
@@ -174,7 +176,7 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
             RenderSystem.enableDepthTest();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            //BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.disableBlend();
             matrices.translate(0.0, 0.0, z + 10.0);
 

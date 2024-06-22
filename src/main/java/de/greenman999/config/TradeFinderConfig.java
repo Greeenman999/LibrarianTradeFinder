@@ -6,10 +6,9 @@ import com.google.gson.JsonObject;
 import de.greenman999.LibrarianTradeFinder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.BuiltinRegistries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +17,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static net.minecraft.registry.RegistryKeys.ENCHANTMENT;
 
 public class TradeFinderConfig {
     public static final TradeFinderConfig INSTANCE = new TradeFinderConfig();
@@ -31,7 +33,7 @@ public class TradeFinderConfig {
     public boolean legitMode = true;
     public boolean slowMode = false;
 
-    public HashMap<Enchantment, EnchantmentOption> enchantments = new HashMap<>();
+    public HashMap<String, EnchantmentOption> enchantments = new HashMap<>();
 
     public void save() {
         try {
@@ -45,7 +47,9 @@ public class TradeFinderConfig {
             json.addProperty("slowMode", slowMode);
 
             JsonObject enchantmentsJson = new JsonObject();
-            enchantments.forEach((enchantment, enchantmentOption) -> enchantmentsJson.add(Registries.ENCHANTMENT.getEntry(enchantment).getKey().orElseThrow().getValue().toString(), enchantmentOption.toJson()));
+            enchantments.forEach((enchantmentKey, enchantmentOption) -> {
+                enchantmentsJson.add(enchantmentKey, enchantmentOption.toJson());
+            });
             json.add("enchantments", enchantmentsJson);
 
             Files.writeString(configFile, gson.toJson(json));
@@ -62,6 +66,10 @@ public class TradeFinderConfig {
             }
             JsonObject json = gson.fromJson(Files.readString(configFile), JsonObject.class);
 
+            final Map<String, RegistryEntry<Enchantment>> registeredEnchantments = BuiltinRegistries.createWrapperLookup().getWrapperOrThrow(ENCHANTMENT)
+                .streamEntries()
+                .collect(Collectors.toMap(RegistryEntry::getIdAsString, Function.identity()));
+
             if(!(!json.has("configVersion") || json.get("configVersion").getAsInt() != 1)) {
                 if (json.has("preventAxeBreaking"))
                     preventAxeBreaking = json.getAsJsonPrimitive("preventAxeBreaking").getAsBoolean();
@@ -73,20 +81,20 @@ public class TradeFinderConfig {
                     slowMode = json.getAsJsonPrimitive("slowMode").getAsBoolean();
                 if (json.has("enchantments")) {
                     JsonObject enchantmentsJson = json.getAsJsonObject("enchantments");
-                    enchantmentsJson.entrySet().forEach(entry -> {
-                        RegistryKey<Enchantment> enchantmentKey = RegistryKey.of(Registries.ENCHANTMENT.getKey(), Identifier.tryParse(entry.getKey()));
-                        Enchantment enchantment = Registries.ENCHANTMENT.get(enchantmentKey);
-                        if (enchantment != null) {
-                            enchantments.put(enchantment, EnchantmentOption.fromJson(entry.getValue().getAsJsonObject()));
-                        }
-                    });
+                    enchantmentsJson.entrySet().stream().filter(entry -> registeredEnchantments.containsKey(entry.getKey()))
+                        .forEach(entry -> {
+                            final RegistryEntry<Enchantment> enchantmentRegistryEntry = registeredEnchantments.get(entry.getKey());
+                            enchantments.put(
+                                enchantmentRegistryEntry.getIdAsString(), 
+                                    EnchantmentOption.fromJson(enchantmentRegistryEntry, entry.getValue().getAsJsonObject())
+                                );
+                        });
                 }
             }
 
-            for(Enchantment enchantment : Registries.ENCHANTMENT) {
-                if(!enchantments.containsKey(enchantment)) {
-                    if(!enchantment.isAvailableForEnchantedBookOffer()) continue;
-                    enchantments.put(enchantment, new EnchantmentOption(enchantment, false));
+            for(RegistryEntry<Enchantment> registryEntry : registeredEnchantments.values()) {
+                if(registryEntry != null && !enchantments.containsKey(registryEntry.getIdAsString())) {
+                    enchantments.put(registryEntry.getIdAsString(), new EnchantmentOption(registryEntry, false));
                 }
             }
             sortEnchantmentsMap();
@@ -99,38 +107,35 @@ public class TradeFinderConfig {
 
     private void sortEnchantmentsMap() {
         enchantments = enchantments.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(Comparator.comparing(enchantment -> enchantment.getName(enchantment.getMaxLevel()).copy().formatted(Formatting.WHITE).getString())))
+                .sorted(Map.Entry.comparingByValue(Comparator.comparing((entry) -> Enchantment.getName(entry.enchantment, entry.enchantment.value().getMaxLevel()).copy().formatted(Formatting.WHITE).getString())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     public static class EnchantmentOption {
 
-        public Enchantment enchantment;
+        public RegistryEntry<Enchantment> enchantment;
         public boolean enabled;
         public int level;
         public int maxPrice;
 
-        EnchantmentOption(Enchantment enchantment, boolean enabled, int level, int maxPrice) {
+        EnchantmentOption(RegistryEntry<Enchantment> enchantment, boolean enabled, int level, int maxPrice) {
             this.enchantment = enchantment;
             this.enabled = enabled;
             this.level = level;
             this.maxPrice = maxPrice;
         }
 
-        public EnchantmentOption(Enchantment enchantment, boolean enabled) {
-            this(enchantment, enabled, enchantment.getMaxLevel(), 64);
+        public EnchantmentOption(RegistryEntry<Enchantment> enchantment, boolean enabled) {
+            this(enchantment, enabled, enchantment.value().getMaxLevel(), 64);
         }
 
-        public static EnchantmentOption fromJson(JsonObject json) {
-            RegistryKey<Enchantment> enchantmentKey = RegistryKey.of(Registries.ENCHANTMENT.getKey(), Identifier.tryParse(json.getAsJsonPrimitive("enchantment").getAsString()));
-            Enchantment enchantment = Registries.ENCHANTMENT.get(enchantmentKey);
-            if (enchantment == null) return null;
-            return new EnchantmentOption(enchantment, json.getAsJsonPrimitive("enabled").getAsBoolean(), json.getAsJsonPrimitive("level").getAsInt(), json.getAsJsonPrimitive("maxPrice").getAsInt());
+        public static EnchantmentOption fromJson(RegistryEntry<Enchantment> enchantmentRegistryEntry, JsonObject json) {
+            return new EnchantmentOption(enchantmentRegistryEntry, json.getAsJsonPrimitive("enabled").getAsBoolean(), json.getAsJsonPrimitive("level").getAsInt(), json.getAsJsonPrimitive("maxPrice").getAsInt());
         }
 
         public JsonObject toJson() {
             JsonObject json = new JsonObject();
-            json.addProperty("enchantment", Registries.ENCHANTMENT.getEntry(enchantment).getKey().orElseThrow().getValue().toString());
+            json.addProperty("enchantment", enchantment.getIdAsString());
             json.addProperty("enabled", enabled);
             json.addProperty("level", level);
             json.addProperty("maxPrice", maxPrice);
@@ -162,7 +167,7 @@ public class TradeFinderConfig {
         }
 
         public String getName() {
-            return enchantment.getName(level).copy().formatted(Formatting.WHITE).getString();
+            return Enchantment.getName(enchantment, level).copy().formatted(Formatting.WHITE).getString();
         }
     }
 

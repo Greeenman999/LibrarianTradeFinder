@@ -2,6 +2,7 @@ package de.greenman999.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.greenman999.LibrarianTradeFinder;
+import de.greenman999.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
@@ -25,10 +27,8 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         super(client, width, height, top, itemHeight);
         this.top = top;
 
-        setRenderBackground(false);
-
-        for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
-            this.addEntry(new EnchantmentEntry(enchantment));
+        for(TradeFinderConfig.EnchantmentOption options : LibrarianTradeFinder.getConfig().enchantments.values()) {
+            this.addEntry(new EnchantmentEntry(options.enchantment));
         }
 
         this.resetButton = GrayButtonWidget.builder(Text.translatable("tradefinderui.reset"), (buttonWidget) -> {
@@ -114,7 +114,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     }
 
     @Override
-    protected int getScrollbarPositionX() {
+    protected int getScrollbarX() {
         return this.width - 1;
     }
 
@@ -173,6 +173,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         int l = j + i;
         int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollAmount();
         int n = m / this.itemHeight;
-        return x < (double)this.getScrollbarPositionX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
+        return x < (double)this.getScrollbarX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
     }
 }
