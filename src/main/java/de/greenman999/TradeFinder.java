@@ -6,8 +6,8 @@ import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.entity.Entity;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -18,6 +18,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -42,7 +43,7 @@ public class TradeFinder {
     public static boolean searchAll = true;
 
     // When searching a single enchantment
-    public static Enchantment enchantment = null;
+    public static RegistryEntry<Enchantment> enchantment = null;
     public static int maxBookPrice = 0;
     public static int minLevel = 0;
 
@@ -91,9 +92,9 @@ public class TradeFinder {
         return 1;
     }
 
-    public static int searchSingle(Enchantment enchantment, int minLevel, int maxBookPrice) {
+    public static int searchSingle(RegistryEntry<Enchantment> enchantment, int minLevel, int maxBookPrice) {
         TradeFinder.enchantment = enchantment;
-        TradeFinder.minLevel = Math.min(minLevel, enchantment.getMaxLevel());
+        TradeFinder.minLevel = Math.min(minLevel, enchantment.value().getMaxLevel());
         TradeFinder.maxBookPrice = maxBookPrice;
 
         searchAll = false;
@@ -105,7 +106,7 @@ public class TradeFinder {
             stop();
             return 0;
         }
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-single", enchantment.getName(minLevel), maxBookPrice).styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-single", Enchantment.getName(enchantment, minLevel), maxBookPrice).styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
         return 1;
     }
 

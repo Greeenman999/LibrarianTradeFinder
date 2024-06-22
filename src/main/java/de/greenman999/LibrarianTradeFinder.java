@@ -11,7 +11,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.command.argument.RegistryEntryArgumentType;
+import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -22,7 +22,8 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 @Environment(net.fabricmc.api.EnvType.CLIENT)
 public class LibrarianTradeFinder implements ClientModInitializer {
@@ -60,26 +61,23 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 				dispatcher.register(literal("tradefinder")
 						.then(literal("select").executes(context -> (TradeFinder.select() ? 1 : 0)))
 						.then(literal("search").executes(context -> TradeFinder.searchList())
-							.then(argument("enchantment", RegistryEntryArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
+							.then(argument("enchantment", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
 								RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-								Enchantment enchantment = enchantmentRegistryEntry.value();
 
-								return TradeFinder.searchSingle(enchantment, 1, 64);
+								return TradeFinder.searchSingle(enchantmentRegistryEntry, 1, 64);
 							})
 								.then(argument("level", IntegerArgumentType.integer(1, 5)).executes(context -> {
 									RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-									Enchantment enchantment = enchantmentRegistryEntry.value();
 									int level = IntegerArgumentType.getInteger(context, "level");
 
-									return TradeFinder.searchSingle(enchantment, level, 64);
+									return TradeFinder.searchSingle(enchantmentRegistryEntry, level, 64);
 								})
 									.then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
 										RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-										Enchantment enchantment = enchantmentRegistryEntry.value();
 										int level = IntegerArgumentType.getInteger(context, "level");
 										int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
 
-										return TradeFinder.searchSingle(enchantment, level, bookPrice);
+										return TradeFinder.searchSingle(enchantmentRegistryEntry, level, bookPrice);
 									})))
 							)
 						)

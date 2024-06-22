@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Items;
@@ -16,6 +17,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
 import net.minecraft.network.packet.s2c.play.SetTradeOffersS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -46,17 +48,20 @@ public class ClientConnectionMixin {
             AtomicBoolean found = new AtomicBoolean(false);
             for(TradeOffer tradeOffer : setTradeOffersS2CPacket.getOffers()) {
                 if(!tradeOffer.getSellItem().getItem().equals(Items.ENCHANTED_BOOK)) continue;
-                EnchantmentHelper.get(tradeOffer.getSellItem()).forEach((enchantment, level) -> {
+                final ItemEnchantmentsComponent enchantments = EnchantmentHelper.getEnchantments(tradeOffer.getSellItem());
+                enchantments.getEnchantments().forEach((enchantment) -> {
+                    final int level = enchantments.getLevel(enchantment);
+                    
                     int maxBookPrice;
                     int minLevel;
                     if (TradeFinder.searchAll) {
-                        TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
+                        TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment.getIdAsString());
                         if (enchantmentOption == null || !enchantmentOption.isEnabled()) return;
                         maxBookPrice = enchantmentOption.getMaxPrice();
                         minLevel = enchantmentOption.getLevel();
                     }
                     else {
-                        if (!enchantment.getName(enchantment.getMaxLevel()).equals(TradeFinder.enchantment.getName(enchantment.getMaxLevel()))) return;
+                        if (!Enchantment.getName(enchantment, enchantment.value().getMaxLevel()).equals(Enchantment.getName(TradeFinder.enchantment, enchantment.value().getMaxLevel()))) return;
                         maxBookPrice = TradeFinder.maxBookPrice;
                         minLevel = TradeFinder.minLevel;
                     }
@@ -73,10 +78,10 @@ public class ClientConnectionMixin {
     }
 
     @Unique
-    private void foundEnchantment(AtomicBoolean found, TradeOffer tradeOffer, Enchantment enchantment, int level) {
+    private void foundEnchantment(AtomicBoolean found, TradeOffer tradeOffer, RegistryEntry<Enchantment> enchantment, int level) {
         TradeFinder.stop();
         found.set(true);
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.found", enchantment.getName(level), tradeOffer.getOriginalFirstBuyItem().getCount()).formatted(Formatting.GREEN));
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.found", Enchantment.getName(enchantment, level), tradeOffer.getOriginalFirstBuyItem().getCount()).formatted(Formatting.GREEN));
     }
 
 }
