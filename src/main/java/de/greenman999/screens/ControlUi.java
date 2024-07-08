@@ -3,6 +3,7 @@ package de.greenman999.screens;
 import de.greenman999.LibrarianTradeFinder;
 import de.greenman999.TradeFinder;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -22,12 +23,14 @@ public class ControlUi extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.drawVerticalLine(this.width / 2, 4, this.height - 5, 0xFFC7C0C0);
         super.renderBackground(context, mouseX, mouseY, delta);
+        context.drawVerticalLine(this.width / 2, 4, this.height - 5, 0xFFC7C0C0);
 
         context.fill(this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("tradefinderui.options.title"), this.width / 2 + 10, 9, 0xFFFFFF);
-        super.render(context, mouseX, mouseY, delta);
+        for (Drawable drawable : this.drawables) {
+            drawable.render(context, mouseX, mouseY, delta);
+        }
     }
 
     @Override

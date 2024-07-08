@@ -46,7 +46,10 @@ public class ClientConnectionMixin {
             AtomicBoolean found = new AtomicBoolean(false);
             for(TradeOffer tradeOffer : setTradeOffersS2CPacket.getOffers()) {
                 if(!tradeOffer.getSellItem().getItem().equals(Items.ENCHANTED_BOOK)) continue;
-                EnchantmentHelper.get(tradeOffer.getSellItem()).forEach((enchantment, level) -> {
+                EnchantmentHelper.getEnchantments(tradeOffer.getSellItem()).getEnchantmentsMap().forEach((enchantmentEntry) -> {
+                    Enchantment enchantment = enchantmentEntry.getKey().value();
+                    int level = enchantmentEntry.getIntValue();
+                    System.out.println(enchantment.getName(level));
                     int maxBookPrice;
                     int minLevel;
                     if (TradeFinder.searchAll) {

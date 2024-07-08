@@ -25,8 +25,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         super(client, width, height, top, itemHeight);
         this.top = top;
 
-        setRenderBackground(false);
-
         for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
             this.addEntry(new EnchantmentEntry(enchantment));
         }
@@ -97,6 +95,15 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         }
     }
 
+    @Override
+    protected void drawMenuListBackground(DrawContext context) {
+
+    }
+
+    @Override
+    protected void drawHeaderAndFooterSeparators(DrawContext context) {
+
+    }
 
     @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
@@ -113,9 +120,14 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         return this.width + 7;
     }
 
+    //@Override
+    /*protected int getScrollbarPositionX() {
+        return this.width - 10;
+    }*/
+
     @Override
-    protected int getScrollbarPositionX() {
-        return this.width - 1;
+    protected int getScrollbarX() {
+        return this.width;
     }
 
     @Override
@@ -173,6 +185,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         int l = j + i;
         int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollAmount();
         int n = m / this.itemHeight;
-        return x < (double)this.getScrollbarPositionX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
+        return x < (double)this.getScrollbarX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
     }
 }
