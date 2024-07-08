@@ -24,7 +24,7 @@
 	"accessWidener" : "librarian-trade-finder.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.14.13",
-		"minecraft": ">=1.20.3",
+		"minecraft": ["1.20.5", "1.20.6"],
 		"java": ">=17",
 		"fabric-api": "*"
 	}
