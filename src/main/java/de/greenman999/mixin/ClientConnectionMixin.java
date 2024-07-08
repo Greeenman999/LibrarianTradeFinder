@@ -49,7 +49,6 @@ public class ClientConnectionMixin {
                 EnchantmentHelper.getEnchantments(tradeOffer.getSellItem()).getEnchantmentsMap().forEach((enchantmentEntry) -> {
                     Enchantment enchantment = enchantmentEntry.getKey().value();
                     int level = enchantmentEntry.getIntValue();
-                    System.out.println(enchantment.getName(level));
                     int maxBookPrice;
                     int minLevel;
                     if (TradeFinder.searchAll) {
