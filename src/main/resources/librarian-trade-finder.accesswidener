@@ -1,7 +1,6 @@
 accessWidener	v1	named
 
 accessible class net/minecraft/client/gui/widget/EntryListWidget$Entry
-accessible class net/minecraft/enchantment/EnchantmentHelper$Consumer
 
 extendable	method	net/minecraft/client/gui/widget/EntryListWidget	getEntryAtPosition	(DD)Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;
 
