@@ -73,7 +73,7 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         }else {
             context.fill(x, y, x + entryWidth, y + entryHeight, 0x1AC7C0C0);
         }
-        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable(enchantment.getTranslationKey()), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
+        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, enchantment.description(), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
         matrices.push();
         RenderSystem.enableDepthTest();
@@ -159,10 +159,7 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
             matrices.push();
             RenderSystem.enableDepthTest();
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferBuilder = tessellator.getBuffer();
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             TooltipBackgroundRenderer.render(
                     context,
                     drawX,
@@ -174,7 +171,6 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
             RenderSystem.enableDepthTest();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.disableBlend();
             matrices.translate(0.0, 0.0, z + 10.0);
 

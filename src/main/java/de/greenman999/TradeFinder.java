@@ -18,6 +18,8 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -105,7 +107,7 @@ public class TradeFinder {
             stop();
             return 0;
         }
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-single", enchantment.getName(minLevel), maxBookPrice).styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-single", Enchantment.getName(RegistryEntry.of(enchantment), minLevel), maxBookPrice).styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
         return 1;
     }
 
@@ -135,6 +137,7 @@ public class TradeFinder {
         double closestDistance = Double.POSITIVE_INFINITY;
         Entity closestEntity = null;
 
+        assert MinecraftClient.getInstance().world != null;
         for(Entity entity : MinecraftClient.getInstance().world.getEntities()) {
             Vec3d entityPos = entity.getPos();
             if (blockPos != null && entity instanceof VillagerEntity && ((VillagerEntity) entity).getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
@@ -208,6 +211,8 @@ public class TradeFinder {
                 mc.player.swingHand(Hand.MAIN_HAND, true);
                 mc.player.networkHandler
                         .sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                mc.player.networkHandler
+                        .sendPacket(PlayerInteractEntityC2SPacket.interact(villager, false, Hand.MAIN_HAND));
             }
             if(result == ActionResult.SUCCESS) {
                 finishedBreakLook = false;
