@@ -16,6 +16,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
 import net.minecraft.network.packet.s2c.play.SetTradeOffersS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -46,7 +47,7 @@ public class ClientConnectionMixin {
             AtomicBoolean found = new AtomicBoolean(false);
             for(TradeOffer tradeOffer : setTradeOffersS2CPacket.getOffers()) {
                 if(!tradeOffer.getSellItem().getItem().equals(Items.ENCHANTED_BOOK)) continue;
-                EnchantmentHelper.getEnchantments(tradeOffer.getSellItem()).getEnchantmentsMap().forEach((enchantmentEntry) -> {
+                EnchantmentHelper.getEnchantments(tradeOffer.getSellItem()).getEnchantmentEntries().forEach((enchantmentEntry) -> {
                     Enchantment enchantment = enchantmentEntry.getKey().value();
                     int level = enchantmentEntry.getIntValue();
                     int maxBookPrice;
@@ -58,7 +59,8 @@ public class ClientConnectionMixin {
                         minLevel = enchantmentOption.getLevel();
                     }
                     else {
-                        if (!enchantment.getName(enchantment.getMaxLevel()).equals(TradeFinder.enchantment.getName(enchantment.getMaxLevel()))) return;
+                        if (!Enchantment.getName(RegistryEntry.of(enchantment), enchantment.getMaxLevel()).equals(
+                                Enchantment.getName(RegistryEntry.of(TradeFinder.enchantment), enchantment.getMaxLevel()))) return;
                         maxBookPrice = TradeFinder.maxBookPrice;
                         minLevel = TradeFinder.minLevel;
                     }
@@ -78,7 +80,10 @@ public class ClientConnectionMixin {
     private void foundEnchantment(AtomicBoolean found, TradeOffer tradeOffer, Enchantment enchantment, int level) {
         TradeFinder.stop();
         found.set(true);
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.found", enchantment.getName(level), tradeOffer.getOriginalFirstBuyItem().getCount()).formatted(Formatting.GREEN));
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable(
+                "librarian-trade-finder.found",
+                Enchantment.getName(RegistryEntry.of(enchantment), level),
+                tradeOffer.getOriginalFirstBuyItem().getCount()).formatted(Formatting.GREEN));
     }
 
 }

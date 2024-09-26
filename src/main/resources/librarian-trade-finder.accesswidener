@@ -5,6 +5,6 @@ accessible class net/minecraft/enchantment/EnchantmentHelper$Consumer
 
 extendable	method	net/minecraft/client/gui/widget/EntryListWidget	getEntryAtPosition	(DD)Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;
 
-accessible method net/minecraft/enchantment/EnchantmentHelper forEachEnchantment (Lnet/minecraft/enchantment/EnchantmentHelper$Consumer;Lnet/minecraft/item/ItemStack;)V
+accessible method net/minecraft/enchantment/EnchantmentHelper forEachEnchantment (Lnet/minecraft/item/ItemStack;Lnet/minecraft/enchantment/EnchantmentHelper$Consumer;)V
 
 accessible field net/minecraft/client/gui/screen/Screen drawables Ljava/util/List;
