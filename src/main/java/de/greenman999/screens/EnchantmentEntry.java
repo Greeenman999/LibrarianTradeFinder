@@ -6,6 +6,7 @@ import de.greenman999.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
 import net.minecraft.client.gui.widget.EntryListWidget;
@@ -159,14 +160,15 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
             matrices.push();
             RenderSystem.enableDepthTest();
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
             TooltipBackgroundRenderer.render(
                     context,
                     drawX,
                     drawY,
                     maxWidth,
                     height,
-                    z
+                    z,
+                    null
             );
             RenderSystem.enableDepthTest();
             RenderSystem.enableBlend();
