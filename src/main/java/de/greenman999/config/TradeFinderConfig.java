@@ -48,7 +48,7 @@ public class TradeFinderConfig {
             }
             assert MinecraftClient.getInstance().world != null;
             currentEnchantmentRegistry = MinecraftClient.getInstance().world
-                    .getRegistryManager().get(RegistryKeys.ENCHANTMENT);
+                    .getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
         }
         return currentEnchantmentRegistry;
     }
@@ -125,7 +125,7 @@ public class TradeFinderConfig {
                     Identifier.of("minecraft","tradeable"));
             for (Enchantment enchantment : enchantmentRegistry) {
                 RegistryKey<Enchantment> enchantmentKey = enchantmentRegistry.getKey(enchantment).orElseThrow();
-                boolean availableAsTrade = enchantmentRegistry.entryOf(enchantmentKey).isIn(tradeableTag);
+                boolean availableAsTrade = enchantmentRegistry.getOrThrow(enchantmentKey).isIn(tradeableTag);
                 if (!availableAsTrade) continue;
                 String resLocation = enchantmentKey.getValue().toString();
                 EnchantmentOption enchantmentOption =

@@ -259,13 +259,13 @@ public class TradeFinder {
                 state = TradeState.PLACE;
                 if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getNetworkHandler() != null) {
                     prevPos = mc.player.getPos();
-                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true));
+                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true, false));
                 }
             }
 
         } else if (state == TradeState.PLACE) {
             if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getNetworkHandler() != null) {
-                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(prevPos.x, prevPos.y, prevPos.z, true));
+                mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(prevPos.x, prevPos.y, prevPos.z, true, false));
             }
 
             BlockPos toPlace = lecternPos.down();
