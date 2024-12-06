@@ -132,7 +132,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     @Override
     public int getRowTop(int index) {
-        return this.getY() - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
+        return this.getY() - (int)this.getScrollY() + index * this.itemHeight + this.headerHeight;
     }
 
     @Override
@@ -183,7 +183,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         int j = this.getX() + this.width / 2;
         int k = j - i;
         int l = j + i;
-        int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollAmount();
+        int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollY();
         int n = m / this.itemHeight;
         return x < (double)this.getScrollbarX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
     }
