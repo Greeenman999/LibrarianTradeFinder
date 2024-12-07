@@ -1,4 +1,4 @@
-package de.greenman999.screens;
+package de.greenman999.librariantradefinder.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;

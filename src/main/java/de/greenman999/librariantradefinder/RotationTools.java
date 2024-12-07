@@ -1,4 +1,4 @@
-package de.greenman999;
+package de.greenman999.librariantradefinder;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.argument.EntityAnchorArgumentType;

@@ -1,4 +1,4 @@
-package de.greenman999;
+package de.greenman999.librariantradefinder;
 
 public enum TradeState {
     IDLE,

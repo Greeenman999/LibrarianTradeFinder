@@ -1,7 +1,7 @@
-package de.greenman999.screens;
+package de.greenman999.librariantradefinder.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import de.greenman999.LibrarianTradeFinder;
+import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;

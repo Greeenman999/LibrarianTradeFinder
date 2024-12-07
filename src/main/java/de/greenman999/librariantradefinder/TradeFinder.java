@@ -1,6 +1,6 @@
-package de.greenman999;
+package de.greenman999.librariantradefinder;
 
-import de.greenman999.config.TradeFinderConfig;
+import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;

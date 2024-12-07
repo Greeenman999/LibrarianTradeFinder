@@ -9,6 +9,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "ClientConnectionMixin"
+    "de.greenman999.librariantradefinder.mixin.ClientConnectionMixin"
   ]
 }

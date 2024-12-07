@@ -15,7 +15,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"client": [
-          "de.greenman999.LibrarianTradeFinder"
+			"de.greenman999.librariantradefinder.LibrarianTradeFinder"
 		]
 	},
 	"mixins": [

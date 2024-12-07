@@ -1,9 +1,9 @@
-package de.greenman999.mixin;
+package de.greenman999.librariantradefinder.mixin;
 
-import de.greenman999.LibrarianTradeFinder;
-import de.greenman999.TradeFinder;
-import de.greenman999.TradeState;
-import de.greenman999.config.TradeFinderConfig;
+import de.greenman999.librariantradefinder.LibrarianTradeFinder;
+import de.greenman999.librariantradefinder.TradeFinder;
+import de.greenman999.librariantradefinder.TradeState;
+import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import io.netty.channel.ChannelHandlerContext;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

@@ -1,8 +1,8 @@
-package de.greenman999.screens;
+package de.greenman999.librariantradefinder.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import de.greenman999.LibrarianTradeFinder;
-import de.greenman999.config.TradeFinderConfig;
+import de.greenman999.librariantradefinder.LibrarianTradeFinder;
+import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
@@ -11,7 +11,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;

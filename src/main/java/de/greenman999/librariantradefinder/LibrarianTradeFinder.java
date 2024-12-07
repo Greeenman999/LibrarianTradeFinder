@@ -1,8 +1,8 @@
-package de.greenman999;
+package de.greenman999.librariantradefinder;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import de.greenman999.config.TradeFinderConfig;
-import de.greenman999.screens.ControlUi;
+import de.greenman999.librariantradefinder.config.TradeFinderConfig;
+import de.greenman999.librariantradefinder.screens.ControlUi;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;

@@ -1,7 +1,7 @@
-package de.greenman999.screens;
+package de.greenman999.librariantradefinder.screens;
 
-import de.greenman999.LibrarianTradeFinder;
-import de.greenman999.TradeFinder;
+import de.greenman999.librariantradefinder.LibrarianTradeFinder;
+import de.greenman999.librariantradefinder.TradeFinder;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
