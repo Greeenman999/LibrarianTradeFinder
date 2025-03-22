@@ -1,6 +1,5 @@
 package de.greenman999.librariantradefinder.screens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
@@ -52,14 +51,12 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         this.setSelected(null);
         MatrixStack matrices = context.getMatrices();
         matrices.push();
-        RenderSystem.enableDepthTest();
         matrices.translate(0, 0, 100);
 
         context.fill(5, 5, this.width + 5, 20, 0xAFC7C0C0);
         context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("tradefinderui.enchantments.title"), 9, 9, 0xFFFFFF);
         resetButton.render(context, mouseX, mouseY, delta);
 
-        RenderSystem.disableDepthTest();
         matrices.pop();
 
         super.renderWidget(context, mouseX, mouseY, delta);

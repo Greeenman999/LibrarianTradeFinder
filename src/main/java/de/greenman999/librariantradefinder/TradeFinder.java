@@ -140,7 +140,7 @@ public class TradeFinder {
         assert MinecraftClient.getInstance().world != null;
         for(Entity entity : MinecraftClient.getInstance().world.getEntities()) {
             Vec3d entityPos = entity.getPos();
-            if (blockPos != null && entity instanceof VillagerEntity && ((VillagerEntity) entity).getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
+            if (blockPos != null && entity instanceof VillagerEntity && ((VillagerEntity) entity).getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
                 closestDistance = entityPos.distanceTo(blockPos.toCenterPos());
                 closestEntity = entity;
             }
@@ -178,7 +178,7 @@ public class TradeFinder {
             case PLACE -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.place", tries).formatted(Formatting.GRAY), false);
         }
 
-        if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().getProfession().equals(VillagerProfession.LIBRARIAN)) {
+        if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN)) {
             Vec3d villagerPosition = new Vec3d(villager.getX(), villager.getY() + (double) villager.getEyeHeight(EntityPose.STANDING), villager.getZ());
 
             if(LibrarianTradeFinder.getConfig().legitMode && LibrarianTradeFinder.getConfig().slowMode) {
@@ -240,7 +240,7 @@ public class TradeFinder {
                 player.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(toPlace.getX() + 0.5, toPlace.getY() + 1.0, toPlace.getZ() + 0.5));
             }
             PlayerInventory inventory = player.getInventory();
-            ItemStack mainHand = inventory.getMainHandStack();
+            ItemStack mainHand = inventory.getSelectedStack();
             if(mainHand.getItem() instanceof AxeItem) {
                 int remainingDurability = mainHand.getMaxDamage() - mainHand.getDamage();
                 if(remainingDurability <= 5 && LibrarianTradeFinder.getConfig().preventAxeBreaking) {
@@ -313,8 +313,8 @@ public class TradeFinder {
                 } else {
                     for (int i = 0; i < 9; i++) {
                         if (mc.player.getInventory().getStack(i).getItem() == Items.LECTERN) {
-                            if (i != mc.player.getInventory().selectedSlot) {
-                                mc.player.getInventory().selectedSlot = i;
+                            if (i != mc.player.getInventory().getSelectedSlot()) {
+                                mc.player.getInventory().setSelectedSlot(i);
                                 mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(i));
                             }
 
