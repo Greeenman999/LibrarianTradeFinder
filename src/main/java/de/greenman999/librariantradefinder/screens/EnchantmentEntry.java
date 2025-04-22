@@ -1,12 +1,10 @@
 package de.greenman999.librariantradefinder.screens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
 import net.minecraft.client.gui.widget.EntryListWidget;
@@ -76,17 +74,14 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, enchantment.description(), 8, y + (entryHeight / 2 / 2), 0xFFFFFF);
 
         matrices.push();
-        RenderSystem.enableDepthTest();
         matrices.translate(0, 0, 50);
         maxPriceField.setX(x + entryWidth - 21);
         maxPriceField.setY(y + 1);
         maxPriceField.render(context, mouseX, mouseY, tickDelta);
 
-        RenderSystem.enableDepthTest();
         levelField.setX(x + entryWidth - 21 - 15 - 14);
         levelField.setY(y + 1);
         levelField.render(context, mouseX, mouseY, tickDelta);
-        RenderSystem.disableDepthTest();
         matrices.pop();
     }
 
@@ -158,8 +153,6 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
             int drawY = y - 12;
 
             matrices.push();
-            RenderSystem.enableDepthTest();
-            RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
             TooltipBackgroundRenderer.render(
                     context,
                     drawX,
@@ -169,16 +162,11 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
                     z,
                     null
             );
-            RenderSystem.enableDepthTest();
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableBlend();
             matrices.translate(0.0, 0.0, z + 10.0);
 
             text.drawWithShadow(context, drawX, drawY, lineHeight, -1);
 
             matrices.pop();
-            RenderSystem.disableDepthTest();
         }
     }
 }
