@@ -78,12 +78,20 @@ public class ClientConnectionMixin {
 
     @Unique
     private void foundEnchantment(AtomicBoolean found, TradeOffer tradeOffer, Enchantment enchantment, int level) {
+        int attempts = TradeFinder.tries; // Save the attempts BEFORE calling stop()
         TradeFinder.stop();
         found.set(true);
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable(
-                "librarian-trade-finder.found",
-                Enchantment.getName(RegistryEntry.of(enchantment), level),
-                tradeOffer.getOriginalFirstBuyItem().getCount()).formatted(Formatting.GREEN));
+
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
+                Text.translatable(
+                        "librarian-trade-finder.found",
+                        Enchantment.getName(RegistryEntry.of(enchantment), level),
+                        tradeOffer.getOriginalFirstBuyItem().getCount(),
+                        Text.literal(String.valueOf(attempts))
+                                .styled(style -> style.withColor(0xcc1141))
+                ).formatted(Formatting.GREEN)
+        );
     }
+
 
 }

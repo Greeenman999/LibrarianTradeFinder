@@ -16,7 +16,7 @@
   "librarian-trade-finder.actionbar.status.place": "placing lectern --- attempt: %d",
   "librarian-trade-finder.check.interact.failed": "Failed to interact with villager. Try again.",
   "librarian-trade-finder.break.axe.breaking": "The searching process was stopped because your axe is about to break.",
-  "librarian-trade-finder.found": "Found enchantment %d for %d emeralds!",
+  "librarian-trade-finder.found": "Found enchantment %d for %d emeralds after %d attempts!",
   "tradefinderui.screen.title": "Librarian Trade Finder",
   "tradefinderui.options.title": "Options",
   "tradefinderui.buttons.save": "Save & Exit",

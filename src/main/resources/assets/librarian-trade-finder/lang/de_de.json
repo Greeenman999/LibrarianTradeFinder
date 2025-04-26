@@ -16,7 +16,7 @@
   "librarian-trade-finder.actionbar.status.place": "Lesepult platzieren --- Versuch: %d",
   "librarian-trade-finder.check.interact.failed": "Interaktion mit Dorfbewohner fehlgeschlagen. Versuchen Sie es erneut.",
   "librarian-trade-finder.break.axe.breaking": "Der Suchvorgang wurde unterbrochen, weil Ihre Axt zu zerbrechen droht.",
-  "librarian-trade-finder.found": "Verzauberung %d für %d Smaragde gefunden!",
+  "librarian-trade-finder.found": "Verzauberung %d für %d Smaragde, nach %d Versuche gefunden!",
   "tradefinderui.screen.title": "Bibliothekar Tausch Finder",
   "tradefinderui.options.title": "Optionen",
   "tradefinderui.buttons.save": "Speichern & Schließen",
