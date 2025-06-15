@@ -105,10 +105,6 @@ public class ClientConnectionMixin {
                 2.0f,
                 false
         );
-        
-        client.inGameHud.getChatHud().addMessage(
-				Text.literal("SENT PING")
-		);
     }
 
 
