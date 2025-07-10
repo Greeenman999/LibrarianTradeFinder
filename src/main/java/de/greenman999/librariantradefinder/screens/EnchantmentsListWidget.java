@@ -29,7 +29,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         }
 
         this.resetButton = GrayButtonWidget.builder(Text.translatable("tradefinderui.reset"), (buttonWidget) -> {
-            LibrarianTradeFinder.LOGGER.info("Reset button pressed!");
             for(EnchantmentEntry enchantmentEntry : this.children()) {
                         enchantmentEntry.maxPriceField.setText("64");
                         enchantmentEntry.levelField.setText(String.valueOf(enchantmentEntry.enchantment.getMaxLevel()));
@@ -56,7 +55,6 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
         context.fill(5, 5, this.width + 5, 20, 0xAFC7C0C0);
         context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("tradefinderui.enchantments.title"), 9, 9, 0xFFFFFF);
-        resetButton.render(context, mouseX, mouseY, delta);
 
         matrices.popMatrix();
 

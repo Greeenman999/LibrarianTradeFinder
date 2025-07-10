@@ -76,6 +76,7 @@ public class ControlUi extends Screen {
 
         enchantmentsListWidget = new EnchantmentsListWidget(this.client, this.width / 2 - 10, this.height - 30, 25, 20);
         this.addDrawableChild(enchantmentsListWidget);
+        this.addDrawableChild(enchantmentsListWidget.resetButton);
 
         this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().tpToVillager = !LibrarianTradeFinder.getConfig().tpToVillager;
