@@ -23,7 +23,8 @@ public class ControlUi extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderBackground(context, mouseX, mouseY, delta);
+
+        this.renderBackground(context, mouseX, mouseY, delta);
         context.drawVerticalLine(this.width / 2, 4, this.height - 5, 0xFFC7C0C0);
 
         context.fill(this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
@@ -31,6 +32,17 @@ public class ControlUi extends Screen {
         for (Drawable drawable : this.drawables) {
             drawable.render(context, mouseX, mouseY, delta);
         }
+    }
+
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        if (this.client != null && this.client.world == null) {
+            this.renderPanoramaBackground(context, deltaTicks);
+        } else {
+            context.fill(0, 0, this.width, this.height, 0x90202020);
+        }
+
+        this.renderDarkening(context);
     }
 
     @Override
@@ -171,4 +183,5 @@ public class ControlUi extends Screen {
         LibrarianTradeFinder.getConfig().save();
         super.close();
     }
+
 }
