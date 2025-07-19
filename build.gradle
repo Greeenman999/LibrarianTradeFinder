@@ -4,7 +4,9 @@ plugins {
 }
 
 
-archivesBaseName = project.archives_base_name
+tasks.withType(Jar).configureEach {
+	archiveBaseName.set(project.archives_base_name)
+}
 version = project.mod_version
 group = project.maven_group
 
