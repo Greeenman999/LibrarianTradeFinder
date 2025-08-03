@@ -54,7 +54,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         matrices.translate(0.0F, 0.0F);
 
         context.fill(5, 5, this.width + 5, 20, 0xAFC7C0C0);
-        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("tradefinderui.enchantments.title"), 9, 9, 0xFFFFFF);
+        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("tradefinderui.enchantments.title"), 9, 9, 0xFFFFFFFF);
 
         matrices.popMatrix();
 

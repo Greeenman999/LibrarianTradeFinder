@@ -2,6 +2,7 @@ package de.greenman999.librariantradefinder.screens;
 
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import de.greenman999.librariantradefinder.TradeFinder;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -27,8 +28,8 @@ public class ControlUi extends Screen {
         this.renderBackground(context, mouseX, mouseY, delta);
         context.drawVerticalLine(this.width / 2, 4, this.height - 5, 0xFFC7C0C0);
 
-        context.fill(this.width / 2 + 6, 5, this.width - 5, 20, 0xAFC7C0C0);
-        context.drawTextWithShadow(this.textRenderer, Text.translatable("tradefinderui.options.title"), this.width / 2 + 10, 9, 0xFFFFFF);
+        context.fill(this.width / 2 + 6, 5, this.width - 5, 20, 0x3FC7C0C0);
+        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("tradefinderui.options.title"), this.width / 2 + 10, 9, 0xFFFFFFFF);
         for (Drawable drawable : this.drawables) {
             drawable.render(context, mouseX, mouseY, delta);
         }
