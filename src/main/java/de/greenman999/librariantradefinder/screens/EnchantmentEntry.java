@@ -11,8 +11,11 @@ import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix3x2fStack;
+
+import java.util.List;
 
 public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
@@ -80,13 +83,13 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         if (enabled) {
             context.fill(x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
 
-            context.drawTextWithShadow(textRenderer, Text.of("$:"), maxPriceX - 10, y + 2, 0xFFFFFFFF);
-            context.drawTextWithShadow(textRenderer, Text.of("LVL:"), levelX - 23, y + 2, 0xFFFFFFFF);
+            context.drawTextWithShadow(textRenderer, Text.of("$:"), maxPriceX - 10, y + 4, 0xFFFFFFFF);
+            context.drawTextWithShadow(textRenderer, Text.of("LVL:"), levelX - 23, y + 4, 0xFFFFFFFF);
         } else {
             context.fill(x, y, x + entryWidth, y + entryHeight, 0x1AC7C0C0);
         }
 
-        context.drawTextWithShadow(textRenderer, enchantmentText, 8, y + 2, 0xFFFFFFFF);
+        context.drawTextWithShadow(textRenderer, enchantmentText, 8, y + 4, 0xFFFFFFFF);
 
         matrices.pushMatrix();
         matrices.translate(0, 0);
@@ -98,6 +101,27 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         levelField.setY(y + 1);
         levelField.render(context, mouseX, mouseY, tickDelta);
         matrices.popMatrix();
+
+        if (maxPriceField.isActive()) {
+            context.drawTooltip(MinecraftClient.getInstance().textRenderer, List.of(Text.translatable("tradefinderui.enchantments.price.tooltip.1").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.2").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.3").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.4").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.5").formatted(Formatting.GRAY)), maxPriceField.getX() - 8, y + 32);
+        }
+
+        if(mouseX > x + entryWidth - 21 - 10 - 2 && mouseX < x + entryWidth - 21 - 2 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.isActive()) {
+            context.drawTooltip(MinecraftClient.getInstance().textRenderer, List.of(Text.translatable("tradefinderui.enchantments.price.tooltip.title").formatted(Formatting.GREEN),
+                    Text.empty(),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.1").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.2").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.3").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.4").formatted(Formatting.GRAY),
+                    Text.translatable("tradefinderui.enchantments.price.tooltip.5").formatted(Formatting.GRAY)), mouseX, y + 32);
+        }
+        if(mouseX > x + entryWidth - 21 - 15 - 14 - 23 - 2 && mouseX < x + entryWidth - 21 - 15 - 14 - 2 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.isActive()) {
+            context.drawTooltip(MinecraftClient.getInstance().textRenderer, List.of(Text.translatable("tradefinderui.enchantments.level.tooltip").formatted(Formatting.GREEN)), mouseX, y + 32);
+        }
     }
 
     @Override
