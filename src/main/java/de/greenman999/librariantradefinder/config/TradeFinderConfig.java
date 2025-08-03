@@ -138,6 +138,7 @@ public class TradeFinderConfig {
             sortEnchantmentsMap();
 
             save();
+            LibrarianTradeFinder.LOGGER.info("Config file loaded successfully. Enchantments size: {}", enchantments.size());
         } catch (IOException e) {
             LibrarianTradeFinder.LOGGER.error("Failed to load config file", e);
         }

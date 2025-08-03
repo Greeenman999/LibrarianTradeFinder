@@ -4,16 +4,14 @@
 # against bad commits.
 
 name: build
-on: [pull_request, push]
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
   build:
     strategy:
       matrix:
         # Use these Java versions
-        java: [
-          21,    # Current Java LTS & minimum supported by Minecraft
-        ]
+        java: [21,]    # Current Java LTS & minimum supported by Minecraft]
         # and run on both Linux and Windows
         os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
