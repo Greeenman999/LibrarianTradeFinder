@@ -34,6 +34,7 @@ public class TradeFinderConfig {
     public boolean tpToVillager = false;
     public boolean legitMode = true;
     public boolean slowMode = false;
+    public boolean autoBuy = true;
 
     public HashMap<Enchantment, EnchantmentOption> enchantments = new HashMap<>();
 
@@ -67,6 +68,7 @@ public class TradeFinderConfig {
             json.addProperty("tpToVillager", tpToVillager);
             json.addProperty("legitMode", legitMode);
             json.addProperty("slowMode", slowMode);
+            json.addProperty("autoBuy", autoBuy);
 
             JsonObject enchantmentsJson = new JsonObject();
 
@@ -110,6 +112,8 @@ public class TradeFinderConfig {
                     legitMode = json.getAsJsonPrimitive("legitMode").getAsBoolean();
                 if (json.has("slowMode"))
                     slowMode = json.getAsJsonPrimitive("slowMode").getAsBoolean();
+                if (json.has("autoBuy"))
+                    autoBuy = json.getAsJsonPrimitive("autoBuy").getAsBoolean();
                 if (json.has("enchantments")) {
                     JsonObject enchantmentsJson = json.getAsJsonObject("enchantments");
                     enchantmentsJson.entrySet().forEach(entry -> {

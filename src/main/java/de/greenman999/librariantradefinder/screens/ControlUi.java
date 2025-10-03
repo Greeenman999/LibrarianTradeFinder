@@ -123,6 +123,16 @@ public class ControlUi extends Screen {
                 .id(5)
                 .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.slow-mode.tooltip")))
                 .build());
+        this.addDrawableChild(GrayButtonWidget.builder(getButtonText("tradefinderui.options.auto-buy", LibrarianTradeFinder.getConfig().autoBuy), (buttonWidget) -> {
+                    LibrarianTradeFinder.getConfig().autoBuy = !LibrarianTradeFinder.getConfig().autoBuy;
+
+                    updateButtonTexts();
+                })
+                .dimensions(this.width / 2 + 6, 125, this.width / 2 - 10, 20)
+                .color(0x4FC7C0C0)
+                .id(6)
+                .tooltip(Tooltip.of(Text.translatable("tradefinderui.options.auto-buy.tooltip")))
+                .build());
 
         super.init();
     }
@@ -139,6 +149,8 @@ public class ControlUi extends Screen {
                         buttonWidget.setMessage(getButtonText("tradefinderui.options.legit-mode", LibrarianTradeFinder.getConfig().legitMode));
                 case 5 ->
                         buttonWidget.setMessage(getButtonText("tradefinderui.options.slow-mode", LibrarianTradeFinder.getConfig().slowMode));
+                case 6 ->
+                        buttonWidget.setMessage(getButtonText("tradefinderui.options.auto-buy", LibrarianTradeFinder.getConfig().autoBuy));
             }
         }
     }
