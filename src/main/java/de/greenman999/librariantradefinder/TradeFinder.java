@@ -178,7 +178,7 @@ public class TradeFinder {
             case PLACE -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.place", tries).formatted(Formatting.GRAY), false);
         }
 
-        if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN)) {
+        if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET || state == TradeState.WAITING_TO_BUY) && villager.getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN)) {
             Vec3d villagerPosition = new Vec3d(villager.getX(), villager.getY() + (double) villager.getEyeHeight(EntityPose.STANDING), villager.getZ());
 
             if(LibrarianTradeFinder.getConfig().legitMode && LibrarianTradeFinder.getConfig().slowMode) {
@@ -216,7 +216,10 @@ public class TradeFinder {
             }
             if(result == ActionResult.SUCCESS) {
                 finishedBreakLook = false;
-                state = TradeState.WAITING_FOR_PACKET;
+                if (state != TradeState.WAITING_TO_BUY)
+                    state = TradeState.WAITING_FOR_PACKET;
+                else
+                    state = TradeState.BUY;
             }else {
                 mc.inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.check.interact.failed").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
                 stop();

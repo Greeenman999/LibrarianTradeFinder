@@ -36,7 +36,7 @@ public class ClientConnectionMixin {
     @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"), cancellable = true)
     private void onChannelRead0(ChannelHandlerContext channelHandlerContext, Packet<?> packet, CallbackInfo ci) {
         if(packet instanceof OpenScreenS2CPacket openScreenS2CPacket) {
-            if(openScreenS2CPacket.getScreenHandlerType() == ScreenHandlerType.MERCHANT && !(TradeFinder.state.equals(TradeState.IDLE))) {
+            if(openScreenS2CPacket.getScreenHandlerType() == ScreenHandlerType.MERCHANT && !(TradeFinder.state.equals(TradeState.IDLE) || TradeFinder.state.equals(TradeState.BUY))) {
                 ClientPlayNetworkHandler networkHandler = MinecraftClient.getInstance().getNetworkHandler();
                 if(networkHandler != null) {
                     networkHandler.sendPacket(new CloseHandledScreenC2SPacket(openScreenS2CPacket.getSyncId()));
@@ -79,7 +79,11 @@ public class ClientConnectionMixin {
     @Unique
     private void foundEnchantment(AtomicBoolean found, TradeOffer tradeOffer, Enchantment enchantment, int level) {
         int attempts = TradeFinder.tries; // Save the attempts BEFORE calling stop()
-        TradeFinder.stop();
+        if (LibrarianTradeFinder.getConfig().autoBuy) {
+            TradeFinder.state = TradeState.WAITING_TO_BUY;
+        } else {
+            TradeFinder.stop();
+        }
         found.set(true);
 
         MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(

@@ -29,6 +29,8 @@
   "tradefinderui.options.legit-mode.tooltip": "When enabled automatically look at the lectern or villager to prevent getting flagged by some anti cheats.",
   "tradefinderui.options.slow-mode": "Slow Mode: %d",
   "tradefinderui.options.slow-mode.tooltip": "When enabled, the search process is slowed down to make the modification fairer and look more legitimate.",
+  "tradefinderui.options.auto-buy": "Auto Buy: %d",
+  "tradefinderui.options.auto-buy.tooltip": "Automatically buys the enchanted book to lock in the trades of the villager.",
   "tradefinderui.reset": "Reset All",
   "tradefinderui.reset.tooltip": "Reset all enchantments to default values",
   "tradefinderui.enchantments.title": "Enchantments",
