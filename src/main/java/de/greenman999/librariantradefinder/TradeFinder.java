@@ -139,7 +139,7 @@ public class TradeFinder {
 
         assert MinecraftClient.getInstance().world != null;
         for(Entity entity : MinecraftClient.getInstance().world.getEntities()) {
-            Vec3d entityPos = entity.getEntityPos();
+            Vec3d entityPos = entity.getPos();
             if (blockPos != null && entity instanceof VillagerEntity && ((VillagerEntity) entity).getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
                 closestDistance = entityPos.distanceTo(blockPos.toCenterPos());
                 closestEntity = entity;
@@ -258,7 +258,7 @@ public class TradeFinder {
                 finishedPlaceLook = false;
                 state = TradeState.PLACE;
                 if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getNetworkHandler() != null) {
-                    prevPos = mc.player.getEntityPos();
+                    prevPos = mc.player.getPos();
                     mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true, false));
                 }
             }
