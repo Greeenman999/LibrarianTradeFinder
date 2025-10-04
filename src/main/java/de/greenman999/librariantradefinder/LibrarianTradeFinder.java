@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -21,6 +21,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 public class LibrarianTradeFinder implements ClientModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("librarian-trade-finder");
+	public static final KeyBinding.Category CATEGORY = new KeyBinding.Category(Identifier.of("librarian-trade-finder"));
 	private boolean openConfigScreen;
 
 	private static KeyBinding selectKeyBinding;
@@ -40,23 +42,22 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onInitializeClient() {
-
 		selectKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.librarian-trade-finder.select",
 				GLFW.GLFW_KEY_I,
-				"key.categories.librarian-trade-finder"
+				CATEGORY
 		));
 
 		toggleKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.librarian-trade-finder.toggle",
 				GLFW.GLFW_KEY_O,
-				"key.categories.librarian-trade-finder"
+				CATEGORY
 		));
 
 		configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.librarian-trade-finder.config",
 				GLFW.GLFW_KEY_C,
-				"key.categories.librarian-trade-finder"
+				CATEGORY
 		));
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
@@ -126,7 +127,8 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			}
 		});
 
-		WorldRenderEvents.END.register(context -> RotationTools.render());
+		// TODO: Deprecated, move to mixin
+		HudRenderCallback.EVENT.register((a, b) -> RotationTools.render());
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> getConfig().load());
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> {
