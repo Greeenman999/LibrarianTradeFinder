@@ -5,6 +5,7 @@ import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
 import net.minecraft.client.gui.widget.EntryListWidget;
@@ -49,8 +50,9 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
     }
 
     @Override
-    public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+    public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
         Matrix3x2fStack matrices = context.getMatrices();
+        //TODO: find how to get x, y, entryWidth, entryHeight
         this.x = x;
         this.y = y;
         this.entryWidth = entryWidth;
@@ -95,11 +97,11 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         matrices.translate(0, 0);
         maxPriceField.setX(maxPriceX);
         maxPriceField.setY(y + 1);
-        maxPriceField.render(context, mouseX, mouseY, tickDelta);
+        maxPriceField.render(context, mouseX, mouseY, deltaTicks);
 
         levelField.setX(levelX);
         levelField.setY(y + 1);
-        levelField.render(context, mouseX, mouseY, tickDelta);
+        levelField.render(context, mouseX, mouseY, deltaTicks);
         matrices.popMatrix();
 
         if (maxPriceField.isActive()) {
@@ -125,7 +127,8 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        //TODO: fix logic
         int i = 0;
         if(enabled) {
             i = 21 + 15 + 14;
@@ -147,9 +150,9 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        boolean maxPriceFieldReturn = maxPriceField.mouseReleased(mouseX, mouseY, button);
-        boolean levelFieldReturn = levelField.mouseReleased(mouseX, mouseY, button);
+    public boolean mouseReleased(Click click) {
+        boolean maxPriceFieldReturn = maxPriceField.mouseReleased(click);
+        boolean levelFieldReturn = levelField.mouseReleased(click);
         return maxPriceFieldReturn || levelFieldReturn;
     }
 
@@ -170,7 +173,7 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         }
         return false;
     }
-
+    //TODO: fix logic
     public static void renderMultilineTooltip(DrawContext context, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenHeight) {
         Matrix3x2fStack matrices = context.getMatrices();
         if (text.count() > 0) {

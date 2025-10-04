@@ -2,10 +2,13 @@ package de.greenman999.librariantradefinder.screens;
 
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;
@@ -41,7 +44,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     }
 
     @Override
-    protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
+    protected void drawSelectionHighlight(DrawContext context, EnchantmentEntry entry, int color) {
     }
 
     @Override
@@ -105,39 +108,41 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        resetButton.mouseClicked(mouseX, mouseY, button);
-        return super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseClicked(Click click, boolean doubled) {
+        resetButton.mouseClicked(click, doubled);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyInput input) {
+        int keyCode = input.getKeycode();
         if(!(keyCode == InputUtil.GLFW_KEY_BACKSPACE || (keyCode >= InputUtil.GLFW_KEY_0 && keyCode <= InputUtil.GLFW_KEY_9) || keyCode == InputUtil.GLFW_KEY_LEFT || keyCode == InputUtil.GLFW_KEY_RIGHT)) return false;
         for(EnchantmentEntry enchantmentEntry : children()) {
             if(enchantmentEntry.maxPriceField.isFocused()) return enchantmentEntry.maxPriceField.keyPressed(keyCode, scanCode, modifiers);
             if(enchantmentEntry.levelField.isFocused()) return enchantmentEntry.levelField.keyPressed(keyCode, scanCode, modifiers);
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(input);
     }
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    public boolean keyReleased(KeyInput input) {
+        int keyCode = input.getKeycode();
         if(!(keyCode == InputUtil.GLFW_KEY_BACKSPACE || (keyCode >= InputUtil.GLFW_KEY_0 && keyCode <= InputUtil.GLFW_KEY_9) || keyCode == InputUtil.GLFW_KEY_LEFT || keyCode == InputUtil.GLFW_KEY_RIGHT)) return false;
         for (EnchantmentEntry enchantmentEntry : this.children()) {
-            enchantmentEntry.maxPriceField.keyReleased(keyCode, scanCode, modifiers);
-            enchantmentEntry.levelField.keyReleased(keyCode, scanCode, modifiers);
+            enchantmentEntry.maxPriceField.keyReleased(input);
+            enchantmentEntry.levelField.keyReleased(input);
         }
-        return super.keyReleased(keyCode, scanCode, modifiers);
+        return super.keyReleased(input);
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-        if(!Character.isDigit(chr)) return false;
+    public boolean charTyped(CharInput input) {
+        if(!input.isValidChar()) return false;
         for (EnchantmentEntry enchantmentEntry : this.children()) {
-            enchantmentEntry.maxPriceField.charTyped(chr, modifiers);
-            enchantmentEntry.levelField.charTyped(chr, modifiers);
+            enchantmentEntry.maxPriceField.charTyped(input);
+            enchantmentEntry.levelField.charTyped(input);
         }
-        return super.charTyped(chr, modifiers);
+        return super.charTyped(input);
     }
 
     @Nullable

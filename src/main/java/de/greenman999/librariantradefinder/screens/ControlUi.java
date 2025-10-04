@@ -3,11 +3,14 @@ package de.greenman999.librariantradefinder.screens;
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import de.greenman999.librariantradefinder.TradeFinder;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -148,28 +151,28 @@ public class ControlUi extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if(super.keyPressed(keyCode, scanCode, modifiers)) {
+    public boolean keyPressed(KeyInput input) {
+        if(super.keyPressed(input)) {
             return true;
         }else {
-            return enchantmentsListWidget.keyPressed(keyCode, scanCode, modifiers);
+            return enchantmentsListWidget.keyPressed(input);
         }
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-        return enchantmentsListWidget.charTyped(chr, modifiers);
+    public boolean charTyped(CharInput input) {
+        return enchantmentsListWidget.charTyped(input);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         for(EnchantmentEntry enchantmentEntry : enchantmentsListWidget.children()) {
-            boolean maxPriceFieldSuccess = enchantmentEntry.maxPriceField.mouseClicked(mouseX, mouseY, button);
-            boolean levelFieldSuccess = enchantmentEntry.levelField.mouseClicked(mouseX, mouseY, button);
+            boolean maxPriceFieldSuccess = enchantmentEntry.maxPriceField.mouseClicked(click, doubled);
+            boolean levelFieldSuccess = enchantmentEntry.levelField.mouseClicked(click, doubled);
             enchantmentEntry.maxPriceField.setFocused(maxPriceFieldSuccess);
             enchantmentEntry.levelField.setFocused(levelFieldSuccess);
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
