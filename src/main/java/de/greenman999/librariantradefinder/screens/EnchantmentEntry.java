@@ -173,13 +173,13 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         }
         return false;
     }
-    //TODO: fix logic
+
     public static void renderMultilineTooltip(DrawContext context, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenHeight) {
         Matrix3x2fStack matrices = context.getMatrices();
-        if (text.count() > 0) {
+        if (text.getLineCount() > 0) {
             int maxWidth = text.getMaxWidth();
             int lineHeight = textRenderer.fontHeight + 1;
-            int height = text.count() * lineHeight - 1;
+            int height = text.getLineCount() * lineHeight - 1;
 
             int belowY = yBelow + 12;
             int aboveY = yAbove - height + 12;
@@ -204,8 +204,8 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
                     null
             );
             matrices.translate(0.0F, 0.0F);
-
-            text.drawWithShadow(context, drawX, drawY, lineHeight, -1);
+            //TODO: idk what the boolean bl is for, i just put true
+            text.draw(context, MultilineText.Alignment.LEFT, drawX, drawY, lineHeight, false,-1);
 
             matrices.popMatrix();
         }
