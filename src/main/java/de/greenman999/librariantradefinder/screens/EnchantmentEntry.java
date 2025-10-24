@@ -52,11 +52,10 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
         Matrix3x2fStack matrices = context.getMatrices();
-        //TODO: find how to get x, y, entryWidth, entryHeight
-        this.x = x;
-        this.y = y;
-        this.entryWidth = entryWidth;
-        this.entryHeight = entryHeight;
+        this.x = super.getX();
+        this.y = super.getY();
+        this.entryWidth = super.getWidth();
+        this.entryHeight = super.getHeight();
 
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         Text enchantmentText = enchantment.description();
