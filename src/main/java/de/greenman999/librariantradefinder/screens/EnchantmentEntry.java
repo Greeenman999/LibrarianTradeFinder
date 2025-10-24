@@ -127,7 +127,9 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
 
     @Override
     public boolean mouseClicked(Click click, boolean doubled) {
-        //TODO: fix logic
+        double mouseX = click.x();
+        double mouseY = click.y();
+
         int i = 0;
         if(enabled) {
             i = 21 + 15 + 14;
