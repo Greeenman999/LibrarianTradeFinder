@@ -18,7 +18,7 @@
 			"de.greenman999.librariantradefinder.LibrarianTradeFinder"
 		],
         "modmenu": [
-            "de.greenman999.librariantradefinder.config.ModMenuImpl"
+            "de.greenman999.librariantradefinder.compat.ModMenuImpl"
         ]
 	},
 	"mixins": [

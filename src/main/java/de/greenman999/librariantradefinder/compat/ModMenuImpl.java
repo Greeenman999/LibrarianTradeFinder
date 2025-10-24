@@ -1,4 +1,4 @@
-package de.greenman999.librariantradefinder.config;
+package de.greenman999.librariantradefinder.compat;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
