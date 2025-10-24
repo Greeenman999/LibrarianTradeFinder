@@ -1,11 +1,13 @@
 package de.greenman999.librariantradefinder;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import de.greenman999.librariantradefinder.screens.ControlUi;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -14,6 +16,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKeys;
@@ -33,7 +36,6 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("librarian-trade-finder");
 	public static final KeyBinding.Category CATEGORY = new KeyBinding.Category(Identifier.of("librarian-trade-finder"));
-	private boolean openConfigScreen;
 
 	private static KeyBinding selectKeyBinding;
 	private static KeyBinding toggleKeyBinding;
@@ -60,50 +62,13 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 				CATEGORY
 		));
 
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-				dispatcher.register(literal("tradefinder")
-						.then(literal("select").executes(context -> (TradeFinder.select() ? 1 : 0)))
-						.then(literal("search").executes(context -> TradeFinder.searchList())
-							.then(argument("enchantment", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
-								RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-								Enchantment enchantment = enchantmentRegistryEntry.value();
-
-								return TradeFinder.searchSingle(enchantment, 1, 64);
-							})
-								.then(argument("level", IntegerArgumentType.integer(1, 5)).executes(context -> {
-									RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-									Enchantment enchantment = enchantmentRegistryEntry.value();
-									int level = IntegerArgumentType.getInteger(context, "level");
-
-									return TradeFinder.searchSingle(enchantment, level, 64);
-								})
-									.then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
-										RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
-										Enchantment enchantment = enchantmentRegistryEntry.value();
-										int level = IntegerArgumentType.getInteger(context, "level");
-										int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
-
-										return TradeFinder.searchSingle(enchantment, level, bookPrice);
-									})))
-							)
-						)
-						.then(literal("config").executes(context -> {
-							openConfigScreen = true;
-							return 1;
-						}))
-						.then(literal("stop").executes(context -> {
-							TradeFinder.stop();
-							context.getSource().sendFeedback(Text.translatable("commands.tradefinder.stop.success").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
-							return 1;
-						}))
-				));
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->{
+            register(dispatcher, registryAccess, "tradefinder");
+            register(dispatcher, registryAccess, "tf");
+        });
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			TradeFinder.tick();
-			if(openConfigScreen) {
-				openConfigScreen = false;
-				client.setScreen(new ControlUi(client.currentScreen));
-			}
 			ClientPlayerEntity player = client.player;
 			if(player == null) return;
 
@@ -142,8 +107,53 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 		LOGGER.info("Librarian Trade Finder initialized.");
 	}
 
-	public static TradeFinderConfig getConfig() {
+    private void register(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess, String literal) {
+        dispatcher.register(literal(literal)
+                .then(literal("select").executes(context -> (TradeFinder.select() ? 1 : 0)))
+                .then(literal("search").executes(context -> TradeFinder.searchList())
+                        .then(argument("enchantment", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
+                                            RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+                                            Enchantment enchantment = enchantmentRegistryEntry.value();
+
+                                            return TradeFinder.searchSingle(enchantment, 1, 64);
+                                        })
+                                        .then(argument("level", IntegerArgumentType.integer(1, 5)).executes(context -> {
+                                                    RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+                                                    Enchantment enchantment = enchantmentRegistryEntry.value();
+                                                    int level = IntegerArgumentType.getInteger(context, "level");
+
+                                                    return TradeFinder.searchSingle(enchantment, level, 64);
+                                                })
+                                                .then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
+                                                    RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+                                                    Enchantment enchantment = enchantmentRegistryEntry.value();
+                                                    int level = IntegerArgumentType.getInteger(context, "level");
+                                                    int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
+
+                                                    return TradeFinder.searchSingle(enchantment, level, bookPrice);
+                                                })))
+                        )
+                )
+                .then(literal("config").executes(context -> {
+                    openConfig(MinecraftClient.getInstance());
+                    return 1;
+                }))
+                .then(literal("stop").executes(context -> {
+                    TradeFinder.stop();
+                    context.getSource().sendFeedback(Text.translatable("commands.tradefinder.stop.success").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+                    return 1;
+                }))
+        );
+    }
+
+    public static TradeFinderConfig getConfig() {
 		return TradeFinderConfig.INSTANCE;
 	}
+
+    public static void openConfig(MinecraftClient client){
+        if (client != null){
+            client.execute(() -> client.setScreen(new ControlUi(client.currentScreen)));
+        }
+    }
 
 }
