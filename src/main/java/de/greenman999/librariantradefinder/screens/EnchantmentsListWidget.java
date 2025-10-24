@@ -118,8 +118,8 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
         int keyCode = input.getKeycode();
         if(!(keyCode == InputUtil.GLFW_KEY_BACKSPACE || (keyCode >= InputUtil.GLFW_KEY_0 && keyCode <= InputUtil.GLFW_KEY_9) || keyCode == InputUtil.GLFW_KEY_LEFT || keyCode == InputUtil.GLFW_KEY_RIGHT)) return false;
         for(EnchantmentEntry enchantmentEntry : children()) {
-            if(enchantmentEntry.maxPriceField.isFocused()) return enchantmentEntry.maxPriceField.keyPressed(keyCode, scanCode, modifiers);
-            if(enchantmentEntry.levelField.isFocused()) return enchantmentEntry.levelField.keyPressed(keyCode, scanCode, modifiers);
+            if(enchantmentEntry.maxPriceField.isFocused()) return enchantmentEntry.maxPriceField.keyPressed(input);
+            if(enchantmentEntry.levelField.isFocused()) return enchantmentEntry.levelField.keyPressed(input);
         }
         return super.keyPressed(input);
     }
