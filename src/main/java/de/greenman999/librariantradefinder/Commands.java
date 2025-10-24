@@ -1,11 +1,8 @@
 package de.greenman999.librariantradefinder;
 
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKeys;
@@ -24,7 +21,7 @@ public class Commands {
         register("tf");
     }
 
-    private static void register(String base){
+    private static void register(String base) {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(literal(base)
                     .then(literal("select").executes(context -> (TradeFinder.select() ? 1 : 0)))
