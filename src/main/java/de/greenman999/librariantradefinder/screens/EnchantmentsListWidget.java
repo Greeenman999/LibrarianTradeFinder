@@ -12,8 +12,6 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
 public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
@@ -88,9 +86,9 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
     }
 
     //@Override
-    /*protected int getScrollbarPositionX() {
-        return this.width - 10;
-    }*/
+    //protected int getScrollbarPositionX() {
+    //    return this.width - 10;
+    //}
 
     @Override
     protected int getScrollbarX() {
@@ -99,7 +97,7 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
 
     @Override
     public int getRowTop(int index) {
-        return this.getY() - (int)this.getScrollY() + index * this.itemHeight + this.headerHeight;
+        return this.getY() - (int)this.getScrollY() + index * this.itemHeight;
     }
 
     @Override
@@ -143,17 +141,5 @@ public class EnchantmentsListWidget extends EntryListWidget<EnchantmentEntry> {
             enchantmentEntry.levelField.charTyped(input);
         }
         return super.charTyped(input);
-    }
-
-    @Nullable
-    @Override
-    protected EnchantmentEntry getEntryAtPosition(double x, double y) {
-        int i = this.getRowWidth() / 2;
-        int j = this.getX() + this.width / 2;
-        int k = j - i;
-        int l = j + i;
-        int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollY();
-        int n = m / this.itemHeight;
-        return x < (double)this.getScrollbarX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
     }
 }
