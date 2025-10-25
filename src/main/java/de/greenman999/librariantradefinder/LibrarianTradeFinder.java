@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import de.greenman999.librariantradefinder.screens.ControlUi;
+import de.greenman999.librariantradefinder.util.HudUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -13,18 +14,26 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.village.VillagerProfession;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +110,30 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			}
 		});
 
-		LOGGER.info("Librarian Trade Finder initialized.");
+        UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+            if (hand == Hand.OFF_HAND || hitResult == null || !world.isClient())
+                return ActionResult.PASS;
+            if (hitResult.getEntity() instanceof VillagerEntity villager && villager.getVillagerData().profession() == VillagerProfession.LIBRARIAN && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.villager == null) {
+                TradeFinder.villager = villager;
+                HudUtils.overlayMessageTranslatable("commands.tradefinder.select.librarian", Formatting.GREEN, false);
+                return ActionResult.FAIL;
+            }
+            return ActionResult.PASS;
+        });
+
+        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            if (hand == Hand.OFF_HAND || hitResult == null || !world.isClient())
+                return ActionResult.PASS;
+            BlockPos blockPos = hitResult.getBlockPos();
+            if (world.getBlockState(blockPos).getBlock() == Blocks.LECTERN && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.lecternPos == null) {
+                TradeFinder.lecternPos = blockPos;
+                HudUtils.overlayMessageTranslatable("commands.tradefinder.select.lectern", Formatting.GREEN, false);
+                return ActionResult.FAIL;
+            }
+            return ActionResult.PASS;
+        });
+
+        LOGGER.info("Librarian Trade Finder initialized.");
 	}
 
 

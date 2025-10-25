@@ -24,7 +24,12 @@ public class Commands {
     private static void register(String base) {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(literal(base)
-                    .then(literal("select").executes(context -> (TradeFinder.select() ? 1 : 0)))
+                    .then(literal("select")
+                        .then(literal("manual").executes(context -> {
+                            TradeFinder.selectManual();
+                            return 1;
+                        }))
+                        .executes(context -> (TradeFinder.select() ? 1 : 0)))
                     .then(literal("search").executes(context -> TradeFinder.searchList())
                         .then(argument("enchantment", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
                             RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);

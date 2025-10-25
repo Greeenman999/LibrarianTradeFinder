@@ -157,6 +157,12 @@ public class TradeFinder {
         return true;
     }
 
+    public static void selectManual() {
+        villager = null;
+        lecternPos = null;
+        state = TradeState.SELECT_MANUAL;
+    }
+
     public static void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -334,6 +340,12 @@ public class TradeFinder {
 
             finishedCheckLook = false;
             state = TradeState.CHECK;
+        }
+        else if (state == TradeState.SELECT_MANUAL) {
+            if (villager != null && lecternPos != null) {
+                HudUtils.chatMessageTranslatable("commands.tradefinder.select.success", Formatting.GREEN);
+                state = TradeState.IDLE;
+            }
         }
     }
 }
