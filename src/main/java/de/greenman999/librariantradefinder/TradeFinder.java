@@ -74,17 +74,17 @@ public class TradeFinder {
 
     public static int searchList() {
         if(TradeFinderConfig.INSTANCE.enchantments.values().stream().noneMatch(e -> e.enabled)) {
-            HudUtils.chatMessageTranslatable("commands.tradefinder.search.no-enchantments", Formatting.RED);
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.search.no-enchantments"));
             return 0;
         }
         searchAll = true;
         state = TradeState.CHECK;
         if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-            HudUtils.chatMessageTranslatable("commands.tradefinder.start.not-selected", Formatting.RED);
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.start.not-selected"));
             stop();
             return 0;
         }
-        HudUtils.chatMessageTranslatable("commands.tradefinder.start.success-list", Formatting.GREEN);
+        HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.start.success-list"));
         tries = 0;
         return 1;
     }
@@ -99,11 +99,11 @@ public class TradeFinder {
         tries = 0;
 
 		if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-            HudUtils.chatMessageTranslatable("commands.tradefinder.start.not-selected", Formatting.RED);
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.start.not-selected"));
             stop();
             return 0;
         }
-        HudUtils.chatMessageTranslatable("commands.tradefinder.start.success-single", Formatting.GREEN);
+        HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.start.success-single"));
         return 1;
     }
 
@@ -114,7 +114,7 @@ public class TradeFinder {
             hitResult = MinecraftClient.getInstance().player.raycast(3.0, 0.0F, false);
         }
         if (hitResult != null && (!(hitResult.getType().equals(HitResult.Type.BLOCK)) || hitResult.getType().equals(HitResult.Type.ENTITY))) {
-            HudUtils.chatMessageTranslatable("commands.tradefinder.select.not-looking-at-lectern", Formatting.RED);
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
             return false;
         }
         BlockPos blockPos = null;
@@ -126,7 +126,7 @@ public class TradeFinder {
             block = MinecraftClient.getInstance().world.getBlockState(blockPos).getBlock();
         }
         if(!(block instanceof LecternBlock)) {
-            HudUtils.chatMessageTranslatable("commands.tradefinder.select.not-looking-at-lectern", Formatting.RED);
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
             return false;
         }
 
@@ -144,14 +144,14 @@ public class TradeFinder {
 
         VillagerEntity foundVillager = (VillagerEntity) closestEntity;
         if(foundVillager == null) {
-            HudUtils.chatMessageTranslatable("commands.tradefinder.select.no-librarian-found", Formatting.RED);
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.select.no-librarian-found"));
             return false;
         }
 
         villager = foundVillager;
         lecternPos = blockPos;
 
-        HudUtils.chatMessageTranslatable("commands.tradefinder.select.success", Formatting.GREEN);
+        HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.select.success"));
         return true;
     }
 
@@ -169,15 +169,15 @@ public class TradeFinder {
         if(player == null) return;
 
         if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && state != TradeState.SELECT_MANUAL) {
-            HudUtils.chatMessageTranslatable("commands.tradefinder.start.not-selected", Formatting.RED);
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.start.not-selected"));
             return;
         }
         
         switch (state) {
-            case CHECK -> HudUtils.overlayMessageTranslatable("librarian-trade-finder.actionbar.status.check", Formatting.GRAY, false);
-            case BREAK -> HudUtils.overlayMessageTranslatable("librarian-trade-finder.actionbar.status.break", Formatting.GRAY, false);
-            case PLACE -> HudUtils.overlayMessageTranslatable("librarian-trade-finder.actionbar.status.place", Formatting.GRAY, false);
-            case SELECT_MANUAL -> HudUtils.overlayMessageTranslatable("librarian-trade-finder.actionbar.status.select-manual", Formatting.GRAY, false);
+            case CHECK -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.check", tries), false);
+            case BREAK -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.break", tries), false);
+            case PLACE -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.place", tries), false);
+            case SELECT_MANUAL -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.select-manual"), false);
         }
 
         if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN)) {
@@ -220,7 +220,7 @@ public class TradeFinder {
                 finishedBreakLook = false;
                 state = TradeState.WAITING_FOR_PACKET;
             }else {
-                HudUtils.chatMessageTranslatable("librarian-trade-finder.check.interact.failed", Formatting.RED);
+                HudUtils.chatMessage(HudUtils.textTranslatable("librarian-trade-finder.check.interact.failed", Formatting.RED));
                 stop();
             }
 
@@ -247,7 +247,7 @@ public class TradeFinder {
                 int remainingDurability = mainHand.getMaxDamage() - mainHand.getDamage();
                 if(remainingDurability <= 5 && LibrarianTradeFinder.getConfig().preventAxeBreaking) {
                     stop();
-                    HudUtils.chatMessageTranslatable("librarian-trade-finder.break.axe.breaking", Formatting.RED);
+                    HudUtils.chatMessage(HudUtils.textTranslatable("librarian-trade-finder.break.axe.breaking", Formatting.RED));
                     return;
                 }
             }
