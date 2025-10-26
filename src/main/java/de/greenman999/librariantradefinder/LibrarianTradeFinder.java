@@ -109,7 +109,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
                 return ActionResult.PASS;
             if (hitResult.getEntity() instanceof VillagerEntity villager && villager.getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN) && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.villager == null) {
                 TradeFinder.villager = villager;
-                HudUtils.chatMessageTranslatable("commands.tradefinder.select.librarian", Formatting.GREEN);
+                HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.select.librarian"));
                 return ActionResult.FAIL;
             }
             return ActionResult.PASS;
@@ -121,7 +121,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
             BlockPos blockPos = hitResult.getBlockPos();
             if (world.getBlockState(blockPos).getBlock() == Blocks.LECTERN && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.lecternPos == null) {
                 TradeFinder.lecternPos = blockPos;
-                HudUtils.chatMessageTranslatable("commands.tradefinder.select.lectern", Formatting.GREEN);
+                HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.select.lectern"));
                 return ActionResult.FAIL;
             }
             return ActionResult.PASS;
