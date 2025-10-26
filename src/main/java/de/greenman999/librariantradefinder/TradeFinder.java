@@ -20,10 +20,8 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -170,7 +168,7 @@ public class TradeFinder {
         ClientPlayerEntity player = mc.player;
         if(player == null) return;
 
-        if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
+        if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && state != TradeState.SELECT_MANUAL) {
             HudUtils.chatMessageTranslatable("commands.tradefinder.start.not-selected", Formatting.RED);
             return;
         }
@@ -343,7 +341,6 @@ public class TradeFinder {
         }
         else if (state == TradeState.SELECT_MANUAL) {
             if (villager != null && lecternPos != null) {
-                HudUtils.chatMessageTranslatable("commands.tradefinder.select.success", Formatting.GREEN);
                 state = TradeState.IDLE;
             }
         }

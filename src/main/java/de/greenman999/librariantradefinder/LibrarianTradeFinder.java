@@ -1,14 +1,10 @@
 package de.greenman999.librariantradefinder;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import de.greenman999.librariantradefinder.screens.ControlUi;
 import de.greenman999.librariantradefinder.util.HudUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -20,14 +16,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -38,8 +28,6 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
-
 @Environment(net.fabricmc.api.EnvType.CLIENT)
 public class LibrarianTradeFinder implements ClientModInitializer {
 
@@ -49,6 +37,8 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 	private static KeyBinding selectKeyBinding;
 	private static KeyBinding toggleKeyBinding;
 	private static KeyBinding configKeyBinding;
+
+    private static boolean scheduleOpenConfig = false;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -75,6 +65,10 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			TradeFinder.tick();
+            if (scheduleOpenConfig) {
+                client.setScreen(new ControlUi(client.currentScreen));
+                scheduleOpenConfig = false;
+            }
 			ClientPlayerEntity player = client.player;
 			if(player == null) return;
 
@@ -113,9 +107,9 @@ public class LibrarianTradeFinder implements ClientModInitializer {
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
             if (hand == Hand.OFF_HAND || hitResult == null || !world.isClient())
                 return ActionResult.PASS;
-            if (hitResult.getEntity() instanceof VillagerEntity villager && villager.getVillagerData().profession() == VillagerProfession.LIBRARIAN && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.villager == null) {
+            if (hitResult.getEntity() instanceof VillagerEntity villager && villager.getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN) && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.villager == null) {
                 TradeFinder.villager = villager;
-                HudUtils.overlayMessageTranslatable("commands.tradefinder.select.librarian", Formatting.GREEN, false);
+                HudUtils.chatMessageTranslatable("commands.tradefinder.select.librarian", Formatting.GREEN);
                 return ActionResult.FAIL;
             }
             return ActionResult.PASS;
@@ -127,7 +121,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
             BlockPos blockPos = hitResult.getBlockPos();
             if (world.getBlockState(blockPos).getBlock() == Blocks.LECTERN && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.lecternPos == null) {
                 TradeFinder.lecternPos = blockPos;
-                HudUtils.overlayMessageTranslatable("commands.tradefinder.select.lectern", Formatting.GREEN, false);
+                HudUtils.chatMessageTranslatable("commands.tradefinder.select.lectern", Formatting.GREEN);
                 return ActionResult.FAIL;
             }
             return ActionResult.PASS;
@@ -142,10 +136,8 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 		return TradeFinderConfig.INSTANCE;
 	}
 
-    public static void openConfig(MinecraftClient client){
-        if (client != null){
-            client.execute(() -> client.setScreen(new ControlUi(client.currentScreen)));
-        }
+    public static void openConfig(){
+        scheduleOpenConfig = true;
     }
 
 }

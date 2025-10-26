@@ -2,7 +2,6 @@ package de.greenman999.librariantradefinder;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKeys;
@@ -56,7 +55,7 @@ public class Commands {
                         )
                     )
                     .then(literal("config").executes(context -> {
-                        openConfig(MinecraftClient.getInstance());
+                        openConfig();
                         return 1;
                     }))
                     .then(literal("stop").executes(context -> {
