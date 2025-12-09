@@ -1,6 +1,7 @@
 package de.greenman999.librariantradefinder;
 
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
+import de.greenman999.librariantradefinder.util.HudUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.client.MinecraftClient;
@@ -19,10 +20,8 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -62,9 +61,6 @@ public class TradeFinder {
     private static boolean finishedPlaceLook = false;
     private static boolean finishedCheckLook = false;
 
-
-
-
     public static void stop() {
         state = TradeState.IDLE;
 
@@ -78,17 +74,17 @@ public class TradeFinder {
 
     public static int searchList() {
         if(TradeFinderConfig.INSTANCE.enchantments.values().stream().noneMatch(e -> e.enabled)) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.search.no-enchantments").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.search.no-enchantments"));
             return 0;
         }
         searchAll = true;
         state = TradeState.CHECK;
         if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.start.not-selected"));
             stop();
             return 0;
         }
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-list").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.start.success-list"));
         tries = 0;
         return 1;
     }
@@ -103,11 +99,11 @@ public class TradeFinder {
         tries = 0;
 
 		if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.start.not-selected"));
             stop();
             return 0;
         }
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.success-single", Enchantment.getName(RegistryEntry.of(enchantment), minLevel), maxBookPrice).styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+        HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.start.success-single"));
         return 1;
     }
 
@@ -118,7 +114,7 @@ public class TradeFinder {
             hitResult = MinecraftClient.getInstance().player.raycast(3.0, 0.0F, false);
         }
         if (hitResult != null && (!(hitResult.getType().equals(HitResult.Type.BLOCK)) || hitResult.getType().equals(HitResult.Type.ENTITY))) {
-            mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.not-looking-at-lectern").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
             return false;
         }
         BlockPos blockPos = null;
@@ -130,7 +126,7 @@ public class TradeFinder {
             block = MinecraftClient.getInstance().world.getBlockState(blockPos).getBlock();
         }
         if(!(block instanceof LecternBlock)) {
-            mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.not-looking-at-lectern").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
             return false;
         }
 
@@ -139,7 +135,7 @@ public class TradeFinder {
 
         assert MinecraftClient.getInstance().world != null;
         for(Entity entity : MinecraftClient.getInstance().world.getEntities()) {
-            Vec3d entityPos = entity.getPos();
+            Vec3d entityPos = entity.getEntityPos();
             if (blockPos != null && entity instanceof VillagerEntity && ((VillagerEntity) entity).getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.toCenterPos()) < closestDistance) {
                 closestDistance = entityPos.distanceTo(blockPos.toCenterPos());
                 closestEntity = entity;
@@ -148,16 +144,21 @@ public class TradeFinder {
 
         VillagerEntity foundVillager = (VillagerEntity) closestEntity;
         if(foundVillager == null) {
-            mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.no-librarian-found").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.select.no-librarian-found"));
             return false;
         }
 
         villager = foundVillager;
         lecternPos = blockPos;
 
-        mc.inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.select.success").formatted(Formatting.GREEN));
-
+        HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.GREEN, "commands.tradefinder.select.success"));
         return true;
+    }
+
+    public static void selectManual() {
+        villager = null;
+        lecternPos = null;
+        state = TradeState.SELECT_MANUAL;
     }
 
     public static void tick() {
@@ -167,15 +168,16 @@ public class TradeFinder {
         ClientPlayerEntity player = mc.player;
         if(player == null) return;
 
-        if(TradeFinder.villager == null || TradeFinder.lecternPos == null) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("commands.tradefinder.start.not-selected").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+        if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && state != TradeState.SELECT_MANUAL) {
+            HudUtils.chatMessage(HudUtils.textTranslatable(Formatting.RED, "commands.tradefinder.start.not-selected"));
             return;
         }
         
         switch (state) {
-            case CHECK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.check", tries).formatted(Formatting.GRAY), false);
-            case BREAK -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.break", tries).formatted(Formatting.GRAY), false);
-            case PLACE -> mc.inGameHud.setOverlayMessage(Text.translatable("librarian-trade-finder.actionbar.status.place", tries).formatted(Formatting.GRAY), false);
+            case CHECK -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.check", tries), false);
+            case BREAK -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.break", tries), false);
+            case PLACE -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.place", tries), false);
+            case SELECT_MANUAL -> HudUtils.overlayMessage(HudUtils.textTranslatable(Formatting.GRAY, "librarian-trade-finder.actionbar.status.select-manual"), false);
         }
 
         if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().profession().matchesKey(VillagerProfession.LIBRARIAN)) {
@@ -218,7 +220,7 @@ public class TradeFinder {
                 finishedBreakLook = false;
                 state = TradeState.WAITING_FOR_PACKET;
             }else {
-                mc.inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.check.interact.failed").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.RED))));
+                HudUtils.chatMessage(HudUtils.textTranslatable("librarian-trade-finder.check.interact.failed", Formatting.RED));
                 stop();
             }
 
@@ -245,7 +247,7 @@ public class TradeFinder {
                 int remainingDurability = mainHand.getMaxDamage() - mainHand.getDamage();
                 if(remainingDurability <= 5 && LibrarianTradeFinder.getConfig().preventAxeBreaking) {
                     stop();
-                    mc.inGameHud.getChatHud().addMessage(Text.translatable("librarian-trade-finder.break.axe.breaking").formatted(Formatting.RED));
+                    HudUtils.chatMessage(HudUtils.textTranslatable("librarian-trade-finder.break.axe.breaking", Formatting.RED));
                     return;
                 }
             }
@@ -258,7 +260,7 @@ public class TradeFinder {
                 finishedPlaceLook = false;
                 state = TradeState.PLACE;
                 if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getNetworkHandler() != null) {
-                    prevPos = mc.player.getPos();
+                    prevPos = mc.player.getEntityPos();
                     mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(villager.getX(), villager.getY(), villager.getZ(), true, false));
                 }
             }
@@ -336,6 +338,11 @@ public class TradeFinder {
 
             finishedCheckLook = false;
             state = TradeState.CHECK;
+        }
+        else if (state == TradeState.SELECT_MANUAL) {
+            if (villager != null && lecternPos != null) {
+                state = TradeState.IDLE;
+            }
         }
     }
 }

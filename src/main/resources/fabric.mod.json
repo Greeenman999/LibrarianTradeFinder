@@ -16,15 +16,18 @@
 	"entrypoints": {
 		"client": [
 			"de.greenman999.librariantradefinder.LibrarianTradeFinder"
-		]
+		],
+        "modmenu": [
+            "de.greenman999.librariantradefinder.compat.ModMenuImpl"
+        ]
 	},
 	"mixins": [
 		"librarian-trade-finder.mixins.json"
 	],
 	"accessWidener" : "librarian-trade-finder.accesswidener",
 	"depends": {
-		"fabricloader": ">=0.16.10",
-		"minecraft": ">=1.21.6 <=1.21.8",
+		"fabricloader": ">=0.17.2",
+		"minecraft": ">=1.21.9",
 		"java": ">=21",
 		"fabric-api": "*"
 	}
