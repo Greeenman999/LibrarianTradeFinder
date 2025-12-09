@@ -15,14 +15,14 @@ public class GrayButtonWidget extends ButtonWidget {
     int color;
     int id;
 
-    protected GrayButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress, NarrationSupplier narrationSupplier, int color, int id) {
+    protected GrayButtonWidget(int x, int y, int width, int height, net.minecraft.text.Text message, PressAction onPress, NarrationSupplier narrationSupplier, int color, int id) {
         super(x, y, width, height, message, onPress, narrationSupplier);
         this.color = color;
         this.id = id;
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         this.setFocused(false);
         Matrix3x2fStack matrices = context.getMatrices();
         matrices.pushMatrix();
@@ -42,7 +42,7 @@ public class GrayButtonWidget extends ButtonWidget {
         return super.keyPressed(input);
     }
 
-    public static GrayButtonWidget.Builder builder(Text message, PressAction onPress) {
+    public static GrayButtonWidget.Builder builder(net.minecraft.text.Text message, PressAction onPress) {
         return new GrayButtonWidget.Builder(message, onPress);
     }
 
@@ -51,7 +51,7 @@ public class GrayButtonWidget extends ButtonWidget {
     }
 
     public static class Builder extends ButtonWidget.Builder {
-        private final Text message;
+        private final net.minecraft.text.Text message;
         private final PressAction onPress;
         @Nullable
         private Tooltip tooltip;
@@ -63,7 +63,7 @@ public class GrayButtonWidget extends ButtonWidget {
         private int color;
         private int id;
 
-        public Builder(Text message, PressAction onPress) {
+        public Builder(net.minecraft.text.Text message, PressAction onPress) {
             super(message, onPress);
             this.narrationSupplier = ButtonWidget.DEFAULT_NARRATION_SUPPLIER;
             this.message = message;

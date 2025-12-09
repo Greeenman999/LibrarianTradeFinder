@@ -3,6 +3,7 @@ package de.greenman999.librariantradefinder.screens;
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.Alignment;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Click;
@@ -173,42 +174,5 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
             return true;
         }
         return false;
-    }
-
-    public static void renderMultilineTooltip(DrawContext context, TextRenderer textRenderer, MultilineText text, int centerX, int yAbove, int yBelow, int screenHeight) {
-        Matrix3x2fStack matrices = context.getMatrices();
-        if (text.getLineCount() > 0) {
-            int maxWidth = text.getMaxWidth();
-            int lineHeight = textRenderer.fontHeight + 1;
-            int height = text.getLineCount() * lineHeight - 1;
-
-            int belowY = yBelow + 12;
-            int aboveY = yAbove - height + 12;
-            int maxBelow = screenHeight - (belowY + height);
-            int minAbove = aboveY - height;
-            int y = belowY;
-            if (maxBelow < -8)
-                y = maxBelow > minAbove ? belowY : aboveY;
-
-            int x = Math.max(centerX - text.getMaxWidth() / 2 - 12, -6);
-
-            int drawX = x + 12;
-            int drawY = y - 12;
-
-            matrices.pushMatrix();
-            TooltipBackgroundRenderer.render(
-                    context,
-                    drawX,
-                    drawY,
-                    maxWidth,
-                    height,
-                    null
-            );
-            matrices.translate(0.0F, 0.0F);
-            //TODO: idk what the boolean bl is for, i just put true
-            text.draw(context, MultilineText.Alignment.LEFT, drawX, drawY, lineHeight, false,-1);
-
-            matrices.popMatrix();
-        }
     }
 }
