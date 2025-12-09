@@ -2,28 +2,25 @@ package de.greenman999.librariantradefinder.screens;
 
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.Alignment;
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix3x2fStack;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.enchantment.Enchantment;
 
-public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
+public class EnchantmentEntry extends AbstractSelectionList.Entry<EnchantmentEntry> {
 
     public final Enchantment enchantment;
-    public final TextFieldWidget maxPriceField;
-    public final TextFieldWidget levelField;
+    public final EditBox maxPriceField;
+    public final EditBox levelField;
     public int x;
     public int y;
     public int entryWidth;
@@ -39,40 +36,40 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         this.enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
 
         //maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 50, 20, Text.of("Max Price"));
-        maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 20, 14, Text.translatable("tradefinderui.enchantments.price.name"));
+        maxPriceField = new EditBox(Minecraft.getInstance().font, 0, 0, 20, 14, Component.translatable("tradefinderui.enchantments.price.name"));
         maxPriceField.setMaxLength(2);
-        maxPriceField.setText(String.valueOf(enchantmentOption.getMaxPrice()));
+        maxPriceField.setValue(String.valueOf(enchantmentOption.getMaxPrice()));
         //maxPriceField.setDrawsBackground(false);
 
-        levelField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 14, 14, Text.translatable("tradefinderui.enchantments.level.name"));
+        levelField = new EditBox(Minecraft.getInstance().font, 0, 0, 14, 14, Component.translatable("tradefinderui.enchantments.level.name"));
         levelField.setMaxLength(1);
-        levelField.setText(String.valueOf(enchantmentOption.getLevel()));
+        levelField.setValue(String.valueOf(enchantmentOption.getLevel()));
 
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
-        Matrix3x2fStack matrices = context.getMatrices();
+    public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
+        Matrix3x2fStack matrices = context.pose();
         this.x = super.getX();
         this.y = super.getY();
         this.entryWidth = super.getWidth();
         this.entryHeight = super.getHeight();
 
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        Text enchantmentText = enchantment.description();
+        Font textRenderer = Minecraft.getInstance().font;
+        Component enchantmentText = enchantment.description();
 
-        if (!maxPriceField.getText().isEmpty() && !maxPriceField.isActive() &&
-                (Integer.parseInt(maxPriceField.getText()) > 64 || Integer.parseInt(maxPriceField.getText()) < 5)) {
-            maxPriceField.setText("64");
+        if (!maxPriceField.getValue().isEmpty() && !maxPriceField.canConsumeInput() &&
+                (Integer.parseInt(maxPriceField.getValue()) > 64 || Integer.parseInt(maxPriceField.getValue()) < 5)) {
+            maxPriceField.setValue("64");
         }
-        if (!levelField.getText().isEmpty() && !levelField.isActive() &&
-                (Integer.parseInt(levelField.getText()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getText()) < 1)) {
-            levelField.setText(String.valueOf(enchantment.getMaxLevel()));
+        if (!levelField.getValue().isEmpty() && !levelField.canConsumeInput() &&
+                (Integer.parseInt(levelField.getValue()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getValue()) < 1)) {
+            levelField.setValue(String.valueOf(enchantment.getMaxLevel()));
         }
 
         enchantmentOption.setEnabled(enabled);
-        enchantmentOption.setMaxPrice(!maxPriceField.getText().isEmpty() ? Integer.parseInt(maxPriceField.getText()) : 64);
-        enchantmentOption.setLevel(!levelField.getText().isEmpty() ? Integer.parseInt(levelField.getText()) : enchantment.getMaxLevel());
+        enchantmentOption.setMaxPrice(!maxPriceField.getValue().isEmpty() ? Integer.parseInt(maxPriceField.getValue()) : 64);
+        enchantmentOption.setLevel(!levelField.getValue().isEmpty() ? Integer.parseInt(levelField.getValue()) : enchantment.getMaxLevel());
 
         if (y < 8) return;
 
@@ -85,13 +82,13 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         if (enabled) {
             context.fill(x, y, x + entryWidth, y + entryHeight - 4, 0x3F00FF00);
 
-            context.drawTextWithShadow(textRenderer, Text.of("$:"), maxPriceX - 10, y + 4, 0xFFFFFFFF);
-            context.drawTextWithShadow(textRenderer, Text.of("LVL:"), levelX - 23, y + 4, 0xFFFFFFFF);
+            context.drawString(textRenderer, Component.nullToEmpty("$:"), maxPriceX - 10, y + 4, 0xFFFFFFFF);
+            context.drawString(textRenderer, Component.nullToEmpty("LVL:"), levelX - 23, y + 4, 0xFFFFFFFF);
         } else {
             context.fill(x, y, x + entryWidth, y + entryHeight - 4, 0x1AC7C0C0);
         }
 
-        context.drawTextWithShadow(textRenderer, enchantmentText, 8, y + 4, 0xFFFFFFFF);
+        context.drawString(textRenderer, enchantmentText, 8, y + 4, 0xFFFFFFFF);
 
         matrices.pushMatrix();
         matrices.translate(0, 0);
@@ -104,30 +101,30 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         levelField.render(context, mouseX, mouseY, deltaTicks);
         matrices.popMatrix();
 
-        if (maxPriceField.isActive()) {
-            context.drawTooltip(MinecraftClient.getInstance().textRenderer, List.of(Text.translatable("tradefinderui.enchantments.price.tooltip.1").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.2").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.3").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.4").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.5").formatted(Formatting.GRAY)), maxPriceField.getX() - 8, y + 32);
+        if (maxPriceField.canConsumeInput()) {
+            context.setComponentTooltipForNextFrame(Minecraft.getInstance().font, List.of(Component.translatable("tradefinderui.enchantments.price.tooltip.1").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.2").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.3").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.4").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.5").withStyle(ChatFormatting.GRAY)), maxPriceField.getX() - 8, y + 32);
         }
 
-        if(mouseX > x + entryWidth - 21 - 10 - 2 && mouseX < x + entryWidth - 21 - 2 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.isActive()) {
-            context.drawTooltip(MinecraftClient.getInstance().textRenderer, List.of(Text.translatable("tradefinderui.enchantments.price.tooltip.title").formatted(Formatting.GREEN),
-                    Text.empty(),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.1").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.2").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.3").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.4").formatted(Formatting.GRAY),
-                    Text.translatable("tradefinderui.enchantments.price.tooltip.5").formatted(Formatting.GRAY)), mouseX, y + 32);
+        if(mouseX > x + entryWidth - 21 - 10 - 2 && mouseX < x + entryWidth - 21 - 2 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.canConsumeInput()) {
+            context.setComponentTooltipForNextFrame(Minecraft.getInstance().font, List.of(Component.translatable("tradefinderui.enchantments.price.tooltip.title").withStyle(ChatFormatting.GREEN),
+                    Component.empty(),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.1").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.2").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.3").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.4").withStyle(ChatFormatting.GRAY),
+                    Component.translatable("tradefinderui.enchantments.price.tooltip.5").withStyle(ChatFormatting.GRAY)), mouseX, y + 32);
         }
-        if(mouseX > x + entryWidth - 21 - 15 - 14 - 23 - 2 && mouseX < x + entryWidth - 21 - 15 - 14 - 2 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.isActive()) {
-            context.drawTooltip(MinecraftClient.getInstance().textRenderer, List.of(Text.translatable("tradefinderui.enchantments.level.tooltip").formatted(Formatting.GREEN)), mouseX, y + 32);
+        if(mouseX > x + entryWidth - 21 - 15 - 14 - 23 - 2 && mouseX < x + entryWidth - 21 - 15 - 14 - 2 && mouseY > y && mouseY < y + entryHeight && enabled && !maxPriceField.canConsumeInput()) {
+            context.setComponentTooltipForNextFrame(Minecraft.getInstance().font, List.of(Component.translatable("tradefinderui.enchantments.level.tooltip").withStyle(ChatFormatting.GREEN)), mouseX, y + 32);
         }
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         double mouseX = click.x();
         double mouseY = click.y();
 
@@ -152,7 +149,7 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
     }
 
     @Override
-    public boolean mouseReleased(Click click) {
+    public boolean mouseReleased(MouseButtonEvent click) {
         boolean maxPriceFieldReturn = maxPriceField.mouseReleased(click);
         boolean levelFieldReturn = levelField.mouseReleased(click);
         return maxPriceFieldReturn || levelFieldReturn;
@@ -164,13 +161,13 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         // 'amount' is +1.0 or -1.0, sometimes +2.0 or +3.0 for mouse wheels that (physically) snap to positions.
         // There are also mouse wheels that scroll smoothly; the current implementation maybe doesn't work properly with them
         if (maxPriceField.isMouseOver(mouseX, mouseY)){
-            enchantmentOption.setMaxPrice(MathHelper.clamp((int) (enchantmentOption.getMaxPrice() + verticalAmount), 5, 64));
-            maxPriceField.setText(String.valueOf(enchantmentOption.getMaxPrice()));
+            enchantmentOption.setMaxPrice(Mth.clamp((int) (enchantmentOption.getMaxPrice() + verticalAmount), 5, 64));
+            maxPriceField.setValue(String.valueOf(enchantmentOption.getMaxPrice()));
             return true;
         }
         else if (levelField.isMouseOver(mouseX, mouseY)){
-            enchantmentOption.setLevel(MathHelper.clamp((int) (enchantmentOption.getLevel() + verticalAmount), 1, enchantment.getMaxLevel()));
-            levelField.setText(String.valueOf(enchantmentOption.getLevel()));
+            enchantmentOption.setLevel(Mth.clamp((int) (enchantmentOption.getLevel() + verticalAmount), 1, enchantment.getMaxLevel()));
+            levelField.setValue(String.valueOf(enchantmentOption.getLevel()));
             return true;
         }
         return false;

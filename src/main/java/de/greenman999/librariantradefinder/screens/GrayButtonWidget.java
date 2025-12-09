@@ -1,48 +1,47 @@
 package de.greenman999.librariantradefinder.screens;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
-public class GrayButtonWidget extends ButtonWidget {
+public class GrayButtonWidget extends Button {
     int color;
     int id;
 
-    protected GrayButtonWidget(int x, int y, int width, int height, net.minecraft.text.Text message, PressAction onPress, NarrationSupplier narrationSupplier, int color, int id) {
+    protected GrayButtonWidget(int x, int y, int width, int height, net.minecraft.network.chat.Component message, OnPress onPress, CreateNarration narrationSupplier, int color, int id) {
         super(x, y, width, height, message, onPress, narrationSupplier);
         this.color = color;
         this.id = id;
     }
 
     @Override
-    protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderContents(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         this.setFocused(false);
-        Matrix3x2fStack matrices = context.getMatrices();
+        Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
         matrices.translate(0, 0);
         context.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
         int j = this.active ? 16777215 : 10526880;
-        context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        context.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
         matrices.popMatrix();
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
-        int keyCode = input.getKeycode();
-        if(keyCode == InputUtil.GLFW_KEY_ENTER || keyCode == InputUtil.GLFW_KEY_SPACE || keyCode == InputUtil.GLFW_KEY_UP || keyCode == InputUtil.GLFW_KEY_DOWN || keyCode == InputUtil.GLFW_KEY_LEFT || keyCode == InputUtil.GLFW_KEY_RIGHT) {
+    public boolean keyPressed(KeyEvent input) {
+        int keyCode = input.input();
+        if(keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_SPACE || keyCode == InputConstants.KEY_UP || keyCode == InputConstants.KEY_DOWN || keyCode == InputConstants.KEY_LEFT || keyCode == InputConstants.KEY_RIGHT) {
             return false;
         }
         return super.keyPressed(input);
     }
 
-    public static GrayButtonWidget.Builder builder(net.minecraft.text.Text message, PressAction onPress) {
+    public static GrayButtonWidget.Builder builder(net.minecraft.network.chat.Component message, OnPress onPress) {
         return new GrayButtonWidget.Builder(message, onPress);
     }
 
@@ -50,27 +49,27 @@ public class GrayButtonWidget extends ButtonWidget {
         return id;
     }
 
-    public static class Builder extends ButtonWidget.Builder {
-        private final net.minecraft.text.Text message;
-        private final PressAction onPress;
+    public static class Builder extends Button.Builder {
+        private final net.minecraft.network.chat.Component message;
+        private final OnPress onPress;
         @Nullable
         private Tooltip tooltip;
         private int x;
         private int y;
         private int width = 150;
         private int height = 20;
-        private NarrationSupplier narrationSupplier;
+        private CreateNarration narrationSupplier;
         private int color;
         private int id;
 
-        public Builder(net.minecraft.text.Text message, PressAction onPress) {
+        public Builder(net.minecraft.network.chat.Component message, OnPress onPress) {
             super(message, onPress);
-            this.narrationSupplier = ButtonWidget.DEFAULT_NARRATION_SUPPLIER;
+            this.narrationSupplier = Button.DEFAULT_NARRATION;
             this.message = message;
             this.onPress = onPress;
         }
 
-        public GrayButtonWidget.Builder position(int x, int y) {
+        public GrayButtonWidget.Builder pos(int x, int y) {
             this.x = x;
             this.y = y;
             return this;
@@ -87,8 +86,8 @@ public class GrayButtonWidget extends ButtonWidget {
             return this;
         }
 
-        public GrayButtonWidget.Builder dimensions(int x, int y, int width, int height) {
-            return this.position(x, y).size(width, height);
+        public GrayButtonWidget.Builder bounds(int x, int y, int width, int height) {
+            return this.pos(x, y).size(width, height);
         }
 
         public GrayButtonWidget.Builder tooltip(@Nullable Tooltip tooltip) {
@@ -96,7 +95,7 @@ public class GrayButtonWidget extends ButtonWidget {
             return this;
         }
 
-        public GrayButtonWidget.Builder narrationSupplier(NarrationSupplier narrationSupplier) {
+        public GrayButtonWidget.Builder createNarration(CreateNarration narrationSupplier) {
             this.narrationSupplier = narrationSupplier;
             return this;
         }

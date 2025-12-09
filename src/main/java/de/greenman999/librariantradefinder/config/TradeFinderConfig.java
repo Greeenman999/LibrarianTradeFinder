@@ -5,16 +5,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.enchantment.Enchantment;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,9 +45,9 @@ public class TradeFinderConfig {
             if (currentEnchantmentRegistry == null && !refresh) {
                 LibrarianTradeFinder.LOGGER.warn("Enchantment registry is null!");
             }
-            assert MinecraftClient.getInstance().world != null;
-            currentEnchantmentRegistry = MinecraftClient.getInstance().world
-                    .getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
+            assert Minecraft.getInstance().level != null;
+            currentEnchantmentRegistry = Minecraft.getInstance().level
+                    .registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
         }
         return currentEnchantmentRegistry;
     }
@@ -73,11 +72,11 @@ public class TradeFinderConfig {
             enchantmentConfigs.forEach((resLocation, enchantmentOption) ->
                     enchantmentsJson.add(resLocation, enchantmentOption.toJson()));
 
-            if (MinecraftClient.getInstance().world != null) {
+            if (Minecraft.getInstance().level != null) {
                 Registry<Enchantment> enchantmentRegistry = getEnchantmentRegistry();
                 enchantments.forEach((enchantment, enchantmentOption) -> enchantmentsJson.add(
-                        enchantmentRegistry.getEntry(enchantment).getKey().orElseThrow()
-                                .getValue().toString(),
+                        enchantmentRegistry.wrapAsHolder(enchantment).unwrapKey().orElseThrow()
+                                .identifier().toString(),
                         enchantmentOption.toJson()));
                 json.add("enchantments", enchantmentsJson);
             }
@@ -121,13 +120,13 @@ public class TradeFinderConfig {
                 }
             }
             
-            final TagKey<Enchantment> tradeableTag = TagKey.of(enchantmentRegistry.getKey(),
-                    Identifier.of("minecraft","tradeable"));
+            final TagKey<Enchantment> tradeableTag = TagKey.create(enchantmentRegistry.key(),
+                    Identifier.fromNamespaceAndPath("minecraft","tradeable"));
             for (Enchantment enchantment : enchantmentRegistry) {
-                RegistryKey<Enchantment> enchantmentKey = enchantmentRegistry.getKey(enchantment).orElseThrow();
-                boolean availableAsTrade = enchantmentRegistry.getOrThrow(enchantmentKey).isIn(tradeableTag);
+                ResourceKey<Enchantment> enchantmentKey = enchantmentRegistry.getResourceKey(enchantment).orElseThrow();
+                boolean availableAsTrade = enchantmentRegistry.getOrThrow(enchantmentKey).is(tradeableTag);
                 if (!availableAsTrade) continue;
-                String resLocation = enchantmentKey.getValue().toString();
+                String resLocation = enchantmentKey.identifier().toString();
                 EnchantmentOption enchantmentOption =
                         enchantmentConfigs.containsKey(resLocation)
                                 ? enchantmentConfigs.get(resLocation)
@@ -146,7 +145,7 @@ public class TradeFinderConfig {
 
     private void sortEnchantmentsMap() {
         enchantments = enchantments.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(Comparator.comparing(enchantment -> Enchantment.getName(RegistryEntry.of(enchantment), enchantment.getMaxLevel()).copy().formatted(Formatting.WHITE).getString())))
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(enchantment -> Enchantment.getFullname(Holder.direct(enchantment), enchantment.getMaxLevel()).copy().withStyle(ChatFormatting.WHITE).getString())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
@@ -169,15 +168,15 @@ public class TradeFinderConfig {
         }
 
         public static EnchantmentOption fromJson(JsonObject json) {
-            RegistryKey<Enchantment> enchantmentKey = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.tryParse(json.getAsJsonPrimitive("enchantment").getAsString()));
-            Enchantment enchantment = getEnchantmentRegistry().get(enchantmentKey);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, Identifier.tryParse(json.getAsJsonPrimitive("enchantment").getAsString()));
+            Enchantment enchantment = getEnchantmentRegistry().getValue(enchantmentKey);
             if (enchantment == null) return null;
             return new EnchantmentOption(enchantment, json.getAsJsonPrimitive("enabled").getAsBoolean(), json.getAsJsonPrimitive("level").getAsInt(), json.getAsJsonPrimitive("maxPrice").getAsInt());
         }
 
         public JsonObject toJson() {
             JsonObject json = new JsonObject();
-            json.addProperty("enchantment", getEnchantmentRegistry().getEntry(enchantment).getKey().orElseThrow().getValue().toString());
+            json.addProperty("enchantment", getEnchantmentRegistry().wrapAsHolder(enchantment).unwrapKey().orElseThrow().identifier().toString());
             json.addProperty("enabled", enabled);
             json.addProperty("level", level);
             json.addProperty("maxPrice", maxPrice);
@@ -209,7 +208,7 @@ public class TradeFinderConfig {
         }
 
         public String getName() {
-            return Enchantment.getName(RegistryEntry.of(enchantment), level).copy().formatted(Formatting.WHITE).getString();
+            return Enchantment.getFullname(Holder.direct(enchantment), level).copy().withStyle(ChatFormatting.WHITE).getString();
         }
     }
 

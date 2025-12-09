@@ -2,13 +2,13 @@ package de.greenman999.librariantradefinder;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.minecraft.command.argument.RegistryEntryReferenceArgumentType;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.arguments.ResourceArgument;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 import static de.greenman999.librariantradefinder.LibrarianTradeFinder.openConfig;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
@@ -30,21 +30,21 @@ public class Commands {
                         }))
                         .executes(context -> (TradeFinder.select() ? 1 : 0)))
                     .then(literal("search").executes(context -> TradeFinder.searchList())
-                        .then(argument("enchantment", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, RegistryKeys.ENCHANTMENT)).executes(context -> {
-                            RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+                        .then(argument("enchantment", ResourceArgument.resource(registryAccess, Registries.ENCHANTMENT)).executes(context -> {
+                            Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
                             Enchantment enchantment = enchantmentRegistryEntry.value();
 
                             return TradeFinder.searchSingle(enchantment, 1, 64);
                         })
                             .then(argument("level", IntegerArgumentType.integer(1, 5)).executes(context -> {
-                                RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+                                Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
                                 Enchantment enchantment = enchantmentRegistryEntry.value();
                                 int level = IntegerArgumentType.getInteger(context, "level");
 
                                 return TradeFinder.searchSingle(enchantment, level, 64);
                             })
                                 .then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
-                                    RegistryEntry<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", RegistryEntry.class);
+                                    Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
                                     Enchantment enchantment = enchantmentRegistryEntry.value();
                                     int level = IntegerArgumentType.getInteger(context, "level");
                                     int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
@@ -60,7 +60,7 @@ public class Commands {
                     }))
                     .then(literal("stop").executes(context -> {
                         TradeFinder.stop();
-                        context.getSource().sendFeedback(Text.translatable("commands.tradefinder.stop.success").styled(style -> style.withColor(TextColor.fromFormatting(Formatting.GREEN))));
+                        context.getSource().sendFeedback(Component.translatable("commands.tradefinder.stop.success").withStyle(style -> style.withColor(TextColor.fromLegacyFormat(ChatFormatting.GREEN))));
                         return 1;
                     }))
             );

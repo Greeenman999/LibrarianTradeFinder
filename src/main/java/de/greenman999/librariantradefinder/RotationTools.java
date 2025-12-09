@@ -1,9 +1,9 @@
 package de.greenman999.librariantradefinder;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public class RotationTools {
 
@@ -16,18 +16,18 @@ public class RotationTools {
     private static float elapsedTime = 0;
     private static long prevTimeMillis = 0;
 
-    public static void smoothLookAt(Vec3d target, float speed) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+    public static void smoothLookAt(Vec3 target, float speed) {
+        Minecraft mc = Minecraft.getInstance();
         if(mc.player == null) return;
-        Vec3d vec3d = EntityAnchorArgumentType.EntityAnchor.EYES.positionAt(mc.player);
+        Vec3 vec3d = EntityAnchorArgument.Anchor.EYES.apply(mc.player);
         double d = target.x - vec3d.x;
         double e = target.y - vec3d.y;
         double f = target.z - vec3d.z;
         double g = Math.sqrt(d * d + f * f);
-        destPitch = MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 57.2957763671875)));
-        destYaw = MathHelper.wrapDegrees((float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0F);
-        startPitch = mc.player.getPitch();
-        startYaw = mc.player.getYaw();
+        destPitch = Mth.wrapDegrees((float)(-(Mth.atan2(e, g) * 57.2957763671875)));
+        destYaw = Mth.wrapDegrees((float)(Mth.atan2(f, d) * 57.2957763671875) - 90.0F);
+        startPitch = mc.player.getXRot();
+        startYaw = mc.player.getYRot();
         if(destPitch == startPitch && destYaw == startYaw) return;
         RotationTools.speed = speed / 10f;
         elapsedTime = 0;
@@ -36,7 +36,7 @@ public class RotationTools {
     }
 
     public static void render() {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         if(mc.player == null || isRotated || speed == 0) return;
         float delta = (System.currentTimeMillis() - (prevTimeMillis == 0 ? System.currentTimeMillis() : prevTimeMillis )) / 1000f;
         prevTimeMillis = System.currentTimeMillis();
@@ -48,11 +48,11 @@ public class RotationTools {
             return;
         }
 
-        float pitch = MathHelper.lerp(percentageComplete, startPitch, destPitch);
-        float yaw = MathHelper.lerp(percentageComplete, startYaw, destYaw);
+        float pitch = Mth.lerp(percentageComplete, startPitch, destPitch);
+        float yaw = Mth.lerp(percentageComplete, startYaw, destYaw);
 
-        mc.player.setPitch(pitch);
-        mc.player.setYaw(yaw);
+        mc.player.setXRot(pitch);
+        mc.player.setYRot(yaw);
     }
 
 }
