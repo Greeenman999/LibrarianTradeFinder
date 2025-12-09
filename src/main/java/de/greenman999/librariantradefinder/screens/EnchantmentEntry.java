@@ -82,12 +82,12 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         int levelX = maxPriceX - 15 - 14;
 
         if (enabled) {
-            context.fill(x, y, x + entryWidth, y + entryHeight, 0x3F00FF00);
+            context.fill(x, y, x + entryWidth, y + entryHeight - 4, 0x3F00FF00);
 
             context.drawTextWithShadow(textRenderer, Text.of("$:"), maxPriceX - 10, y + 4, 0xFFFFFFFF);
             context.drawTextWithShadow(textRenderer, Text.of("LVL:"), levelX - 23, y + 4, 0xFFFFFFFF);
         } else {
-            context.fill(x, y, x + entryWidth, y + entryHeight, 0x1AC7C0C0);
+            context.fill(x, y, x + entryWidth, y + entryHeight - 4, 0x1AC7C0C0);
         }
 
         context.drawTextWithShadow(textRenderer, enchantmentText, 8, y + 4, 0xFFFFFFFF);
@@ -134,10 +134,10 @@ public class EnchantmentEntry extends EntryListWidget.Entry<EnchantmentEntry> {
         if(enabled) {
             i = 21 + 15 + 14;
         }
-        if(mouseX > this.x && mouseX < this.x + this.entryWidth - i && mouseY > y && mouseY < y + entryHeight) {
+        if(mouseX > this.x && mouseX < this.x + this.entryWidth - i && mouseY > y && mouseY < y + entryHeight - 4) {
             enabled = !enabled;
             return true;
-        } else if(mouseX > this.x + entryWidth - 21 - 10 - 4 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight && enabled) {
+        } else if(mouseX > this.x + entryWidth - 21 - 10 - 4 && mouseX < this.x + this.entryWidth - 21 && mouseY > y && mouseY < y + entryHeight - 4 && enabled) {
             enabled = false;
             return true;
         }
