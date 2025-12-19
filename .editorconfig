@@ -1,0 +1,35 @@
+root = true
+
+[*]
+indent_style = tab
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+[*.properties]
+indent_style = space
+indent_size = 2
+
+[.editorconfig]
+indent_style = space
+
+[*.java]
+ij_java_use_single_class_imports = true
+ij_continuation_indent_size = 8
+ij_java_class_count_to_use_import_on_demand = 999
+ij_java_names_count_to_use_import_on_demand = 999
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
