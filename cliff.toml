@@ -58,7 +58,7 @@ trim = true
 # postprocessors
 postprocessors = [
 	# Replace the placeholder `<REPO>` with a URL.
-	{ pattern = '\$REPO', replace = "%%%repo_url%%%" }, # replace repository URL
+	{ pattern = '\$REPO', replace = "https://github.com/Greeenman999/LibrarianTradeFinder" }, # replace repository URL
 ]
 
 [git]
@@ -72,7 +72,7 @@ split_commits = false
 # An array of regex based parsers to modify commit messages prior to further processing.
 commit_preprocessors = [
 	# Replace issue numbers with link templates to be updated in `changelog.postprocessors`.
-	{ pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](%%%repo_url%%%/issues/${2}))"},
+	{ pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](https://github.com/Greeenman999/LibrarianTradeFinder/issues/${2}))"},
 ]
 # An array of regex based parsers for extracting data from the commit message.
 # Assigns commits to groups.
