@@ -110,6 +110,9 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 			from(rootProject.file("licenses")) {
 				into("licenses")
 			}
+			from(rootProject.file("NOTICE.md")) {
+				rename { "NOTICE_${modId}.md" }
+			}
 		}
 	}
 
