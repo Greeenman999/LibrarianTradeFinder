@@ -1,3 +1,17 @@
+Repository licensing summary
+
+This repository contains code under multiple licenses.
+The project as a whole is distributed under the GNU General Public License v3 (GPLv3);
+the full GPLv3 text appears in the LICENSE file. Specific files are licensed
+under the MIT License: per-file MIT headers have been added and the complete
+MIT text is available at licenses/MIT.txt.
+
+Preserve the per-file license headers and the licenses/MIT.txt file when copying,
+modifying, or redistributing MIT-licensed files. Do not remove or alter original
+copyright notices; obtain contributor permission before relicensing others' code.
+
+--------------------------------
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
