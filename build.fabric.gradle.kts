@@ -61,6 +61,7 @@ fabricApi {
 repositories {
 	maven("https://repo.essential.gg/repository/maven-public") { name = "Essential" }
 	maven("https://maven.terraformersmc.com/") { name = "TerraformersMC" }
+	maven("https://maven.parchmentmc.org") { name = "ParchmentMC" }
 }
 
 dependencies {

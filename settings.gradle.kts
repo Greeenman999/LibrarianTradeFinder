@@ -14,7 +14,6 @@ pluginManagement {
 		maven("https://maven.neoforged.net/releases/") { name = "NeoForged" }
 		maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
 		maven("https://maven.kikugie.dev/releases") { name = "KikuGie Releases" }
-		maven("https://maven.parchmentmc.org") { name = "ParchmentMC" }
 		maven("https://jitpack.io") { name = "Jitpack" }
 		exclusiveContent {
 			forRepository { maven("https://api.modrinth.com/maven") { name = "Modrinth" } }

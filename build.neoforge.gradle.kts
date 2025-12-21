@@ -63,6 +63,7 @@ neoForge {
 repositories {
 	maven("https://repo.essential.gg/repository/maven-public") { name = "Essential" }
 	maven("https://thedarkcolour.github.io/KotlinForForge/") { name = "KotlinForForge" }
+	maven("https://maven.parchmentmc.org") { name = "ParchmentMC" }
 }
 
 dependencies {
