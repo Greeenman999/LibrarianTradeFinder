@@ -20,6 +20,8 @@
 package de.greenman999.librariantradefinder.config;
 
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
+import de.greenman999.librariantradefinder.config.serializers.IntegerRangeSerializer;
+import de.greenman999.librariantradefinder.util.IntegerRange;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.gson.GsonConfigurationLoader;
@@ -70,6 +72,7 @@ public class ConfigManager {
 		final Path configDirectory = LibrarianTradeFinder.xplat().configDirectory();
 		return GsonConfigurationLoader.builder()
 				.path(configDirectory.resolve(LibrarianTradeFinder.MOD_ID + ".json"))
+				.defaultOptions(opts -> opts.serializers(builder -> builder.register(IntegerRange.class, IntegerRangeSerializer.INSTANCE)))
 				.build();
 	}
 }
