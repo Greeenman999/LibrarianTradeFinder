@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 rotgruengelb, and stonecutter-mod-template contributors
  * Copyright (c) 2025 murder_spagurder
+ * Copyright (c) 2025 Greenman999
  * See the LICENSE file in the project root for license terms.
  */
 
@@ -22,6 +23,10 @@ platform {
 		}
 		required("fabricloader") {
 			versionRange = ">=${libs.fabric.loader.get().version}"
+		}
+		required("fabric-language-kotlin") {
+			slug("fabric-kotlin-language")
+			versionRange = ">=${prop("deps.fabric-kotlin")}"
 		}
 		optional("modmenu") {}
 	}
@@ -65,4 +70,5 @@ dependencies {
 	include(libs.moulberry.mixinconstraints)
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${prop("deps.fabric-api")}")
 	//modLocalRuntime("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
+	modImplementation("net.fabricmc:fabric-language-kotlin:${prop("deps.fabric-kotlin")}")
 }

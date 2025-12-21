@@ -20,6 +20,10 @@ platform {
 		required("neoforge") {
 			forgeVersionRange = "[1,)"
 		}
+		required("kotlinforforge") {
+			forgeVersionRange = "[${prop("deps.kotlinforforge")},)"
+			slug("kotlin-for-forge")
+		}
 	}
 }
 
@@ -56,9 +60,15 @@ neoForge {
 	sourceSets["main"].resources.srcDir("${rootDir}/versions/datagen/${stonecutter.current.version.split("-")[0]}/src/main/generated")
 }
 
+repositories {
+	maven("https://thedarkcolour.github.io/KotlinForForge/") { name = "KotlinForForge" }
+}
+
 dependencies {
 	implementation(libs.moulberry.mixinconstraints)
 	jarJar(libs.moulberry.mixinconstraints)
+
+	implementation("thedarkcolour:kotlinforforge-neoforge:${property("deps.kotlinforforge")}")
 }
 
 tasks.named("createMinecraftArtifacts") {
