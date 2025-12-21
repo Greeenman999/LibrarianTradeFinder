@@ -60,6 +60,9 @@ public class LibrarianTradeFinder {
 	}
 
 	public static LibrarianTradeFinder getInstance() {
+		if (instance == null) {
+			instance = new LibrarianTradeFinder();
+		}
 		return instance;
 	}
 
