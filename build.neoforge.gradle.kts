@@ -61,12 +61,26 @@ neoForge {
 }
 
 repositories {
+	maven("https://repo.essential.gg/repository/maven-public") { name = "Essential" }
 	maven("https://thedarkcolour.github.io/KotlinForForge/") { name = "KotlinForForge" }
 }
 
 dependencies {
 	implementation(libs.moulberry.mixinconstraints)
 	jarJar(libs.moulberry.mixinconstraints)
+
+	jarJar("gg.essential:elementa") {
+		version {
+			strictly("[${prop("deps.elementa")},)")
+			prefer(prop("deps.elementa"))
+		}
+	}
+	jarJar("gg.essential:universalcraft-${prop("deps.universalcraft-mc")}-neoforge") {
+		version {
+			strictly("[${prop("deps.universalcraft")},)")
+			prefer(prop("deps.universalcraft"))
+		}
+	}
 
 	implementation("thedarkcolour:kotlinforforge-neoforge:${property("deps.kotlinforforge")}")
 }

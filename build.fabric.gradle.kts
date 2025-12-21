@@ -59,6 +59,7 @@ fabricApi {
 }
 
 repositories {
+	maven("https://repo.essential.gg/repository/maven-public") { name = "Essential" }
 	maven("https://maven.terraformersmc.com/") { name = "TerraformersMC" }
 }
 
@@ -73,7 +74,9 @@ dependencies {
 	implementation(libs.moulberry.mixinconstraints)
 	include(libs.moulberry.mixinconstraints)
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${prop("deps.fabric-api")}")
-	//modLocalRuntime("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
 	modImplementation("net.fabricmc:fabric-language-kotlin:${prop("deps.fabric-kotlin")}")
+
+	implementation(include("gg.essential:elementa:${prop("deps.elementa")}")!!)
+	modImplementation(include("gg.essential:universalcraft-${prop("deps.universalcraft-mc")}-fabric:${prop("deps.universalcraft")}")!!)
 	modLocalRuntime("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
 }
