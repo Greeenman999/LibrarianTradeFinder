@@ -128,6 +128,7 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 	) {
 		tasks.named<ProcessResources>("processResources") {
 			dependsOn(tasks.named("stonecutterGenerate"))
+			dependsOn(tasks.named("kspKotlin"))
 
 			filesMatching("*.mixins.json") { expand("java" to "JAVA_${requiredJava.majorVersion}") }
 
