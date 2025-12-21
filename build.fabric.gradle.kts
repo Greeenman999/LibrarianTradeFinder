@@ -58,6 +58,10 @@ fabricApi {
 	}
 }
 
+repositories {
+	maven("https://maven.terraformersmc.com/") { name = "TerraformersMC" }
+}
+
 dependencies {
 	minecraft("com.mojang:minecraft:${prop("deps.minecraft")}")
 	mappings(
@@ -71,4 +75,5 @@ dependencies {
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${prop("deps.fabric-api")}")
 	//modLocalRuntime("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
 	modImplementation("net.fabricmc:fabric-language-kotlin:${prop("deps.fabric-kotlin")}")
+	modLocalRuntime("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
 }
