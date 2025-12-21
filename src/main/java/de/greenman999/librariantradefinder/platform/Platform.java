@@ -7,6 +7,8 @@
 
 package de.greenman999.librariantradefinder.platform;
 
+import java.nio.file.Path;
+
 public interface Platform {
 	boolean isModLoaded(String modId);
 
@@ -19,6 +21,8 @@ public interface Platform {
 	default boolean isDebug() {
 		return isDevelopmentEnvironment();
 	}
+
+	Path configDirectory();
 
 	enum ModLoader {
 		FABRIC, NEOFORGE, FORGE, QUILT

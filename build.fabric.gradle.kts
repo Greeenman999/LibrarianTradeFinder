@@ -80,4 +80,6 @@ dependencies {
 	implementation(include("gg.essential:elementa:${prop("deps.elementa")}")!!)
 	modImplementation(include("gg.essential:universalcraft-${prop("deps.universalcraft-mc")}-fabric:${prop("deps.universalcraft")}")!!)
 	modLocalRuntime("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
+
+	implementation("org.spongepowered:configurate-gson:${prop("deps.configurate")}")
 }
