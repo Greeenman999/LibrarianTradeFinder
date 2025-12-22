@@ -31,6 +31,9 @@
     ],
     "fabric-datagen": [
       "${group}.${id}.platform.fabric.datagen.FabricDataGeneratorEntrypoint"
+    ],
+    "modmenu": [
+      "${group}.${id}.compat.ModMenuApiImpl"
     ]
   },
   "mixins": [
