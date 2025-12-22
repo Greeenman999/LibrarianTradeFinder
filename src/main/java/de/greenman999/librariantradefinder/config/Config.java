@@ -20,8 +20,23 @@
 package de.greenman999.librariantradefinder.config;
 
 import de.greenman999.librariantradefinder.util.IntegerRange;
+import de.greenman999.librariantradefinder.util.RegistryHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.enchantment.Enchantment;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 @ConfigSerializable
 public class Config {
@@ -94,6 +109,47 @@ public class Config {
 	 * to reroll the villager.
 	 */
 	private int rerollTimeoutTicks = 100;
+
+	private HashMap<Identifier, EnchantmentEntry> enchantments = new HashMap<>();
+
+	@ConfigSerializable
+	public static class EnchantmentEntry {
+
+		private boolean enabled;
+		private int minLevel;
+		private int maxPrice;
+
+		public EnchantmentEntry(boolean enabled, int minLevel, int maxPrice) {
+			this.enabled = enabled;
+			this.minLevel = minLevel;
+			this.maxPrice = maxPrice;
+		}
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		public int getMinLevel() {
+			return minLevel;
+		}
+
+		public void setMinLevel(int minLevel) {
+			this.minLevel = minLevel;
+		}
+
+		public int getMaxPrice() {
+			return maxPrice;
+		}
+
+		public void setMaxPrice(int maxPrice) {
+			this.maxPrice = maxPrice;
+		}
+
+	}
 
 	public boolean shouldPreventToolBreaking() {
 		return preventToolBreaking;
@@ -173,5 +229,113 @@ public class Config {
 
 	public void setRerollTimeoutTicks(int rerollTimeoutTicks) {
 		this.rerollTimeoutTicks = rerollTimeoutTicks;
+	}
+
+	public LinkedHashMap<Identifier, EnchantmentEntry> getEnchantments() {
+		LinkedHashMap<Identifier, EnchantmentEntry> sortedEnchantments = new LinkedHashMap<>();
+		Registry<Enchantment> enchantmentRegistry = RegistryHelper.getEnchantmentRegistry();
+		if (enchantmentRegistry == null) {
+			return sortedEnchantments;
+		}
+		for (Enchantment enchantment : enchantmentRegistry) {
+			Identifier id = enchantmentRegistry.getKey(enchantment);
+
+			final TagKey<Enchantment> tradeableTag = TagKey.create(enchantmentRegistry.key(), Identifier.fromNamespaceAndPath("minecraft","tradeable"));
+
+			ResourceKey<Enchantment> enchantmentKey = enchantmentRegistry.getResourceKey(enchantment).orElseThrow();
+			Optional<Holder.Reference<Enchantment>> reference = enchantmentRegistry.get(enchantmentKey);
+			boolean isTradeable = reference.map(enchantmentReference -> enchantmentReference.is(tradeableTag)).orElse(false);
+			if (!isTradeable) {
+				continue;
+			}
+
+			if (enchantments.containsKey(id)) {
+				sortedEnchantments.put(id, enchantments.get(id));
+			} else {
+				sortedEnchantments.put(id, new EnchantmentEntry(false, enchantment.getMaxLevel(), enchantment.getMaxCost(enchantment.getMaxLevel())));
+			}
+		}
+
+		sortedEnchantments = new LinkedHashMap<>(sortedEnchantments.entrySet().stream()
+				.sorted(Map.Entry.comparingByKey(Comparator.comparing(enchantmentKey ->
+						Enchantment.getFullname(
+								enchantmentRegistry.get(enchantmentKey).orElseThrow(),
+								enchantmentRegistry.get(enchantmentKey).orElseThrow().value().getMaxLevel()
+						).copy().withStyle(ChatFormatting.WHITE).getString())))
+				.toList()
+				.stream()
+				.collect(java.util.stream.Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue,
+						(oldValue, newValue) -> oldValue,
+						LinkedHashMap::new
+				))
+		);
+
+		return sortedEnchantments;
+	}
+
+	public HashMap<Identifier, EnchantmentEntry> getEnchantmentsRaw() {
+		return enchantments;
+	}
+
+	public void updateEnchantment(Identifier id, Function<EnchantmentEntry, EnchantmentEntry> updater) {
+		EnchantmentEntry entry = enchantments.get(id);
+		if (entry != null) {
+			enchantments.put(id, updater.apply(entry));
+		} else {
+			Enchantment enchantment = RegistryHelper.getEnchantmentById(id);
+			if (enchantment == null) {
+				return;
+			}
+			EnchantmentEntry newEntry = new EnchantmentEntry(true, enchantment.getMaxLevel(), enchantment.getMaxCost(enchantment.getMaxLevel()));
+			enchantments.put(id, updater.apply(newEntry));
+		}
+	}
+
+	public void enableEnchantment(Identifier id, boolean enabled) {
+		Enchantment enchantment = RegistryHelper.getEnchantmentById(id);
+		if (enchantment == null) {
+			return;
+		}
+
+		EnchantmentEntry entry = enchantments.get(id);
+		if (entry != null) {
+			entry.setEnabled(enabled);
+		} else {
+			enchantments.put(id, new EnchantmentEntry(enabled, enchantment.getMaxLevel(), enchantment.getMaxCost(enchantment.getMaxLevel())));
+		}
+	}
+
+	public void setEnchantmentMinLevel(Identifier id, int minLevel) {
+		Enchantment enchantment = RegistryHelper.getEnchantmentById(id);
+		if (enchantment == null) {
+			return;
+		}
+
+		EnchantmentEntry entry = enchantments.get(id);
+		if (entry != null) {
+			entry.setMinLevel(minLevel);
+		} else {
+			enchantments.put(id, new EnchantmentEntry(true, minLevel, enchantment.getMaxCost(minLevel)));
+		}
+	}
+
+	public void setEnchantmentMaxPrice(Identifier id, int maxPrice) {
+		Enchantment enchantment = RegistryHelper.getEnchantmentById(id);
+		if (enchantment == null) {
+			return;
+		}
+
+		EnchantmentEntry entry = enchantments.get(id);
+		if (entry != null) {
+			entry.setMaxPrice(maxPrice);
+		} else {
+			enchantments.put(id, new EnchantmentEntry(true, enchantment.getMaxLevel(), maxPrice));
+		}
+	}
+
+	public void setEnchantments(HashMap<Identifier, EnchantmentEntry> enchantments) {
+		this.enchantments = enchantments;
 	}
 }
