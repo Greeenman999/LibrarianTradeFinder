@@ -76,12 +76,14 @@ dependencies {
 			prefer(prop("deps.elementa"))
 		}
 	}
+	implementation("gg.essential:elementa:${prop("deps.elementa")}")
 	jarJar("gg.essential:universalcraft-${prop("deps.universalcraft-mc")}-neoforge") {
 		version {
 			strictly("[${prop("deps.universalcraft")},)")
 			prefer(prop("deps.universalcraft"))
 		}
 	}
+	implementation("gg.essential:universalcraft-${prop("deps.universalcraft-mc")}-neoforge:${prop("deps.universalcraft")}")
 
 	implementation("thedarkcolour:kotlinforforge-neoforge:${property("deps.kotlinforforge")}")
 	implementation("org.spongepowered:configurate-gson:${prop("deps.configurate")}")
