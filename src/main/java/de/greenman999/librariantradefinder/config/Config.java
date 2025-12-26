@@ -125,6 +125,10 @@ public class Config {
 			this.maxPrice = maxPrice;
 		}
 
+		public EnchantmentEntry() {
+			// Configurate
+		}
+
 		public boolean isEnabled() {
 			return enabled;
 		}
