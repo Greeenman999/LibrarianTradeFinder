@@ -252,7 +252,7 @@ public class Config {
 			if (enchantments.containsKey(id)) {
 				sortedEnchantments.put(id, enchantments.get(id));
 			} else {
-				sortedEnchantments.put(id, new EnchantmentEntry(false, enchantment.getMaxLevel(), enchantment.getMaxCost(enchantment.getMaxLevel())));
+				sortedEnchantments.put(id, new EnchantmentEntry(false, enchantment.getMaxLevel(), RegistryHelper.getMaxEmeraldCost(id)));
 			}
 		}
 
@@ -288,7 +288,7 @@ public class Config {
 			if (enchantment == null) {
 				return;
 			}
-			EnchantmentEntry newEntry = new EnchantmentEntry(true, enchantment.getMaxLevel(), enchantment.getMaxCost(enchantment.getMaxLevel()));
+			EnchantmentEntry newEntry = new EnchantmentEntry(true, enchantment.getMaxLevel(), RegistryHelper.getMaxEmeraldCost(id));
 			enchantments.put(id, updater.apply(newEntry));
 		}
 	}
@@ -303,7 +303,7 @@ public class Config {
 		if (entry != null) {
 			entry.setEnabled(enabled);
 		} else {
-			enchantments.put(id, new EnchantmentEntry(enabled, enchantment.getMaxLevel(), enchantment.getMaxCost(enchantment.getMaxLevel())));
+			enchantments.put(id, new EnchantmentEntry(enabled, enchantment.getMaxLevel(), RegistryHelper.getMaxEmeraldCost(id)));
 		}
 	}
 

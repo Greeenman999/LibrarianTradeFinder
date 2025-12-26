@@ -20,10 +20,15 @@
 package de.greenman999.librariantradefinder.util;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.item.enchantment.Enchantment;
+
+import java.util.Objects;
+import java.util.Optional;
 
 public class RegistryHelper {
 
@@ -39,6 +44,21 @@ public class RegistryHelper {
 		if (enchantmentRegistry == null || !enchantmentRegistry.containsKey(id) || enchantmentRegistry.get(id).isEmpty())
 			return null;
 		return enchantmentRegistry.get(id).get().value();
+	}
+
+	public static int getMaxEmeraldCost(Identifier id) {
+		Optional<Holder.Reference<Enchantment>> enchantment = Objects.requireNonNull(getEnchantmentRegistry()).get(id);
+		if (enchantment.isEmpty())
+			return 64;
+		int cost = 6 + 13 * enchantment.get().value().getMaxLevel();
+		if (enchantment.get().is(EnchantmentTags.DOUBLE_TRADE_PRICE)) {
+			cost *= 2;
+		}
+
+		if (cost > 64) {
+			cost = 64;
+		}
+		return cost;
 	}
 
 }
