@@ -297,6 +297,14 @@ public class Config {
 		}
 	}
 
+	public boolean isEnchantmentEnabled(Identifier id) {
+		EnchantmentEntry entry = enchantments.get(id);
+		if (entry == null) {
+			return false;
+		}
+		return entry.isEnabled();
+	}
+
 	public void enableEnchantment(Identifier id, boolean enabled) {
 		Enchantment enchantment = RegistryHelper.getEnchantmentById(id);
 		if (enchantment == null) {
