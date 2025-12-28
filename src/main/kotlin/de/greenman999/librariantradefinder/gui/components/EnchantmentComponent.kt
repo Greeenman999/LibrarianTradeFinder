@@ -22,15 +22,12 @@ import java.awt.Color
 
 class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config.EnchantmentEntry>) : UIRoundedRectangle(4f) {
 
-	val colorState: BasicState<Color> = if (entry.value.isEnabled) {
-		BasicState(Color(56, 171, 80, 150))
-	} else {
-		BasicState(Color(0, 0, 0, 100))
-	}
+	val colorState: BasicState<Color> = BasicState(Color(0, 0, 0, 100))
 
 	init {
-		val config = LibrarianTradeFinder.getInstance().config
-	    constrain {
+		val config: Config = LibrarianTradeFinder.getInstance().config
+
+		constrain {
 			x = 0.pixels()
 			y = SiblingConstraint(padding = 2f)
 
@@ -57,12 +54,14 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			height = 14.pixels()
 		} childOf this
 
-		if (!entry.value.isEnabled) {
-			emeraldsSlider.hide(true)
-		}
+		withHandCursor()
 
-		onMouseClick {
-			config.enableEnchantment(entry.key, !config.isEnchantmentEnabled(entry.key))
+		fun updateEntry(toggle: Boolean) {
+			if (toggle) {
+				config.enableEnchantment(entry.key, !config.isEnchantmentEnabled(entry.key))
+				LibrarianTradeFinder.getInstance().configManager.save()
+			}
+
 			colorState.set {
 				if (config.isEnchantmentEnabled(entry.key)) {
 					Color(56, 171, 80, 150)
@@ -73,12 +72,17 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			if (config.isEnchantmentEnabled(entry.key)) {
 				emeraldsSlider.unhide(true)
 			} else {
-				emeraldsSlider.hide(true)
+				emeraldsSlider.hide(false)
 			}
-			LibrarianTradeFinder.getInstance().configManager.save()
 		}
 
-		withHandCursor()
+		onMouseClick {
+			updateEntry(true)
+		}
+
+		updateEntry(false)
 	}
+
+
 
 }
