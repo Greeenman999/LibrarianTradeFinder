@@ -46,11 +46,21 @@ public class RegistryHelper {
 		return enchantmentRegistry.get(id).get().value();
 	}
 
-	public static int getMaxEmeraldCost(Identifier id) {
+	/**
+	 * Calculates the maximum emerald cost for an enchantment at a given level.
+	 *
+	 * @param id    The identifier of the enchantment.
+	 * @param level The level of the enchantment. If null, the maximum level of the enchantment is used.
+	 * @return The maximum emerald cost, capped at 64.
+	 */
+	public static int getMaxEmeraldCost(Identifier id, Integer level) {
 		Optional<Holder.Reference<Enchantment>> enchantment = Objects.requireNonNull(getEnchantmentRegistry()).get(id);
 		if (enchantment.isEmpty())
 			return 64;
-		int cost = 6 + 13 * enchantment.get().value().getMaxLevel();
+		if (level == null) {
+			level = enchantment.get().value().getMaxLevel();
+		}
+		int cost = 6 + 13 * level;
 		if (enchantment.get().is(EnchantmentTags.DOUBLE_TRADE_PRICE)) {
 			cost *= 2;
 		}
