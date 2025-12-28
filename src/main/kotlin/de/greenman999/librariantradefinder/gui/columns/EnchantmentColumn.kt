@@ -49,7 +49,7 @@ class EnchantmentColumn : UIContainer() {
 			width = 100.percent() - 4.pixels() * 2
 			height = 100.percent()
 		} childOf enchantmentsContainer
-		enchantments.emptyText.setWidth(enchantments.getWidth().pixels() - 10.pixels())
+		enchantments.emptyText.setWidth(100.percent() - 10.pixels())
 		enchantments.emptyText.setY(CenterConstraint())
 
 		val scrollbar by UIRoundedRectangle(2f).constrain {
