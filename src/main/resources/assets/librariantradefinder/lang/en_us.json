@@ -1,4 +1,7 @@
 {
   "librariantradefinder.gui.title": "Librarian Trade Finder",
-  "librariantradefinder.gui.empty-enchantments": "Please join a world to load enchantments."
+  "librariantradefinder.gui.empty-enchantments": "Please join a world to load enchantments.",
+  "librariantradefinder.gui.enchantment-column-info.enchantment": "Enchantment",
+  "librariantradefinder.gui.enchantment-column-info.min-level": "Level",
+  "librariantradefinder.gui.enchantment-column-info.max-price": "Emeralds"
 }
