@@ -38,6 +38,10 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 		}
 
 		val enchantment: Enchantment = RegistryHelper.getEnchantmentById(entry.key)
+		fun maxEmeraldCost(level: Int? = entry.value.minLevel) = RegistryHelper.getMaxEmeraldCost(entry.key, level)
+		fun minEmeraldCost(level: Int? = entry.value.minLevel) = RegistryHelper.getMinEmeraldCost(entry.key, level)
+		fun calculateEmeraldsFromValue(value: Float) = (value * (maxEmeraldCost() - minEmeraldCost())) + minEmeraldCost()
+		fun calculateValueFromEmeralds(emeralds: Int) = (emeralds - minEmeraldCost()).toFloat() / (maxEmeraldCost() - minEmeraldCost()).toFloat()
 
 		val name by UIText(enchantment.description().string).constrain {
 			x = 5.pixels()
@@ -46,12 +50,22 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			color = Color.WHITE.toConstraint()
 		} childOf this
 
-		val emeraldsSlider = SliderComponent().constrain {
+		val emeraldsSlider = SliderComponent(calculateValueFromEmeralds(entry.value.maxPrice)).constrain {
 			x = 5.pixels(alignOpposite = true)
 			y = CenterConstraint()
 
-			width = 40.pixels()
+			width = 50.pixels()
 			height = 14.pixels()
+		}.onValueSave {
+			if (!config.isEnchantmentEnabled(entry.key)) return@onValueSave
+
+			val newValue = calculateEmeraldsFromValue(it).toInt()
+			entry.value.maxPrice = newValue
+
+			config.setEnchantmentMaxPrice(entry.key, newValue)
+			LibrarianTradeFinder.getInstance().configManager.save()
+		}.formatText { value ->
+			(calculateEmeraldsFromValue(value)).toInt().toString()
 		} childOf this
 
 		withHandCursor()
