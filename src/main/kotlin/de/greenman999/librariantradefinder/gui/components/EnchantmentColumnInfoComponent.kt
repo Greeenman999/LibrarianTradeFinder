@@ -6,6 +6,7 @@ import gg.essential.elementa.components.UIText
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.minus
+import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.dsl.toConstraint
@@ -20,15 +21,19 @@ class EnchantmentColumnInfoComponent : UIContainer() {
 		color = Color.WHITE.toConstraint()
 	} childOf this
 
-	val minLevelInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.min-level")).constrain {
-		x = 65.pixels(alignOpposite = true)
+	// 8 for scrollbar and padding, 5 for padding inside EnchantmentComponent, 51 for width of emeralds slider (include outline)
+	val maxPriceInfoX = 100.percent() - 8.pixels() - 5.pixels() - 51.pixels()
+	val maxPriceInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.max-price")).constrain {
+		x = maxPriceInfoX
 		y = 0.pixels()
 
 		color = Color.WHITE.toConstraint()
 	} childOf this
 
-	val maxPriceInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.max-price")).constrain {
-		x = 8.pixels(alignOpposite = true) - 5.pixels()
+	// 40 for width of min level info, 5 for padding
+	val minLevelInfoX = maxPriceInfoX - 40.pixels() - 5.pixels()
+	val minLevelInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.min-level")).constrain {
+		x = minLevelInfoX
 		y = 0.pixels()
 
 		color = Color.WHITE.toConstraint()
