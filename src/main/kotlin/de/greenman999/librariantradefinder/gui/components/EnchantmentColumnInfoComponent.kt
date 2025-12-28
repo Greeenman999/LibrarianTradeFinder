@@ -13,26 +13,24 @@ import java.awt.Color
 
 class EnchantmentColumnInfoComponent : UIContainer() {
 
-	init {
-		val enchantmentInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.enchantment")).constrain {
-			x = 5.pixels()
-			y = 0.pixels()
+	val enchantmentInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.enchantment")).constrain {
+		x = 5.pixels()
+		y = 0.pixels()
 
-			color = Color.WHITE.toConstraint()
-		} childOf this
+		color = Color.WHITE.toConstraint()
+	} childOf this
 
-		val minLevelInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.min-level")).constrain {
-			x = 65.pixels(alignOpposite = true)
-			y = 0.pixels()
+	val minLevelInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.min-level")).constrain {
+		x = 65.pixels(alignOpposite = true)
+		y = 0.pixels()
 
-			color = Color.WHITE.toConstraint()
-		} childOf this
+		color = Color.WHITE.toConstraint()
+	} childOf this
 
-		val maxPriceInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.max-price")).constrain {
-			x = 8.pixels(alignOpposite = true) - 5.pixels()
-			y = 0.pixels()
+	val maxPriceInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.max-price")).constrain {
+		x = 8.pixels(alignOpposite = true) - 5.pixels()
+		y = 0.pixels()
 
-			color = Color.WHITE.toConstraint()
-		} childOf this
-	}
+		color = Color.WHITE.toConstraint()
+	} childOf this
 }
