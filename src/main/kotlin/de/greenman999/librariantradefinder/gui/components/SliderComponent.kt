@@ -18,6 +18,9 @@ class SliderComponent : UIContainer() {
 	private var dragging = false
 	private var offset = 0f // Offset between mouse x and handle left edge when dragging starts
 
+	val handleWidth = 3f
+	fun availableWidth() = this.getWidth() - handleWidth
+
 	init {
 		val outline by UIContainer().constrain {
 			x = 0.pixels()
@@ -27,44 +30,46 @@ class SliderComponent : UIContainer() {
 			height = 100.percent()
 		} childOf this effect OutlineEffect(Color.DARK_GRAY, 1f)
 
+		// The draggable handle
 		val handle by UIBlock(Color.LIGHT_GRAY).constrain {
 			x = basicXConstraint {
-				((this@SliderComponent.getWidth() - getWidth()) * value) + this@SliderComponent.getLeft()
+				(availableWidth() * value) + this@SliderComponent.getLeft()
 			}
 			y = 0.pixels()
 
-			width = 5.pixels()
+			width = handleWidth.pixels()
 			height = 100.percent()
 		}.onMouseClick { event ->
 			dragging = true
-			offset = event.relativeX - (getWidth() / 2f)
-		}.onMouseRelease {
-			dragging = false
-			offset = 0f
+			// Calculate offset between mouse x and handle left edge
+			offset = event.relativeX
+			event.stopPropagation()
 		} childOf this
 
-		onMouseClick { event ->
+		// Handle dragging on the whole slider area
+		this.onMouseClick { event ->
 			dragging = true
-			//value = event.relativeX.coerceIn(0f, this@SliderComponent.getWidth()) / this@SliderComponent.getWidth()
+			// Center the handle on the mouse cursor
+			offset = handle.getWidth() / 2
 			updateValue(event.relativeX)
 			event.stopPropagation()
 		}
-		onMouseRelease {
+		this.onMouseRelease {
 			dragging = false
+			// Reset offset
 			offset = 0f
 		}
-		onMouseDrag { mouseX, mouseY, mouseButton ->
+		this.onMouseDrag { mouseX, mouseY, mouseButton ->
 			if (!dragging) return@onMouseDrag
 
 			updateValue(mouseX)
-			//val x = mouseX - offset
-			//value = x.coerceIn(0f, this@SliderComponent.getWidth()) / this@SliderComponent.getWidth()
 		}
 	}
 
 	fun updateValue(mouseX: Float) {
+		// Subtract offset from mouse x to get handle left edge position
 		val offsetX = mouseX - offset
-		val clampedX = offsetX.coerceIn(0f, this@SliderComponent.getWidth())
-		value = clampedX / this@SliderComponent.getWidth()
+		val clampedX = offsetX.coerceIn(0f, availableWidth())
+		value = clampedX / availableWidth()
 	}
 }
