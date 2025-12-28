@@ -59,7 +59,7 @@ class SliderComponent : UIContainer() {
 			// Reset offset
 			offset = 0f
 		}
-		this.onMouseDrag { mouseX, mouseY, mouseButton ->
+		this.onMouseDrag { mouseX, _, _ ->
 			if (!dragging) return@onMouseDrag
 
 			updateValue(mouseX)
