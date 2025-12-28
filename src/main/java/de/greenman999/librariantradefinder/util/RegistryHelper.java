@@ -82,4 +82,28 @@ public class RegistryHelper {
 		return cost;
 	}
 
+	/**
+	 * Calculates the minimum emerald cost for an enchantment at a given level.
+	 *
+	 * @param id    The identifier of the enchantment.
+	 * @param level The level of the enchantment. If null, the maximum level of the enchantment is used.
+	 * @return The minimum emerald cost, capped at 64.
+	 */
+	public static int getMinEmeraldCost(Identifier id, Integer level) {
+		Optional<Holder.Reference<Enchantment>> enchantment = Objects.requireNonNull(getEnchantmentRegistry()).get(id);
+		if (enchantment.isEmpty())
+			return 1;
+		if (level == null) {
+			level = enchantment.get().value().getMaxLevel();
+		}
+		int cost = 2 + 3 * level;
+		if (enchantment.get().is(EnchantmentTags.DOUBLE_TRADE_PRICE)) {
+			cost *= 2;
+		}
+
+		if (cost > 64) {
+			cost = 64;
+		}
+		return cost;
+	}
 }
