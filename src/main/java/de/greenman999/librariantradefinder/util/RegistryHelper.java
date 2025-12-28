@@ -32,6 +32,11 @@ import java.util.Optional;
 
 public class RegistryHelper {
 
+	/**
+	 * Retrieves the enchantment registry from the current Minecraft level.
+	 *
+	 * @return The enchantment registry, or null if the level is not loaded.
+	 */
 	public static Registry<Enchantment> getEnchantmentRegistry() {
 		if (Minecraft.getInstance().level == null) {
 			return null;
@@ -39,6 +44,12 @@ public class RegistryHelper {
 		return Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
 	}
 
+	/**
+	 * Fetches an enchantment by its identifier.
+	 *
+	 * @param id The identifier of the enchantment.
+	 * @return The enchantment, or null if it does not exist or the registry is unavailable.
+	 */
 	public static Enchantment getEnchantmentById(Identifier id) {
 		Registry<Enchantment> enchantmentRegistry = getEnchantmentRegistry();
 		if (enchantmentRegistry == null || !enchantmentRegistry.containsKey(id) || enchantmentRegistry.get(id).isEmpty())
