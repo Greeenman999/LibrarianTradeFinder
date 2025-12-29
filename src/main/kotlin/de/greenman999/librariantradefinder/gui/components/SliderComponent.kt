@@ -5,6 +5,8 @@ import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.constraints.animation.Animations
+import gg.essential.elementa.dsl.animate
 import gg.essential.elementa.dsl.basicXConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
@@ -31,36 +33,36 @@ class SliderComponent(initialValue: Float) : UIContainer() {
 
 	val textState: BasicState<String> = BasicState("")
 
+	val outline by UIContainer().constrain {
+		x = 0.pixels()
+		y = 0.pixels()
+
+		width = 100.percent()
+		height = 100.percent()
+	} childOf this effect OutlineEffect(Color.DARK_GRAY, 1f)
+
+	// The draggable handle
+	val handle by UIBlock(Color.LIGHT_GRAY).constrain {
+		x = basicXConstraint {
+			(availableWidth() * value) + this@SliderComponent.getLeft()
+		}
+		y = 0.pixels()
+
+		width = handleWidth.pixels()
+		height = 100.percent()
+	}.onMouseClick { event ->
+		dragging = true
+		// Calculate offset between mouse x and handle left edge
+		offset = event.relativeX
+		event.stopPropagation()
+	} childOf this
+
+	val text by UIText().bindText(textState).constrain {
+		x = CenterConstraint()
+		y = CenterConstraint()
+	} childOf this
+
 	init {
-		val outline by UIContainer().constrain {
-			x = 0.pixels()
-			y = 0.pixels()
-
-			width = 100.percent()
-			height = 100.percent()
-		} childOf this effect OutlineEffect(Color.DARK_GRAY, 1f)
-
-		// The draggable handle
-		val handle by UIBlock(Color.LIGHT_GRAY).constrain {
-			x = basicXConstraint {
-				(availableWidth() * value) + this@SliderComponent.getLeft()
-			}
-			y = 0.pixels()
-
-			width = handleWidth.pixels()
-			height = 100.percent()
-		}.onMouseClick { event ->
-			dragging = true
-			// Calculate offset between mouse x and handle left edge
-			offset = event.relativeX
-			event.stopPropagation()
-		} childOf this
-
-		val text by UIText().bindText(textState).constrain {
-			x = CenterConstraint()
-			y = CenterConstraint()
-		} childOf this
-
 		// Handle dragging on the whole slider area
 		this.onMouseClick { event ->
 			dragging = true
@@ -93,7 +95,19 @@ class SliderComponent(initialValue: Float) : UIContainer() {
 	}
 
 	fun updateSliderValue(newValue: Float) {
-		value = newValue.coerceIn(0f, 1f)
+		val clampedValue = newValue.coerceIn(0f, 1f)
+		handle.animate {
+			setXAnimation(Animations.OUT_EXP, 0.25f, basicXConstraint {
+				(availableWidth() * clampedValue) + this@SliderComponent.getLeft()
+			})
+			onComplete {
+				value = clampedValue
+				handle.setX(basicXConstraint {
+					(availableWidth() * value) + this@SliderComponent.getLeft()
+				})
+				reRenderText()
+			}
+		}
 	}
 
 	fun reRenderText() {

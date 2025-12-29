@@ -96,7 +96,6 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			}
 
 			emeraldsSlider.updateSliderValue(normalizeEmeralds(entry.value.maxPrice))
-			emeraldsSlider.reRenderText()
 		}.onValueSave {
 			if (!config.isEnchantmentEnabled(entry.key)) return@onValueSave
 
