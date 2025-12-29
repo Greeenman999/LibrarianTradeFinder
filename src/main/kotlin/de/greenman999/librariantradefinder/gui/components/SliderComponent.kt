@@ -22,7 +22,7 @@ class SliderComponent(initialValue: Float) : UIContainer() {
 
 	private var onValueChange: UIComponent.(Float) -> Unit = {}
 	private var onValueSave: UIComponent.(Float) -> Unit = {}
-	private lateinit var formatText: UIComponent.(Float) -> String
+	private var formatText: UIComponent.(Float) -> String = { v -> v.toString() }
 
 	private var value: Float = initialValue // Ranges from 0f to 1f
 	private var dragging = false
