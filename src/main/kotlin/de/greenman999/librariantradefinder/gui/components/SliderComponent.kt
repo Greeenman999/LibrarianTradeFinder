@@ -89,6 +89,7 @@ class SliderComponent(initialValue: Float) : UIContainer() {
 		// Subtract offset from mouse x to get handle left edge position
 		val offsetX = mouseX - offset
 		val clampedX = offsetX.coerceIn(0f, availableWidth())
+		if (availableWidth() == 0f) return
 		value = clampedX / availableWidth()
 		onValueChange(value)
 		textState.set(formatText(value))
