@@ -92,6 +92,14 @@ class SliderComponent(initialValue: Float) : UIContainer() {
 		textState.set(formatText(value))
 	}
 
+	fun updateSliderValue(newValue: Float) {
+		value = newValue.coerceIn(0f, 1f)
+	}
+
+	fun reRenderText() {
+		textState.set(formatText(value))
+	}
+
 	fun onValueChange(listener: UIComponent.(Float) -> Unit) = apply {
 		onValueChange = listener
 	}
