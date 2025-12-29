@@ -40,8 +40,16 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 		val enchantment: Enchantment = RegistryHelper.getEnchantmentById(entry.key)
 		fun maxEmeraldCost(level: Int? = entry.value.minLevel) = RegistryHelper.getMaxEmeraldCost(entry.key, level)
 		fun minEmeraldCost(level: Int? = entry.value.minLevel) = RegistryHelper.getMinEmeraldCost(entry.key, level)
-		fun calculateEmeraldsFromValue(value: Float) = (value * (maxEmeraldCost() - minEmeraldCost())) + minEmeraldCost()
-		fun calculateValueFromEmeralds(emeralds: Int) = (emeralds - minEmeraldCost()).toFloat() / (maxEmeraldCost() - minEmeraldCost()).toFloat()
+		fun denormalize(value: Float, min: Int, max: Int) = (value * (max - min)) + min
+		fun normalize(value: Int, min: Int, max: Int) = if (min == max) {
+			min.toFloat()
+		} else {
+			(value - min).toFloat() / (max - min).toFloat()
+		}
+		fun calculateEmeraldsFromValue(value: Float) = denormalize(value, minEmeraldCost(), maxEmeraldCost())
+		fun normalizeEmeralds(emeralds: Int) = normalize(emeralds, minEmeraldCost(), maxEmeraldCost())
+		fun calculateLevelFromValue(value: Float) = denormalize(value, enchantment.minLevel, enchantment.maxLevel).toInt()
+		fun normalizeLevel(level: Int) = normalize(level, enchantment.minLevel, enchantment.maxLevel)
 
 		val name by UIText(enchantment.description().string).constrain {
 			x = 5.pixels()
@@ -50,7 +58,7 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			color = Color.WHITE.toConstraint()
 		} childOf this
 
-		val emeraldsSlider = SliderComponent(calculateValueFromEmeralds(entry.value.maxPrice)).constrain {
+		val emeraldsSlider = SliderComponent(normalizeEmeralds(entry.value.maxPrice)).constrain {
 			x = 5.pixels(alignOpposite = true)
 			y = CenterConstraint()
 
