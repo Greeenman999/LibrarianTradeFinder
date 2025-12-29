@@ -10,6 +10,7 @@ import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.provideDelegate
@@ -76,6 +77,47 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			(calculateEmeraldsFromValue(value)).toInt().toString()
 		} childOf this
 
+		val levelSlider = SliderComponent(normalizeLevel(entry.value.minLevel)).constrain {
+			x = 5.pixels(alignOpposite = true) - 50.pixels() - 5.pixels()
+			y = CenterConstraint()
+
+			width = 40.pixels()
+			height = 14.pixels()
+		}.onValueChange {
+			if (!config.isEnchantmentEnabled(entry.key)) return@onValueChange
+
+			val newLevel = calculateLevelFromValue(it)
+			entry.value.minLevel = newLevel
+			// Update emeralds slider in case min level change affected costs
+			if (entry.value.maxPrice < minEmeraldCost(newLevel)) {
+				entry.value.maxPrice = minEmeraldCost(newLevel)
+			} else if (entry.value.maxPrice > maxEmeraldCost(newLevel)) {
+				entry.value.maxPrice = maxEmeraldCost(newLevel)
+			}
+
+			emeraldsSlider.updateSliderValue(normalizeEmeralds(entry.value.maxPrice))
+			emeraldsSlider.reRenderText()
+		}.onValueSave {
+			if (!config.isEnchantmentEnabled(entry.key)) return@onValueSave
+
+			config.setEnchantmentMinLevel(entry.key, entry.value.minLevel)
+			LibrarianTradeFinder.getInstance().configManager.save()
+		}.formatText {
+			when (calculateLevelFromValue(it)) {
+				1 -> "I"
+				2 -> "II"
+				3 -> "III"
+				4 -> "IV"
+				5 -> "V"
+				6 -> "VI"
+				7 -> "VII"
+				8 -> "VIII"
+				9 -> "IX"
+				10 -> "X"
+				else -> calculateLevelFromValue(it).toString()
+			}
+ 		} childOf this
+
 		withHandCursor()
 
 		fun updateEntry(toggle: Boolean) {
@@ -93,8 +135,10 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			}
 			if (config.isEnchantmentEnabled(entry.key)) {
 				emeraldsSlider.unhide(true)
+				levelSlider.unhide(true)
 			} else {
 				emeraldsSlider.hide(false)
+				levelSlider.hide(false)
 			}
 		}
 
