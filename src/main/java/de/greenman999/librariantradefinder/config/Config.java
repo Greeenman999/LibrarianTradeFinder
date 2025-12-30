@@ -333,7 +333,7 @@ public class Config {
 		}
 	}
 
-	public void setEnchantmentMaxPrice(Identifier id, int maxPrice) {
+	public void setMaxPriceForEnchantment(Identifier id, int maxPrice) {
 		Enchantment enchantment = RegistryHelper.getEnchantmentById(id);
 		if (enchantment == null) {
 			return;

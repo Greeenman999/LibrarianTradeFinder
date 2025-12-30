@@ -91,7 +91,7 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			val newValue = calculateEmeraldsFromValue(it).toInt()
 			entry.value.maxPrice = newValue
 
-			config.setEnchantmentMaxPrice(entry.key, newValue)
+			config.setMaxPriceForEnchantment(entry.key, newValue)
 			LibrarianTradeFinder.getInstance().configManager.save()
 		}.formatText { value ->
 			(calculateEmeraldsFromValue(value)).toInt().toString()
