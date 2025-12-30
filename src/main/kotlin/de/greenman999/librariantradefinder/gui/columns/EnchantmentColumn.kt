@@ -55,7 +55,7 @@ class EnchantmentColumn : UIContainer() {
 			y = 0.pixels()
 
 			width = 100.percent()
-			height = 22.pixels()
+			height = 20.pixels()
 		} childOf this
 
 	    val columnInfo by EnchantmentColumnInfoComponent().constrain {
