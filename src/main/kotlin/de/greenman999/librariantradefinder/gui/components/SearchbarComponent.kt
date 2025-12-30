@@ -19,6 +19,7 @@
 
 package de.greenman999.librariantradefinder.gui.components
 
+import de.greenman999.librariantradefinder.util.withHandCursor
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
@@ -34,9 +35,11 @@ import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.dsl.toConstraint
 import gg.essential.elementa.state.BasicState
+import gg.essential.universal.USound
 import java.awt.Color
 
 private const val PADDING = 8f
+private val TEXT_COLOR = Color(130, 130, 130)
 
 class SearchbarComponent : UIContainer() {
 
@@ -55,21 +58,49 @@ class SearchbarComponent : UIContainer() {
 		y = CenterConstraint()
 
 		height = 10.pixels()
+		color = TEXT_COLOR.toConstraint()
 	} childOf background
 
 	val inputField by UITextInput("Search enchantments...", shadow = false).constrain {
 		x = SiblingConstraint(padding = PADDING)
 		y = CenterConstraint() + (0.5f).pixels()
 
-		width = (100.percent() - (PADDING * 3).pixels() - magnifyingGlassIcon.getWidth().pixels())
-		color = Color(130, 130, 130).toConstraint()
+		width = (100.percent() - (PADDING * 4).pixels() - magnifyingGlassIcon.getWidth().pixels()) - 10.pixels()
+		color = TEXT_COLOR.toConstraint()
 	} childOf background
+
+	val discardButton by UIContainer().constrain {
+		x = SiblingConstraint(padding = PADDING)
+		y = CenterConstraint()
+
+		width = 10.pixels()
+		height = 10.pixels()
+	} childOf background
+
+	val discardIcon by UIText("\u274C").constrain {
+		x = CenterConstraint()
+		y = CenterConstraint()
+
+		height = 10.pixels()
+		color = TEXT_COLOR.toConstraint()
+	} childOf discardButton
 
 	val searchTextState = BasicState("")
 
 	init {
 		background.onMouseClick {
 			inputField.grabWindowFocus()
+			USound.playButtonPress()
+		}.withHandCursor()
+
+		discardButton.onMouseClick {
+			it.stopPropagation()
+			inputField.setText("")
+			USound.playButtonPress()
+		}.onMouseEnter {
+			discardIcon.setColor(Color(255, 100, 100).toConstraint())
+		}.onMouseLeave {
+			discardIcon.setColor(TEXT_COLOR.toConstraint())
 		}
 
 		inputField.onUpdate { text -> searchTextState.set(text) }
