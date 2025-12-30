@@ -22,6 +22,7 @@ package de.greenman999.librariantradefinder.gui.columns
 import de.greenman999.librariantradefinder.LibrarianTradeFinder
 import de.greenman999.librariantradefinder.gui.components.EnchantmentColumnInfoComponent
 import de.greenman999.librariantradefinder.gui.components.EnchantmentComponent
+import de.greenman999.librariantradefinder.gui.components.SearchbarComponent
 import de.greenman999.librariantradefinder.util.translatable
 import de.greenman999.librariantradefinder.util.withHandCursor
 import gg.essential.elementa.components.ScrollComponent
@@ -30,6 +31,7 @@ import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
 import gg.essential.elementa.constraints.FillConstraint
+import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.minus
@@ -45,9 +47,17 @@ import kotlin.collections.iterator
 class EnchantmentColumn : UIContainer() {
 
 	init {
-	    val columnInfo by EnchantmentColumnInfoComponent().constrain {
+		val searchbar by SearchbarComponent().constrain {
 			x = 0.pixels()
 			y = 0.pixels()
+
+			width = 100.percent()
+			height = 22.pixels()
+		} childOf this
+
+	    val columnInfo by EnchantmentColumnInfoComponent().constrain {
+			x = 0.pixels()
+			y = SiblingConstraint(padding = 4f)
 
 			width = 100.percent()
 			height = ChildBasedMaxSizeConstraint()
@@ -55,7 +65,7 @@ class EnchantmentColumn : UIContainer() {
 
 		val enchantmentsContainer by UIContainer().constrain {
 			x = 0.pixels()
-			y = columnInfo.getHeight().pixels() + 2.pixels()
+			y = SiblingConstraint(padding = 2f)
 
 			width = 100.percent()
 			height = FillConstraint() - 2.pixels()
