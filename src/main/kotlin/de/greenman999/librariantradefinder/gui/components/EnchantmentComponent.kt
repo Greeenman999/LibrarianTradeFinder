@@ -3,6 +3,7 @@ package de.greenman999.librariantradefinder.gui.components
 import de.greenman999.librariantradefinder.LibrarianTradeFinder
 import de.greenman999.librariantradefinder.config.Config
 import de.greenman999.librariantradefinder.util.RegistryHelper
+import de.greenman999.librariantradefinder.util.translatable
 import de.greenman999.librariantradefinder.util.withHandCursor
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
@@ -77,6 +78,10 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			(calculateEmeraldsFromValue(value)).toInt().toString()
 		} childOf this
 
+		val emeraldTooltip by TooltipComponent(emeraldsSlider)
+			.bindVisibility(emeraldsSlider)
+			.bindText(BasicState(translatable("librariantradefinder.gui.tooltip.max-price")))
+
 		val levelSlider = SliderComponent(normalizeLevel(entry.value.minLevel)).constrain {
 			x = 5.pixels(alignOpposite = true) - 50.pixels() - 5.pixels()
 			y = CenterConstraint()
@@ -116,6 +121,10 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 				else -> calculateLevelFromValue(it).toString()
 			}
  		} childOf this
+
+		val levelTooltip by TooltipComponent(levelSlider)
+			.bindVisibility(levelSlider)
+			.bindText(BasicState(translatable("librariantradefinder.gui.tooltip.level")))
 
 		withHandCursor()
 
