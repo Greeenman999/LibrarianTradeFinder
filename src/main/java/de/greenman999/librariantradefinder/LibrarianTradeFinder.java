@@ -27,7 +27,7 @@ import de.greenman999.librariantradefinder.platform.fabric.FabricPlatform;
 public class LibrarianTradeFinder {
 
 	public static final String MOD_ID = /*$ mod_id*/ "librariantradefinder";
-	public static final String MOD_VERSION = /*$ mod_version*/ "0.1.0-alpha.1";
+	public static final String MOD_VERSION = /*$ mod_version*/ "3.0.0-alpha.1";
 	public static final String MOD_FRIENDLY_NAME = /*$ mod_name*/ "Librarian Trade Finder";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
