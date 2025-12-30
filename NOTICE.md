@@ -8,4 +8,10 @@ This project includes code from the following open source projects:
 - **Copyright**: Copyright (C) EssentialGG
 - **Usage**: GUI library for UI components
 
+## Vigilance
+- **Source**: https://github.com/EssentialGG/Vigilance
+- **License**: GNU Lesser General Public License v3 (LGPLv3)
+- **Copyright**: Copyright (C) EssentialGG
+- **Usage**: some code for ui components
+
 Full license text can be found in `licenses/LGPL`
