@@ -116,12 +116,12 @@ public class Config {
 	public static class EnchantmentEntry {
 
 		private boolean enabled;
-		private int minLevel;
+		private int level;
 		private int maxPrice;
 
-		public EnchantmentEntry(boolean enabled, int minLevel, int maxPrice) {
+		public EnchantmentEntry(boolean enabled, int level, int maxPrice) {
 			this.enabled = enabled;
-			this.minLevel = minLevel;
+			this.level = level;
 			this.maxPrice = maxPrice;
 		}
 
@@ -137,12 +137,12 @@ public class Config {
 			this.enabled = enabled;
 		}
 
-		public int getMinLevel() {
-			return minLevel;
+		public int getLevel() {
+			return level;
 		}
 
-		public void setMinLevel(int minLevel) {
-			this.minLevel = minLevel;
+		public void setLevel(int level) {
+			this.level = level;
 		}
 
 		public int getMaxPrice() {
@@ -319,7 +319,7 @@ public class Config {
 		}
 	}
 
-	public void setEnchantmentMinLevel(Identifier id, int minLevel) {
+	public void setLevelForEnchantment(Identifier id, int level) {
 		Enchantment enchantment = RegistryHelper.getEnchantmentById(id);
 		if (enchantment == null) {
 			return;
@@ -327,9 +327,9 @@ public class Config {
 
 		EnchantmentEntry entry = enchantments.get(id);
 		if (entry != null) {
-			entry.setMinLevel(minLevel);
+			entry.setLevel(level);
 		} else {
-			enchantments.put(id, new EnchantmentEntry(true, minLevel, RegistryHelper.getMaxEmeraldCost(id, null)));
+			enchantments.put(id, new EnchantmentEntry(true, level, RegistryHelper.getMaxEmeraldCost(id, null)));
 		}
 	}
 

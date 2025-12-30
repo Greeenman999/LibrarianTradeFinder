@@ -2,7 +2,7 @@
   "librariantradefinder.gui.title": "Librarian Trade Finder",
   "librariantradefinder.gui.empty-enchantments": "Please join a world to load enchantments.",
   "librariantradefinder.gui.enchantment-column-info.enchantment": "Enchantment",
-  "librariantradefinder.gui.enchantment-column-info.min-level": "Level",
+  "librariantradefinder.gui.enchantment-column-info.level": "Level",
   "librariantradefinder.gui.enchantment-column-info.max-price": "Emeralds",
   "librariantradefinder.gui.tooltip.level": "The exact level of the enchantment.",
   "librariantradefinder.gui.tooltip.max-price": "The maximum price of the enchantment in emeralds."

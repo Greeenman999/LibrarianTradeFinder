@@ -50,9 +50,9 @@ class EnchantmentColumnInfoComponent : UIContainer() {
 	} childOf this
 
 	// 40 for width of min level info, 5 for padding
-	val minLevelInfoX = maxPriceInfoX - 40.pixels() - 5.pixels()
-	val minLevelInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.min-level")).constrain {
-		x = minLevelInfoX
+	val levelInfoX = maxPriceInfoX - 40.pixels() - 5.pixels()
+	val levelInfo by UIText(translatable("librariantradefinder.gui.enchantment-column-info.level")).constrain {
+		x = levelInfoX
 		y = 0.pixels()
 
 		color = Color.WHITE.toConstraint()

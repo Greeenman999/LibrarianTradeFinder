@@ -59,8 +59,8 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 		}
 
 		val enchantment: Enchantment = RegistryHelper.getEnchantmentById(entry.key)
-		fun maxEmeraldCost(level: Int? = entry.value.minLevel) = RegistryHelper.getMaxEmeraldCost(entry.key, level)
-		fun minEmeraldCost(level: Int? = entry.value.minLevel) = RegistryHelper.getMinEmeraldCost(entry.key, level)
+		fun maxEmeraldCost(level: Int? = entry.value.level) = RegistryHelper.getMaxEmeraldCost(entry.key, level)
+		fun minEmeraldCost(level: Int? = entry.value.level) = RegistryHelper.getMinEmeraldCost(entry.key, level)
 		fun denormalize(value: Float, min: Int, max: Int) = (value * (max - min)) + min
 		fun normalize(value: Int, min: Int, max: Int) = if (min == max) {
 			min.toFloat()
@@ -101,7 +101,7 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			.bindVisibility(emeraldsSlider)
 			.bindText(BasicState(translatable("librariantradefinder.gui.tooltip.max-price")))
 
-		val levelSlider = SliderComponent(normalizeLevel(entry.value.minLevel)).constrain {
+		val levelSlider = SliderComponent(normalizeLevel(entry.value.level)).constrain {
 			x = 5.pixels(alignOpposite = true) - 50.pixels() - 5.pixels()
 			y = CenterConstraint()
 
@@ -111,7 +111,7 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 			if (!config.isEnchantmentEnabled(entry.key)) return@onValueChange
 
 			val newLevel = calculateLevelFromValue(it)
-			entry.value.minLevel = newLevel
+			entry.value.level = newLevel
 			// Update emeralds slider in case min level change affected costs
 			if (entry.value.maxPrice < minEmeraldCost(newLevel)) {
 				entry.value.maxPrice = minEmeraldCost(newLevel)
@@ -123,7 +123,7 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 		}.onValueSave {
 			if (!config.isEnchantmentEnabled(entry.key)) return@onValueSave
 
-			config.setEnchantmentMinLevel(entry.key, entry.value.minLevel)
+			config.setLevelForEnchantment(entry.key, entry.value.level)
 			LibrarianTradeFinder.getInstance().configManager.save()
 		}.formatText {
 			when (calculateLevelFromValue(it)) {
