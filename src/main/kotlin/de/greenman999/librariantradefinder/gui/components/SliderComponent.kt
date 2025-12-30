@@ -35,6 +35,7 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.state.BasicState
+import gg.essential.universal.USound
 import java.awt.Color
 
 class SliderComponent(initialValue: Float) : UIContainer() {
@@ -92,6 +93,7 @@ class SliderComponent(initialValue: Float) : UIContainer() {
 		}
 		this.onMouseRelease {
 			if (!dragging) return@onMouseRelease
+			USound.playButtonPress()
 			dragging = false
 			// Reset offset
 			offset = 0f

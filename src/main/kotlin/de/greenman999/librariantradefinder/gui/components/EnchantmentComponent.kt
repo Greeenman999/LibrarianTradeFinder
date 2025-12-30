@@ -37,6 +37,7 @@ import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.dsl.toConstraint
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.toConstraint
+import gg.essential.universal.USound
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.enchantment.Enchantment
 import org.apache.commons.text.similarity.FuzzyScore
@@ -172,6 +173,7 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 
 		onMouseClick {
 			updateEntry(true)
+			USound.playButtonPress()
 		}
 
 		updateEntry(false)
