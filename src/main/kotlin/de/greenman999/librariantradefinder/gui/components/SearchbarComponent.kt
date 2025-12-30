@@ -19,8 +19,6 @@
 
 package de.greenman999.librariantradefinder.gui.components
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
@@ -39,7 +37,7 @@ import java.awt.Color
 
 private const val PADDING = 8f
 
-class SearchbarComponent : UIComponent() {
+class SearchbarComponent : UIContainer() {
 
 	val background by UIRoundedRectangle(4f).constrain {
 		x = 0.pixels()
