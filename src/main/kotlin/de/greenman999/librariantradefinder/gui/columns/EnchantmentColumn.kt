@@ -23,12 +23,14 @@ import de.greenman999.librariantradefinder.LibrarianTradeFinder
 import de.greenman999.librariantradefinder.gui.components.EnchantmentColumnInfoComponent
 import de.greenman999.librariantradefinder.gui.components.EnchantmentComponent
 import de.greenman999.librariantradefinder.gui.components.SearchbarComponent
+import de.greenman999.librariantradefinder.gui.components.TooltipComponent
 import de.greenman999.librariantradefinder.util.RegistryHelper
 import de.greenman999.librariantradefinder.util.translatable
 import de.greenman999.librariantradefinder.util.withHandCursor
 import gg.essential.elementa.components.ScrollComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIRoundedRectangle
+import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
 import gg.essential.elementa.constraints.FillConstraint
@@ -38,10 +40,13 @@ import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.dsl.times
 import gg.essential.elementa.dsl.toConstraint
+import gg.essential.elementa.state.BasicState
 import gg.essential.universal.UMinecraft
+import gg.essential.universal.USound
 import org.apache.commons.text.similarity.FuzzyScore
 import java.awt.Color
 import java.util.Locale
@@ -54,7 +59,7 @@ class EnchantmentColumn : UIContainer() {
 			x = 0.pixels()
 			y = 0.pixels()
 
-			width = 100.percent()
+			width = 100.percent() - 24.pixels()
 			height = 20.pixels()
 		} childOf this
 
@@ -71,7 +76,7 @@ class EnchantmentColumn : UIContainer() {
 			y = SiblingConstraint(padding = 2f)
 
 			width = 100.percent()
-			height = FillConstraint() - 2.pixels()
+			height = FillConstraint() - 2.pixels() - 4.pixels() + 20.pixels()
 		} childOf this
 
 		val enchantments by ScrollComponent(translatable("librariantradefinder.gui.empty-enchantments")).constrain {
@@ -83,6 +88,33 @@ class EnchantmentColumn : UIContainer() {
 		} childOf enchantmentsContainer
 		enchantments.emptyText.setWidth(100.percent() - 10.pixels())
 		enchantments.emptyText.setY(CenterConstraint())
+
+		val resetButton by UIRoundedRectangle(4f).constrain {
+			x = 0.pixels(alignOpposite = true)
+			y = 0.pixels()
+			width = 20.pixels()
+			height = 20.pixels()
+			color = Color(200, 50, 50, 150).toConstraint()
+		}.onMouseClick {
+			USound.playButtonPress()
+			LibrarianTradeFinder.getInstance().config.setEnchantments(HashMap())
+			LibrarianTradeFinder.getInstance().configManager.save()
+			for (child in enchantments.allChildren.toList()) {
+				(child as? EnchantmentComponent)?.reset()
+			}
+		}.withHandCursor() childOf this
+
+		val resetIcon by UIText("\u21BA").constrain {
+			x = CenterConstraint()
+			y = CenterConstraint() - 4.pixels()
+			color = Color.WHITE.toConstraint()
+			textScale = 2.pixels
+			height = 6.pixels()
+		} childOf resetButton
+
+		val resetTootip by TooltipComponent(resetButton)
+			.bindVisibility(resetButton)
+			.bindText(BasicState(translatable("librariantradefinder.gui.tooltip.reset")))
 
 		val scrollbar by UIRoundedRectangle(2f).constrain {
 			x = 0.pixels(alignOpposite = true)
