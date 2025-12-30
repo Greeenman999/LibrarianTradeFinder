@@ -39,9 +39,10 @@ import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.toConstraint
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.enchantment.Enchantment
+import org.apache.commons.text.similarity.FuzzyScore
 import java.awt.Color
 
-class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config.EnchantmentEntry>) : UIRoundedRectangle(4f) {
+class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config.EnchantmentEntry>, searchTextState: BasicState<String>, fuzzyScore: FuzzyScore) : UIRoundedRectangle(4f) {
 
 	val colorState: BasicState<Color> = BasicState(Color(0, 0, 0, 100))
 
@@ -174,6 +175,21 @@ class EnchantmentComponent(val entry: MutableMap.MutableEntry<Identifier, Config
 		}
 
 		updateEntry(false)
+
+		searchTextState.onSetValue { text ->
+			fuzzyScore.fuzzyScore(enchantment.description().string, text).let { score ->
+				val shouldBeVisible = if (text.isBlank()) {
+					true
+				} else {
+					score >= text.length
+				}
+				if (shouldBeVisible) {
+					unhide(false)
+				} else {
+					hide(true)
+				}
+			}
+		}
 	}
 
 

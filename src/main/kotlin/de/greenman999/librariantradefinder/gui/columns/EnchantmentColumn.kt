@@ -23,6 +23,7 @@ import de.greenman999.librariantradefinder.LibrarianTradeFinder
 import de.greenman999.librariantradefinder.gui.components.EnchantmentColumnInfoComponent
 import de.greenman999.librariantradefinder.gui.components.EnchantmentComponent
 import de.greenman999.librariantradefinder.gui.components.SearchbarComponent
+import de.greenman999.librariantradefinder.util.RegistryHelper
 import de.greenman999.librariantradefinder.util.translatable
 import de.greenman999.librariantradefinder.util.withHandCursor
 import gg.essential.elementa.components.ScrollComponent
@@ -37,11 +38,13 @@ import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.dsl.times
 import gg.essential.elementa.dsl.toConstraint
+import gg.essential.universal.UMinecraft
+import org.apache.commons.text.similarity.FuzzyScore
 import java.awt.Color
+import java.util.Locale
 import kotlin.collections.iterator
 
 class EnchantmentColumn : UIContainer() {
@@ -90,8 +93,29 @@ class EnchantmentColumn : UIContainer() {
 		}.withHandCursor() childOf enchantmentsContainer
 		enchantments.setScrollBarComponent(scrollbar, hideWhenUseless = true, isHorizontal = false)
 
+		val fuzzyScore = FuzzyScore(Locale.of(UMinecraft.getSettings().languageCode))
+
 		for (entry in LibrarianTradeFinder.getInstance().config.enchantments) {
-			EnchantmentComponent(entry) childOf enchantments
+			EnchantmentComponent(entry, searchbar.searchTextState, fuzzyScore) childOf enchantments
+		}
+
+		searchbar.searchTextState.onSetValue { text ->
+			enchantments.sortChildren { first, second ->
+				val firstEnchantmentComponent = first as EnchantmentComponent
+				val secondEnchantmentComponent = second as EnchantmentComponent
+
+				val firstEnchantmentName: String = RegistryHelper.getEnchantmentById(firstEnchantmentComponent.entry.key).description().string
+				val secondEnchantmentName: String = RegistryHelper.getEnchantmentById(secondEnchantmentComponent.entry.key).description().string
+
+				if (text.isEmpty()) {
+					return@sortChildren firstEnchantmentName.compareTo(secondEnchantmentName)
+				}
+
+				val firstScore = fuzzyScore.fuzzyScore(firstEnchantmentName, text)
+				val secondScore = fuzzyScore.fuzzyScore(secondEnchantmentName, text)
+
+				secondScore - firstScore
+			}
 		}
 	}
 

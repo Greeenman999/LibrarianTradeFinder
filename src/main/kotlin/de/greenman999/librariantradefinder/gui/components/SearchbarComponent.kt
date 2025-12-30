@@ -33,6 +33,7 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.dsl.toConstraint
+import gg.essential.elementa.state.BasicState
 import java.awt.Color
 
 private const val PADDING = 8f
@@ -65,10 +66,14 @@ class SearchbarComponent : UIContainer() {
 		color = Color(130, 130, 130).toConstraint()
 	} childOf background
 
+	val searchTextState = BasicState("")
+
 	init {
 		background.onMouseClick {
 			inputField.grabWindowFocus()
 		}
+
+		inputField.onUpdate { text -> searchTextState.set(text) }
 	}
 
 }
