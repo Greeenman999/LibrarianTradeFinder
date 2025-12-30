@@ -59,10 +59,9 @@ class SearchbarComponent : UIContainer() {
 
 	val inputField by UITextInput("Search enchantments...", shadow = false).constrain {
 		x = SiblingConstraint(padding = PADDING)
-		y = CenterConstraint()
+		y = CenterConstraint() + (0.5f).pixels()
 
 		width = (100.percent() - (PADDING * 3).pixels() - magnifyingGlassIcon.getWidth().pixels())
-		height = 8.pixels()
 		color = Color(130, 130, 130).toConstraint()
 	} childOf background
 
