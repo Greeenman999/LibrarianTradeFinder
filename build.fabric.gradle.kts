@@ -82,4 +82,6 @@ dependencies {
 	modImplementation("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
 
 	implementation("org.spongepowered:configurate-gson:${prop("deps.configurate")}")
+
+	implementation("org.apache.commons:commons-text:${prop("deps.commons-text")}")
 }

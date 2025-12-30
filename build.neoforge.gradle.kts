@@ -87,6 +87,8 @@ dependencies {
 
 	implementation("thedarkcolour:kotlinforforge-neoforge:${property("deps.kotlinforforge")}")
 	implementation("org.spongepowered:configurate-gson:${prop("deps.configurate")}")
+
+	implementation("org.apache.commons:commons-text:${prop("deps.commons-text")}")
 }
 
 tasks.named("createMinecraftArtifacts") {
