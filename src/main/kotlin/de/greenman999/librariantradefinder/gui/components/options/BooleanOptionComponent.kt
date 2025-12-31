@@ -36,7 +36,7 @@ import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.state.BasicState
 
-class BooleanOptionComponent(val optionKey: String) : UIContainer() {
+class BooleanOptionComponent(val optionKey: String, initialChecked: Boolean, var disabled: Boolean = false) : UIContainer() {
 
 	init {
 	    constrain {
@@ -46,21 +46,28 @@ class BooleanOptionComponent(val optionKey: String) : UIContainer() {
 			x = 0.pixels()
 			y = SiblingConstraint(padding = 5f)
 		}
-
-		val label by UIText(translatable("librariantradefinder.gui.options.$optionKey")).constrain {
-			x = 0.pixels()
-			y = CenterConstraint()
-		} childOf this
-
-		val tooltip by TooltipComponent(label)
-			.bindVisibility(this@BooleanOptionComponent)
-			.bindText(BasicState(translatable("librariantradefinder.gui.options.$optionKey.tooltip")))
-
-		val checkbox by CheckboxComponent().constrain {
-			x = 1.pixels(alignOpposite = true)
-			y = CenterConstraint()
-		}.onUpdate {
-			println("Checkbox changed to: $it")
-		} childOf this
 	}
+
+	val label by UIText(translatable("librariantradefinder.gui.options.$optionKey")).constrain {
+		x = 0.pixels()
+		y = CenterConstraint()
+	} childOf this
+
+	val tooltip by TooltipComponent(label)
+		.bindVisibility(this@BooleanOptionComponent)
+		.bindText(BasicState(translatable("librariantradefinder.gui.options.$optionKey.tooltip")))
+
+	val checkbox by CheckboxComponent(initialChecked).constrain {
+		x = 1.pixels(alignOpposite = true)
+		y = CenterConstraint()
+	} childOf this
+
+	/*fun setDisabled(disabled: Boolean) {
+		this.disabled = disabled
+		if (disabled) {
+			checkbox.alpha = 0.5f
+		} else {
+			checkbox.alpha = 1.0f
+		}
+	}*/
 }

@@ -6,5 +6,19 @@
   "librariantradefinder.gui.enchantment-column-info.max-price": "Emeralds",
   "librariantradefinder.gui.tooltip.level": "The exact level of the enchantment.",
   "librariantradefinder.gui.tooltip.max-price": "The maximum price of the enchantment in emeralds.",
-  "librariantradefinder.gui.tooltip.reset": "Reset all enchantments."
+  "librariantradefinder.gui.tooltip.reset": "Reset all enchantments.",
+  "librariantradefinder.gui.options.prevent_tool_breaking": "Prevent Tool Breaking",
+  "librariantradefinder.gui.options.prevent_tool_breaking.tooltip": "When enabled, stops the search if the tool has less than 5 durability left.",
+  "librariantradefinder.gui.options.teleport_to_dropped_items": "Teleport to Dropped Items",
+  "librariantradefinder.gui.options.teleport_to_dropped_items.tooltip": "When enabled, teleports you quickly to dropped lecterns to pick them up.",
+  "librariantradefinder.gui.options.smart_look_mode": "Smart Look Mode",
+  "librariantradefinder.gui.options.smart_look_mode.tooltip": "When enabled, automatically looks at the lectern and villager when interacting.",
+  "librariantradefinder.gui.options.slow_mode": "Slow Mode",
+  "librariantradefinder.gui.options.slow_mode.tooltip": "When enabled, slowly moves the camera to look more natural.",
+  "librariantradefinder.gui.options.buy_on_trade_found": "Buy on Trade Found",
+  "librariantradefinder.gui.options.buy_on_trade_found.tooltip": "When enabled, automatically buys the enchantment when found.",
+  "librariantradefinder.gui.options.notify_on_trade_found": "Notify on Trade Found",
+  "librariantradefinder.gui.options.notify_on_trade_found.tooltip": "When enabled, plays a sound and sends a chat message when the enchantment is found.",
+  "librariantradefinder.gui.options.display_trades_on_villager": "Display Trades on Villager",
+  "librariantradefinder.gui.options.display_trades_on_villager.tooltip": "When enabled, shows the trades in front of the villager"
 }
