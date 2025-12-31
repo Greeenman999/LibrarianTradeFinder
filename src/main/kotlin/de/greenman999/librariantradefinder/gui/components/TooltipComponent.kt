@@ -29,7 +29,7 @@ import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIPoint
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIShape
-import gg.essential.elementa.components.UIText
+import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
@@ -59,8 +59,8 @@ class TooltipComponent(val tooltipParent: UIComponent) : UIContainer() {
 		x = 0.pixels()
 		y = 4.pixels()
 
-		width = ChildBasedMaxSizeConstraint() + PADDING.pixels() * 2
-		height = ChildBasedSizeConstraint() + PADDING.pixels() * 2//- 4.pixels()
+		width = 100.pixels() + (PADDING * 2).pixels()
+		height = ChildBasedSizeConstraint() + PADDING.pixels() * 2
 		color = Color(0, 0, 0, 200).toConstraint()
 	} childOf this
 
@@ -89,9 +89,11 @@ class TooltipComponent(val tooltipParent: UIComponent) : UIContainer() {
 		}
 	}
 
-	val text by UIText().constrain {
+	val text by UIWrappedText(centered = true).constrain {
 		x = PADDING.pixels()
 		y = PADDING.pixels()
+
+		width = 100.percent() - (PADDING * 2).pixels()
 
 		color = Color.WHITE.toConstraint()
 	} childOf box
