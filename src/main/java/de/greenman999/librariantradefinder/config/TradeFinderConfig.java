@@ -167,6 +167,10 @@ public class TradeFinderConfig {
             this(enchantment, enabled, enchantment.getMaxLevel(), 64);
         }
 
+        public Enchantment getEnchantment() {
+            return enchantment;
+        }
+
         public static EnchantmentOption fromJson(JsonObject json) {
             ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, Identifier.tryParse(json.getAsJsonPrimitive("enchantment").getAsString()));
             Enchantment enchantment = getEnchantmentRegistry().getValue(enchantmentKey);

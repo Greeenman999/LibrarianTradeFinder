@@ -2,6 +2,7 @@ package de.greenman999.librariantradefinder.screens;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
+import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
@@ -28,16 +29,22 @@ public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEnt
         }
 
         this.resetButton = GrayButtonWidget.builder(Component.translatable("tradefinderui.reset"), (buttonWidget) -> {
-            for(EnchantmentEntry enchantmentEntry : this.children()) {
-                        enchantmentEntry.maxPriceField.setValue("64");
-                        enchantmentEntry.levelField.setValue(String.valueOf(enchantmentEntry.enchantment.getMaxLevel()));
-                        enchantmentEntry.enabled = false;
+                    for (TradeFinderConfig.EnchantmentOption option : LibrarianTradeFinder.getConfig().enchantments.values()) {
+                        option.setMaxPrice(64);
+                        option.setLevel(option.getEnchantment().getMaxLevel());
+                        option.setEnabled(false);
+                    }
+                    LibrarianTradeFinder.getConfig().save();
+                    this.clearEntries();
+                    for (Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
+                        this.addEntry(new EnchantmentEntry(enchantment));
                     }
                 })
                 .color(0x5FC7C0C0)
                 .bounds(this.width - 45, 5, 50, 15)
                 .tooltip(Tooltip.create(Component.translatable("tradefinderui.reset.tooltip")))
                 .build();
+
 
     }
 
