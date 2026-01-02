@@ -36,6 +36,7 @@ import gg.essential.elementa.dsl.toConstraint
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.utils.withAlpha
+import gg.essential.universal.USound
 import java.awt.Color
 
 private const val CHECKED_SIZE = 80
@@ -113,6 +114,7 @@ class CheckboxComponent(initialChecked: Boolean = false, val disabledState: Basi
 	}
 
 	fun updateChecked() {
+		USound.playButtonPress()
 		innerBox.animate {
 			val size = if (checked) {
 				CHECKED_SIZE
