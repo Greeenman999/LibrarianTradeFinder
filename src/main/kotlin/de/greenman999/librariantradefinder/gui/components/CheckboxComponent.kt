@@ -34,20 +34,38 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.dsl.toConstraint
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.utils.withAlpha
 import java.awt.Color
 
 private const val CHECKED_SIZE = 80
 private val ANIMATION_STRATEGY = Animations.OUT_EXP
 private const val ANIMATION_LENGTH = 0.3f
+private val DISABLED_COLOR = Color.WHITE.withAlpha(0.5f)
 
-class CheckboxComponent(initialChecked: Boolean = false) : UIContainer() {
+class CheckboxComponent(initialChecked: Boolean = false, val disabledState: BasicState<Boolean>) : UIContainer() {
 
 	var checked: Boolean = initialChecked
 		set(value) {
 			field = value
 			listener?.invoke(this, value)
 		}
+
+	private fun getInnerColor(): Color {
+		return if (disabledState.get()) {
+			DISABLED_COLOR
+		} else {
+			if (!checked) Color.WHITE.withAlpha(0) else Color.WHITE
+		}
+	}
+
+	val colorState = BasicState(
+		if (disabledState.get()) {
+			DISABLED_COLOR
+		} else {
+			Color.WHITE
+		}
+	)
 
 	var listener: (UIComponent.(Boolean) -> Unit)? = null
 
@@ -65,11 +83,7 @@ class CheckboxComponent(initialChecked: Boolean = false) : UIContainer() {
 		x = CenterConstraint()
 		y = CenterConstraint()
 
-		color = if (checked) {
-			Color.WHITE.toConstraint()
-		} else {
-			Color.WHITE.withAlpha(0).toConstraint()
-		}
+		color = getInnerColor().toConstraint()
 	} childOf this
 
 	init {
@@ -78,29 +92,36 @@ class CheckboxComponent(initialChecked: Boolean = false) : UIContainer() {
 			height = 10.pixels()
 		}
 
-		effect(OutlineEffect(Color.WHITE, 1f))
+		effect(OutlineEffect(colorState.get(), 1f).bindColor(colorState))
 
 		onMouseClick {
+			if (disabledState.get()) return@onMouseClick
 			checked = !checked
 			updateChecked()
 		}
 
 		withHandCursor()
+
+		disabledState.onSetValue {
+			if (it) {
+				colorState.set(DISABLED_COLOR)
+			} else {
+				colorState.set(Color.WHITE)
+			}
+			updateChecked()
+		}
 	}
 
 	fun updateChecked() {
-		if (checked) {
-			innerBox.animate {
-				setWidthAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, CHECKED_SIZE.percent())
-				setHeightAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, CHECKED_SIZE.percent())
-				setColorAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, Color.WHITE.toConstraint())
+		innerBox.animate {
+			val size = if (checked) {
+				CHECKED_SIZE
+			} else {
+				0
 			}
-		} else {
-			innerBox.animate {
-				setWidthAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, 0.percent())
-				setHeightAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, 0.percent())
-				setColorAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, Color.WHITE.withAlpha(0).toConstraint())
-			}
+			setWidthAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, size.percent())
+			setHeightAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, size.percent())
+			setColorAnimation(ANIMATION_STRATEGY, ANIMATION_LENGTH, getInnerColor().toConstraint())
 		}
 	}
 
