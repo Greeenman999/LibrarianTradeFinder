@@ -23,6 +23,10 @@ import de.greenman999.librariantradefinder.LibrarianTradeFinder
 import de.greenman999.librariantradefinder.gui.components.options.BooleanOptionComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.minus
+import gg.essential.elementa.dsl.percent
+import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.provideDelegate
 
 class OptionsColumn : UIContainer() {
@@ -32,7 +36,10 @@ class OptionsColumn : UIContainer() {
 	val preventToolBreakingOption by BooleanOptionComponent("prevent_tool_breaking", instance.config.shouldPreventToolBreaking()) childOf this
 	val teleportToDroppedItemsOption by BooleanOptionComponent("teleport_to_dropped_items", instance.config.shouldTeleportToDroppedItems()) childOf this
 	val smartLookModeOption by BooleanOptionComponent("smart_look_mode", instance.config.isSmartLookMode) childOf this
-	val slowModeOption by BooleanOptionComponent("slow_mode", instance.config.isSlowMode, !instance.config.isSmartLookMode) childOf this
+	val slowModeOption by BooleanOptionComponent("slow_mode", instance.config.isSlowMode, !instance.config.isSmartLookMode).constrain {
+		x = 20.pixels()
+		width = 100.percent() - 20.pixels()
+	} childOf this
 	val buyOnTradeFoundOption by BooleanOptionComponent("buy_on_trade_found", instance.config.shouldBuyOnTradeFound()) childOf this
 	val notifyOnTradeFoundOption by BooleanOptionComponent("notify_on_trade_found", instance.config.shouldNotifyOnTradeFound()) childOf this
 	val displayTradesOnVillagerOption by BooleanOptionComponent("display_trades_on_villager", instance.config.shouldDisplayTradesOnVillager()) childOf this
