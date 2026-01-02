@@ -27,46 +27,48 @@ import gg.essential.elementa.dsl.provideDelegate
 
 class OptionsColumn : UIContainer() {
 
-	init {
-		val instance = LibrarianTradeFinder.getInstance()
+	val instance = LibrarianTradeFinder.getInstance()
 
-		val preventToolBreakingOption by BooleanOptionComponent("prevent_tool_breaking", instance.config.shouldPreventToolBreaking()) childOf this
+	val preventToolBreakingOption by BooleanOptionComponent("prevent_tool_breaking", instance.config.shouldPreventToolBreaking()) childOf this
+	val teleportToDroppedItemsOption by BooleanOptionComponent("teleport_to_dropped_items", instance.config.shouldTeleportToDroppedItems()) childOf this
+	val smartLookModeOption by BooleanOptionComponent("smart_look_mode", instance.config.isSmartLookMode) childOf this
+	val slowModeOption by BooleanOptionComponent("slow_mode", instance.config.isSlowMode, !instance.config.isSmartLookMode) childOf this
+	val buyOnTradeFoundOption by BooleanOptionComponent("buy_on_trade_found", instance.config.shouldBuyOnTradeFound()) childOf this
+	val notifyOnTradeFoundOption by BooleanOptionComponent("notify_on_trade_found", instance.config.shouldNotifyOnTradeFound()) childOf this
+	val displayTradesOnVillagerOption by BooleanOptionComponent("display_trades_on_villager", instance.config.shouldDisplayTradesOnVillager()) childOf this
+
+	init {
 		preventToolBreakingOption.checkbox.onUpdate {
 			instance.config.setPreventToolBreaking(it)
 			instance.configManager.save()
 		}
 
-		val teleportToDroppedItemsOption by BooleanOptionComponent("teleport_to_dropped_items", instance.config.shouldTeleportToDroppedItems()) childOf this
 		teleportToDroppedItemsOption.checkbox.onUpdate {
 			instance.config.setTeleportToDroppedItems(it)
 			instance.configManager.save()
 		}
 
-		val smartLookModeOption by BooleanOptionComponent("smart_look_mode", instance.config.isSmartLookMode) childOf this
 		smartLookModeOption.checkbox.onUpdate {
 			instance.config.isSmartLookMode = it
 			instance.configManager.save()
+			slowModeOption.disabled.set(!it)
 		}
 
-		val slowModeOption by BooleanOptionComponent("slow_mode", instance.config.isSlowMode) childOf this
 		slowModeOption.checkbox.onUpdate {
 			instance.config.isSlowMode = it
 			instance.configManager.save()
 		}
 
-		val buyOnTradeFoundOption by BooleanOptionComponent("buy_on_trade_found", instance.config.shouldBuyOnTradeFound()) childOf this
 		buyOnTradeFoundOption.checkbox.onUpdate {
 			instance.config.setBuyOnTradeFound(it)
 			instance.configManager.save()
 		}
 
-		val notifyOnTradeFoundOption by BooleanOptionComponent("notify_on_trade_found", instance.config.shouldNotifyOnTradeFound()) childOf this
 		notifyOnTradeFoundOption.checkbox.onUpdate {
 			instance.config.setNotifyOnTradeFound(it)
 			instance.configManager.save()
 		}
 
-		val displayTradesOnVillagerOption by BooleanOptionComponent("display_trades_on_villager", instance.config.shouldDisplayTradesOnVillager()) childOf this
 		displayTradesOnVillagerOption.checkbox.onUpdate {
 			instance.config.setDisplayTradesOnVillager(it)
 			instance.configManager.save()
