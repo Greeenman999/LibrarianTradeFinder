@@ -20,5 +20,7 @@
   "librariantradefinder.gui.options.notify_on_trade_found": "Notify on Trade Found",
   "librariantradefinder.gui.options.notify_on_trade_found.tooltip": "When enabled, plays a sound and sends a chat message when the enchantment is found.",
   "librariantradefinder.gui.options.display_trades_on_villager": "Display Trades on Villager",
-  "librariantradefinder.gui.options.display_trades_on_villager.tooltip": "When enabled, shows the trades in front of the villager"
+  "librariantradefinder.gui.options.display_trades_on_villager.tooltip": "When enabled, shows the trades in front of the villager",
+  "librariantradefinder.gui.options.reroll_timeout_ticks": "Reroll Timeout Ticks",
+  "librariantradefinder.gui.options.reroll_timeout_ticks.tooltip": "The maximum amount of ticks to wait for the villager to refresh trades."
 }

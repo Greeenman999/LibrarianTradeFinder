@@ -21,6 +21,7 @@ package de.greenman999.librariantradefinder.gui.columns
 
 import de.greenman999.librariantradefinder.LibrarianTradeFinder
 import de.greenman999.librariantradefinder.gui.components.options.BooleanOptionComponent
+import de.greenman999.librariantradefinder.gui.components.options.IntegerOptionComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
@@ -43,6 +44,8 @@ class OptionsColumn : UIContainer() {
 	val buyOnTradeFoundOption by BooleanOptionComponent("buy_on_trade_found", instance.config.shouldBuyOnTradeFound()) childOf this
 	val notifyOnTradeFoundOption by BooleanOptionComponent("notify_on_trade_found", instance.config.shouldNotifyOnTradeFound()) childOf this
 	val displayTradesOnVillagerOption by BooleanOptionComponent("display_trades_on_villager", instance.config.shouldDisplayTradesOnVillager()) childOf this
+	val reRollTimeoutTicks by IntegerOptionComponent("reroll_timeout_ticks", instance.config.rerollTimeoutTicks, 1, 200) childOf this
+
 
 	init {
 		preventToolBreakingOption.checkbox.onUpdate {
@@ -78,6 +81,11 @@ class OptionsColumn : UIContainer() {
 
 		displayTradesOnVillagerOption.checkbox.onUpdate {
 			instance.config.setDisplayTradesOnVillager(it)
+			instance.configManager.save()
+		}
+
+		reRollTimeoutTicks.slider.onValueSave {
+			instance.config.rerollTimeoutTicks = reRollTimeoutTicks.denormalizeValue(it)
 			instance.configManager.save()
 		}
 	}
