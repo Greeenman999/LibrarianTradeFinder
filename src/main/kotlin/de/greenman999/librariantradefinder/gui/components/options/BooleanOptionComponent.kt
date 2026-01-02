@@ -34,9 +34,14 @@ import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.provideDelegate
+import gg.essential.elementa.dsl.toConstraint
 import gg.essential.elementa.state.BasicState
+import gg.essential.elementa.utils.withAlpha
+import java.awt.Color
 
-class BooleanOptionComponent(val optionKey: String, initialChecked: Boolean, var disabled: Boolean = false) : UIContainer() {
+class BooleanOptionComponent(val optionKey: String, initialChecked: Boolean, var initialDisabled: Boolean = false) : UIContainer() {
+
+	val disabled = BasicState(initialDisabled)
 
 	init {
 	    constrain {
@@ -46,28 +51,25 @@ class BooleanOptionComponent(val optionKey: String, initialChecked: Boolean, var
 			x = 0.pixels()
 			y = SiblingConstraint(padding = 5f)
 		}
+
+		disabled.onSetValue {
+			label.setColor(if (it) Color.WHITE.withAlpha(0.5f) else Color.WHITE)
+		}
 	}
 
 	val label by UIText(translatable("librariantradefinder.gui.options.$optionKey")).constrain {
 		x = 0.pixels()
 		y = CenterConstraint()
+
+		color = (if (disabled.get()) Color.WHITE.withAlpha(0.5f) else Color.WHITE).toConstraint()
 	} childOf this
 
 	val tooltip by TooltipComponent(label)
 		.bindVisibility(this@BooleanOptionComponent)
 		.bindText(BasicState(translatable("librariantradefinder.gui.options.$optionKey.tooltip")))
 
-	val checkbox by CheckboxComponent(initialChecked).constrain {
+	val checkbox by CheckboxComponent(initialChecked, disabled).constrain {
 		x = 1.pixels(alignOpposite = true)
 		y = CenterConstraint()
 	} childOf this
-
-	/*fun setDisabled(disabled: Boolean) {
-		this.disabled = disabled
-		if (disabled) {
-			checkbox.alpha = 0.5f
-		} else {
-			checkbox.alpha = 1.0f
-		}
-	}*/
 }
