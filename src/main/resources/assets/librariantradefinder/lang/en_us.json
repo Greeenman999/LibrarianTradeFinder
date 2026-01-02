@@ -14,7 +14,7 @@
   "librariantradefinder.gui.options.smart_look_mode": "Smart Look Mode",
   "librariantradefinder.gui.options.smart_look_mode.tooltip": "When enabled, automatically looks at the lectern and villager when interacting.",
   "librariantradefinder.gui.options.slow_mode": "Slow Mode",
-  "librariantradefinder.gui.options.slow_mode.tooltip": "When enabled, slowly moves the camera to look more natural.",
+  "librariantradefinder.gui.options.slow_mode.tooltip": "Depends on: Smart Look Mode\nWhen enabled, slowly moves the camera to look more natural.",
   "librariantradefinder.gui.options.buy_on_trade_found": "Buy on Trade Found",
   "librariantradefinder.gui.options.buy_on_trade_found.tooltip": "When enabled, automatically buys the enchantment when found.",
   "librariantradefinder.gui.options.notify_on_trade_found": "Notify on Trade Found",
