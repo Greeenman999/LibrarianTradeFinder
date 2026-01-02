@@ -20,53 +20,13 @@
 package de.greenman999.librariantradefinder.gui.components.options
 
 import de.greenman999.librariantradefinder.gui.components.CheckboxComponent
-import de.greenman999.librariantradefinder.gui.components.TooltipComponent
-import de.greenman999.librariantradefinder.util.translatable
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
-import gg.essential.elementa.constraints.CoerceAtLeastConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.provideDelegate
-import gg.essential.elementa.dsl.toConstraint
-import gg.essential.elementa.state.BasicState
-import gg.essential.elementa.utils.withAlpha
-import java.awt.Color
 
-class BooleanOptionComponent(val optionKey: String, initialChecked: Boolean, var initialDisabled: Boolean = false) : UIContainer() {
-
-	val disabled = BasicState(initialDisabled)
-
-	init {
-	    constrain {
-			width = 100.percent()
-			height = CoerceAtLeastConstraint(ChildBasedMaxSizeConstraint() + 4.pixels(), 20.pixels())
-
-			x = 0.pixels()
-			y = SiblingConstraint(padding = 5f)
-		}
-
-		disabled.onSetValue {
-			label.setColor(if (it) Color.WHITE.withAlpha(0.5f) else Color.WHITE)
-		}
-	}
-
-	val label by UIText(translatable("librariantradefinder.gui.options.$optionKey")).constrain {
-		x = 0.pixels()
-		y = CenterConstraint()
-
-		color = (if (disabled.get()) Color.WHITE.withAlpha(0.5f) else Color.WHITE).toConstraint()
-	} childOf this
-
-	val tooltip by TooltipComponent(label)
-		.bindVisibility(this@BooleanOptionComponent)
-		.bindText(BasicState(translatable("librariantradefinder.gui.options.$optionKey.tooltip")))
+class BooleanOptionComponent(optionKey: String, initialChecked: Boolean, initialDisabled: Boolean = false) : OptionComponent(optionKey, initialDisabled) {
 
 	val checkbox by CheckboxComponent(initialChecked, disabled).constrain {
 		x = 1.pixels(alignOpposite = true)
