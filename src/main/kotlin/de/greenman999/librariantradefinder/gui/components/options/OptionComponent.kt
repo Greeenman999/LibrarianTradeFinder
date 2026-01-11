@@ -38,9 +38,19 @@ import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.utils.withAlpha
 import java.awt.Color
 
-abstract class OptionComponent(val optionKey: String, var initialDisabled: Boolean = false) : UIContainer() {
+abstract class OptionComponent(val optionKey: String, var initialDisabled: Boolean = false, showTooltip: Boolean = true) : UIContainer() {
 
 	val disabled = BasicState(initialDisabled)
+
+	val label by UIText(translatable("librariantradefinder.gui.options.$optionKey")).constrain {
+		x = 0.pixels()
+		y = CenterConstraint()
+
+		color = (if (disabled.get()) Color.WHITE.withAlpha(0.5f) else Color.WHITE).toConstraint()
+	} childOf this
+
+	val tooltip by TooltipComponent(this@OptionComponent)
+		.bindText(BasicState(translatable("librariantradefinder.gui.options.$optionKey.tooltip")))
 
 	init {
 		constrain {
@@ -54,17 +64,9 @@ abstract class OptionComponent(val optionKey: String, var initialDisabled: Boole
 		disabled.onSetValue {
 			label.setColor(if (it) Color.WHITE.withAlpha(0.5f) else Color.WHITE)
 		}
+
+		if (showTooltip) {
+			tooltip.bindVisibility(this@OptionComponent)
+		}
 	}
-
-	val label by UIText(translatable("librariantradefinder.gui.options.$optionKey")).constrain {
-		x = 0.pixels()
-		y = CenterConstraint()
-
-		color = (if (disabled.get()) Color.WHITE.withAlpha(0.5f) else Color.WHITE).toConstraint()
-	} childOf this
-
-	val tooltip by TooltipComponent(label)
-		.bindVisibility(this@OptionComponent)
-		.bindText(BasicState(translatable("librariantradefinder.gui.options.$optionKey.tooltip")))
-
 }

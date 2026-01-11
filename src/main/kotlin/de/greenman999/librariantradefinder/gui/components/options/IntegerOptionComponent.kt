@@ -29,7 +29,7 @@ import gg.essential.elementa.dsl.provideDelegate
 import gg.essential.elementa.effects.OutlineEffect
 import java.awt.Color
 
-class IntegerOptionComponent(optionKey: String, initialValue: Int, val min: Int, val max: Int, initialDisabled: Boolean = false) : OptionComponent(optionKey, initialDisabled) {
+class IntegerOptionComponent(optionKey: String, initialValue: Int, val min: Int, val max: Int, initialDisabled: Boolean = false, tooltip: Boolean = true) : OptionComponent(optionKey, initialDisabled, tooltip) {
 
 	val slider by SliderComponent(normalizeValue(initialValue)).constrain {
 		x = 1.pixels(alignOpposite = true)
