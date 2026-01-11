@@ -105,7 +105,7 @@ class TooltipComponent(val tooltipParent: UIComponent) : UIContainer() {
 			if (it) {
 				this.showTooltip()
 			} else {
-				this.hide()
+				this.hideTooltip()
 			}
 		}
 	}
