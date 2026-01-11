@@ -22,6 +22,7 @@ package de.greenman999.librariantradefinder.gui.columns
 import de.greenman999.librariantradefinder.LibrarianTradeFinder
 import de.greenman999.librariantradefinder.gui.components.options.BooleanOptionComponent
 import de.greenman999.librariantradefinder.gui.components.options.IntegerOptionComponent
+import de.greenman999.librariantradefinder.gui.components.options.IntegerRangeOptionComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
@@ -41,10 +42,16 @@ class OptionsColumn : UIContainer() {
 		x = 20.pixels()
 		width = 100.percent() - 20.pixels()
 	} childOf this
+	val actionDelayTicksOption by IntegerRangeOptionComponent("action_delay_ticks",
+		instance.config.actionDelayTicks.min,
+		instance.config.actionDelayTicks.max,
+		0,
+		200
+	) childOf this
 	val buyOnTradeFoundOption by BooleanOptionComponent("buy_on_trade_found", instance.config.shouldBuyOnTradeFound()) childOf this
 	val notifyOnTradeFoundOption by BooleanOptionComponent("notify_on_trade_found", instance.config.shouldNotifyOnTradeFound()) childOf this
 	val displayTradesOnVillagerOption by BooleanOptionComponent("display_trades_on_villager", instance.config.shouldDisplayTradesOnVillager()) childOf this
-	val reRollTimeoutTicks by IntegerOptionComponent("reroll_timeout_ticks", instance.config.rerollTimeoutTicks, 1, 200) childOf this
+	val reRollTimeoutTicksOption by IntegerOptionComponent("reroll_timeout_ticks", instance.config.rerollTimeoutTicks, 1, 200) childOf this
 
 
 	init {
@@ -84,8 +91,28 @@ class OptionsColumn : UIContainer() {
 			instance.configManager.save()
 		}
 
-		reRollTimeoutTicks.slider.onValueSave {
-			instance.config.rerollTimeoutTicks = reRollTimeoutTicks.denormalizeValue(it)
+		reRollTimeoutTicksOption.slider.onValueSave {
+			instance.config.rerollTimeoutTicks = reRollTimeoutTicksOption.denormalizeValue(it)
+			instance.configManager.save()
+		}
+
+		actionDelayTicksOption.minOption.slider.onValueSave {
+			instance.config.actionDelayTicks.min = actionDelayTicksOption.minOption.denormalizeValue(it)
+			// Ensure min is not greater than max
+			if (instance.config.actionDelayTicks.min > instance.config.actionDelayTicks.max) {
+				instance.config.actionDelayTicks.max = instance.config.actionDelayTicks.min
+				actionDelayTicksOption.maxOption.slider.updateSliderValue(actionDelayTicksOption.maxOption.normalizeValue(instance.config.actionDelayTicks.max))
+			}
+			instance.configManager.save()
+		}
+
+		actionDelayTicksOption.maxOption.slider.onValueSave {
+			instance.config.actionDelayTicks.max = actionDelayTicksOption.maxOption.denormalizeValue(it)
+			// Ensure max is not less than min
+			if (instance.config.actionDelayTicks.max < instance.config.actionDelayTicks.min) {
+				instance.config.actionDelayTicks.min = instance.config.actionDelayTicks.max
+				actionDelayTicksOption.minOption.slider.updateSliderValue(actionDelayTicksOption.minOption.normalizeValue(instance.config.actionDelayTicks.min))
+			}
 			instance.configManager.save()
 		}
 	}

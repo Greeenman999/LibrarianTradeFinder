@@ -22,5 +22,9 @@
   "librariantradefinder.gui.options.display_trades_on_villager": "Display Trades on Villager",
   "librariantradefinder.gui.options.display_trades_on_villager.tooltip": "When enabled, shows the trades in front of the villager",
   "librariantradefinder.gui.options.reroll_timeout_ticks": "Reroll Timeout Ticks",
-  "librariantradefinder.gui.options.reroll_timeout_ticks.tooltip": "The maximum amount of ticks to wait for the villager to refresh trades."
+  "librariantradefinder.gui.options.reroll_timeout_ticks.tooltip": "The maximum amount of ticks to wait for the villager to refresh trades.",
+  "librariantradefinder.gui.options.action_delay_ticks": "Action Delay Ticks",
+  "librariantradefinder.gui.options.action_delay_ticks.tooltip": "The range of ticks to wait between actions to appear more human-like.",
+  "librariantradefinder.gui.options.action_delay_ticks.min": "Min",
+  "librariantradefinder.gui.options.action_delay_ticks.max": "Max"
 }
