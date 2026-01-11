@@ -24,13 +24,13 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import java.util.Objects;
 
 /**
- * Immutable generic range for configuration.
+ * Generic range for configuration.
  * Use Range.closed(min, max) for inclusive bounds.
  */
 @ConfigSerializable
 public final class IntegerRange {
-	private final int min;
-	private final int max;
+	private int min;
+	private int max;
 
 	public IntegerRange(int min, int max) {
 		this.min = min;
@@ -46,6 +46,14 @@ public final class IntegerRange {
 
 	public int getMax() {
 		return max;
+	}
+
+	public void setMin(int min) {
+		this.min = min;
+	}
+
+	public void setMax(int max) {
+		this.max = max;
 	}
 
 	public boolean contains(int value) {
