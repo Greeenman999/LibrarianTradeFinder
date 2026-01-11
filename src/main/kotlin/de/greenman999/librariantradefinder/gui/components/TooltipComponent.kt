@@ -53,6 +53,7 @@ import java.util.Observer
 
 private const val PADDING = 2
 
+// TODO: Add support for positioning tooltips to the left/right/top of the parent component if there is not enough space
 class TooltipComponent(val tooltipParent: UIComponent) : UIContainer() {
 
 	val box by UIRoundedRectangle(4f).constrain {
