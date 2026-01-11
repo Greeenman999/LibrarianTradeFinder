@@ -36,7 +36,7 @@ class IntegerRangeOptionComponent(optionKey: String, initialMin: Int, initialMax
 			height = ChildBasedSizeConstraint()
 		}
 		super.label.setY(SiblingConstraint(padding = 2f))
-		
+
 		maxOption.constrain {
 			x = 0.pixels()
 			y = SiblingConstraint(padding = 2f)
