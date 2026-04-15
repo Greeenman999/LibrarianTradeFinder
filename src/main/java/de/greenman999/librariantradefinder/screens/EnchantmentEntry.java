@@ -35,16 +35,26 @@ public class EnchantmentEntry extends AbstractSelectionList.Entry<EnchantmentEnt
         this.enabled = LibrarianTradeFinder.getConfig().enchantments.get(enchantment).isEnabled();
         this.enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
 
-        //maxPriceField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 50, 20, Text.of("Max Price"));
         maxPriceField = new EditBox(Minecraft.getInstance().font, 0, 0, 20, 14, Component.translatable("tradefinderui.enchantments.price.name"));
         maxPriceField.setMaxLength(2);
         maxPriceField.setValue(String.valueOf(enchantmentOption.getMaxPrice()));
-        //maxPriceField.setDrawsBackground(false);
+        maxPriceField.setFilter(s -> s.matches("\\d*"));
 
         levelField = new EditBox(Minecraft.getInstance().font, 0, 0, 14, 14, Component.translatable("tradefinderui.enchantments.level.name"));
         levelField.setMaxLength(1);
         levelField.setValue(String.valueOf(enchantmentOption.getLevel()));
+        levelField.setFilter(s -> s.matches("\\d*"));
+    }
 
+    private int safeParseInt(String value, int defaultValue) {
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     @Override
@@ -58,18 +68,21 @@ public class EnchantmentEntry extends AbstractSelectionList.Entry<EnchantmentEnt
         Font textRenderer = Minecraft.getInstance().font;
         Component enchantmentText = enchantment.description();
 
-        if (!maxPriceField.getValue().isEmpty() && !maxPriceField.canConsumeInput() &&
-                (Integer.parseInt(maxPriceField.getValue()) > 64 || Integer.parseInt(maxPriceField.getValue()) < 5)) {
+        int maxPrice = safeParseInt(maxPriceField.getValue(), 64);
+        if (!maxPriceField.canConsumeInput() && (maxPrice > 64 || maxPrice < 5)) {
             maxPriceField.setValue("64");
+            maxPrice = 64;
         }
-        if (!levelField.getValue().isEmpty() && !levelField.canConsumeInput() &&
-                (Integer.parseInt(levelField.getValue()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getValue()) < 1)) {
+
+        int level = safeParseInt(levelField.getValue(), enchantment.getMaxLevel());
+        if (!levelField.canConsumeInput() && (level > enchantment.getMaxLevel() || level < 1)) {
             levelField.setValue(String.valueOf(enchantment.getMaxLevel()));
+            level = enchantment.getMaxLevel();
         }
 
         enchantmentOption.setEnabled(enabled);
-        enchantmentOption.setMaxPrice(!maxPriceField.getValue().isEmpty() ? Integer.parseInt(maxPriceField.getValue()) : 64);
-        enchantmentOption.setLevel(!levelField.getValue().isEmpty() ? Integer.parseInt(levelField.getValue()) : enchantment.getMaxLevel());
+        enchantmentOption.setMaxPrice(maxPrice);
+        enchantmentOption.setLevel(level);
 
         if (y < 8) return;
 
