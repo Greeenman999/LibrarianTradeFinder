@@ -33,23 +33,27 @@ public class Commands {
                         .then(argument("enchantment", ResourceArgument.resource(registryAccess, Registries.ENCHANTMENT)).executes(context -> {
                             Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
                             Enchantment enchantment = enchantmentRegistryEntry.value();
-
-                            return TradeFinder.searchSingle(enchantment, 1, 64);
+                            // Default: max level for the enchantment, cheapest possible price.
+                            int level = enchantment.getMaxLevel();
+                            return TradeFinder.searchSingle(enchantment, level,
+                                de.greenman999.librariantradefinder.config.TradeFinderConfig.computedMinPrice(enchantment, level));
                         })
                             .then(argument("level", IntegerArgumentType.integer(1, 5)).executes(context -> {
                                 Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
                                 Enchantment enchantment = enchantmentRegistryEntry.value();
                                 int level = IntegerArgumentType.getInteger(context, "level");
-
-                                return TradeFinder.searchSingle(enchantment, level, 64);
+                                // Default maxPrice: cheapest possible roll for this (enchant, level).
+                                return TradeFinder.searchSingle(enchantment, level,
+                                    de.greenman999.librariantradefinder.config.TradeFinderConfig.computedMinPrice(enchantment, level));
                             })
                                 .then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
                                     Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
                                     Enchantment enchantment = enchantmentRegistryEntry.value();
                                     int level = IntegerArgumentType.getInteger(context, "level");
                                     int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
-
-                                    return TradeFinder.searchSingle(enchantment, level, bookPrice);
+                                    // Clamp user-supplied price into the legal range so we don't search for a price the server cannot roll.
+                                    int clamped = de.greenman999.librariantradefinder.config.TradeFinderConfig.clampPrice(enchantment, level, bookPrice);
+                                    return TradeFinder.searchSingle(enchantment, level, clamped);
                                 }))
                             )
                         )

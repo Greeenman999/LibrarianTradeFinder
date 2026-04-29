@@ -58,13 +58,27 @@ public class EnchantmentEntry extends AbstractSelectionList.Entry<EnchantmentEnt
         Font textRenderer = Minecraft.getInstance().font;
         Component enchantmentText = enchantment.description();
 
-        if (!maxPriceField.getValue().isEmpty() && !maxPriceField.canConsumeInput() &&
-                (Integer.parseInt(maxPriceField.getValue()) > 64 || Integer.parseInt(maxPriceField.getValue()) < 5)) {
-            maxPriceField.setValue("64");
+        // Per-enchant clamp: only fires on focus loss (incl. Tab to next field, Enter from our key handler,
+        // or click elsewhere). Computes valid bounds for THIS enchant at the current level using the same
+        // vanilla formula MiniHUD uses (with the DOUBLE_TRADE_PRICE tag handled).
+        if (!levelField.getValue().isEmpty() && !levelField.canConsumeInput()) {
+            int parsedLevel = Integer.parseInt(levelField.getValue());
+            int clampedLevel = Math.max(1, Math.min(parsedLevel, enchantment.getMaxLevel()));
+            if (clampedLevel != parsedLevel) {
+                levelField.setValue(String.valueOf(clampedLevel));
+            }
         }
-        if (!levelField.getValue().isEmpty() && !levelField.canConsumeInput() &&
-                (Integer.parseInt(levelField.getValue()) > enchantment.getMaxLevel() || Integer.parseInt(levelField.getValue()) < 1)) {
-            levelField.setValue(String.valueOf(enchantment.getMaxLevel()));
+        if (!maxPriceField.getValue().isEmpty() && !maxPriceField.canConsumeInput()) {
+            int currentLevel = !levelField.getValue().isEmpty()
+                    ? Integer.parseInt(levelField.getValue())
+                    : enchantment.getMaxLevel();
+            int min = TradeFinderConfig.computedMinPrice(enchantment, currentLevel);
+            int max = TradeFinderConfig.computedMaxPrice(enchantment, currentLevel);
+            int parsed = Integer.parseInt(maxPriceField.getValue());
+            int clamped = Math.max(min, Math.min(parsed, max));
+            if (clamped != parsed) {
+                maxPriceField.setValue(String.valueOf(clamped));
+            }
         }
 
         enchantmentOption.setEnabled(enabled);
@@ -157,17 +171,13 @@ public class EnchantmentEntry extends AbstractSelectionList.Entry<EnchantmentEnt
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        // Adjust options by hovering the mouse over the text field and scrolling
-        // 'amount' is +1.0 or -1.0, sometimes +2.0 or +3.0 for mouse wheels that (physically) snap to positions.
-        // There are also mouse wheels that scroll smoothly; the current implementation maybe doesn't work properly with them
+        // Scroll-over-field adjusts maxPrice only. Level was deliberately removed: scrolling
+        // the enchantment list passes the cursor through level fields for one frame each,
+        // silently knocking levels down to 1 and corrupting search criteria. Click + type to
+        // change level instead.
         if (maxPriceField.isMouseOver(mouseX, mouseY)){
             enchantmentOption.setMaxPrice(Mth.clamp((int) (enchantmentOption.getMaxPrice() + verticalAmount), 5, 64));
             maxPriceField.setValue(String.valueOf(enchantmentOption.getMaxPrice()));
-            return true;
-        }
-        else if (levelField.isMouseOver(mouseX, mouseY)){
-            enchantmentOption.setLevel(Mth.clamp((int) (enchantmentOption.getLevel() + verticalAmount), 1, enchantment.getMaxLevel()));
-            levelField.setValue(String.valueOf(enchantmentOption.getLevel()));
             return true;
         }
         return false;

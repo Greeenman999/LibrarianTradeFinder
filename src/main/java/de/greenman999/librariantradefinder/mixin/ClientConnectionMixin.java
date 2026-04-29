@@ -43,17 +43,36 @@ public class ClientConnectionMixin {
                 }
                 ci.cancel();
             }
-        }else if(packet instanceof ClientboundMerchantOffersPacket setTradeOffersS2CPacket && TradeFinder.state.equals(TradeState.WAITING_FOR_PACKET)) {
+        }else if(packet instanceof ClientboundMerchantOffersPacket setTradeOffersS2CPacket
+                && !TradeFinder.state.equals(TradeState.IDLE)) {
+            // Pop the queue on EVERY merchant-offers packet while a search is active, not just
+            // in WAITING. Otherwise a packet that arrives during BREAK (e.g. the response to a
+            // watchdog re-interact) is dropped without draining its queue entry, leaving the
+            // queue out of sync. Next cycle pops the now-stale entry and rejects the real
+            // current packet, forcing another full watchdog timeout — visible to the user as
+            // the search getting stuck on "checking trade" for ~2 seconds.
+            Integer expectedEpoch = TradeFinder.pendingPacketEpochs.pollFirst();
+            if (expectedEpoch == null
+                    || !TradeFinder.state.equals(TradeState.WAITING_FOR_PACKET)
+                    || expectedEpoch != TradeFinder.currentEpoch.get()) {
+                return;
+            }
+
             AtomicBoolean found = new AtomicBoolean(false);
             for(MerchantOffer tradeOffer : setTradeOffersS2CPacket.getOffers()) {
                 if(!tradeOffer.getResult().getItem().equals(Items.ENCHANTED_BOOK)) continue;
                 EnchantmentHelper.getEnchantmentsForCrafting(tradeOffer.getResult()).entrySet().forEach((enchantmentEntry) -> {
                     Enchantment enchantment = enchantmentEntry.getKey().value();
                     int level = enchantmentEntry.getIntValue();
+
+                    if (LibrarianTradeFinder.getConfig().debugLogOffers) {
+                        debugLogOffer(tradeOffer, enchantment, level);
+                    }
+
                     int maxBookPrice;
                     int minLevel;
                     if (TradeFinder.searchAll) {
-                        TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().enchantments.get(enchantment);
+                        TradeFinderConfig.EnchantmentOption enchantmentOption = LibrarianTradeFinder.getConfig().findOptionForEnchantment(enchantment);
                         if (enchantmentOption == null || !enchantmentOption.isEnabled()) return;
                         maxBookPrice = enchantmentOption.getMaxPrice();
                         minLevel = enchantmentOption.getLevel();
@@ -70,6 +89,7 @@ public class ClientConnectionMixin {
                 });
             }
             if(!found.get()) {
+                TradeFinder.currentEpoch.incrementAndGet();
                 TradeFinder.state = TradeState.BREAK;
                 TradeFinder.tries++;
             }
@@ -82,15 +102,46 @@ public class ClientConnectionMixin {
         TradeFinder.stop();
         found.set(true);
 
-        Minecraft.getInstance().gui.getChat().addMessage(
-                Component.translatable(
-                        "librarian-trade-finder.found",
-                        Enchantment.getFullname(Holder.direct(enchantment), level),
-                        tradeOffer.getBaseCostA().getCount(),
-                        Component.literal(String.valueOf(attempts))
-                                .withStyle(style -> style.withColor(0xcc1141))
-                ).withStyle(ChatFormatting.GREEN)
-        );
+        Component baseMessage = Component.translatable(
+                "librarian-trade-finder.found",
+                Enchantment.getFullname(Holder.direct(enchantment), level),
+                tradeOffer.getBaseCostA().getCount(),
+                Component.literal(String.valueOf(attempts))
+                        .withStyle(style -> style.withColor(0xcc1141))
+        ).withStyle(ChatFormatting.GREEN);
+
+        Component finalMessage;
+        if (LibrarianTradeFinder.getConfig().showCostRange) {
+            int min = TradeFinderConfig.computedMinPrice(enchantment, level);
+            int max = TradeFinderConfig.computedMaxPrice(enchantment, level);
+            finalMessage = Component.empty()
+                    .append(baseMessage)
+                    .append(Component.literal(" "))
+                    .append(Component.translatable(
+                            "librarian-trade-finder.found.cost-range", min, max
+                    ).withStyle(ChatFormatting.AQUA));
+        } else {
+            finalMessage = baseMessage;
+        }
+
+        // Chat add must run on the render thread. addMessage internally touches RenderSystem
+        // (e.g. text-width measurement); calling it from netty caused the client to disconnect
+        // with "Rendersystem called from wrong thread".
+        Minecraft.getInstance().execute(() -> Minecraft.getInstance().gui.getChat().addMessage(finalMessage));
+    }
+
+    @Unique
+    private void debugLogOffer(MerchantOffer tradeOffer, Enchantment enchantment, int level) {
+        int min = TradeFinderConfig.computedMinPrice(enchantment, level);
+        int max = TradeFinderConfig.computedMaxPrice(enchantment, level);
+        Component message = Component.translatable(
+                "librarian-trade-finder.debug.offer",
+                Enchantment.getFullname(Holder.direct(enchantment), level),
+                tradeOffer.getBaseCostA().getCount(),
+                min, max
+        ).withStyle(ChatFormatting.GRAY);
+        // Defer to render thread — see foundEnchantment for why.
+        Minecraft.getInstance().execute(() -> Minecraft.getInstance().gui.getChat().addMessage(message));
     }
 
 

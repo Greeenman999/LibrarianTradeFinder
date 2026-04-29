@@ -32,11 +32,17 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 @SuppressWarnings("DuplicatedCode")
 public class TradeFinder {
 
-    public static TradeState state = TradeState.IDLE;
+    // `volatile` so the netty-thread mixin sees fresh state when filtering merchant-offers
+    // packets, and so writes from the netty thread (state = BREAK on no-match) are visible
+    // to the main-thread tick() on the next read.
+    public static volatile TradeState state = TradeState.IDLE;
     public static Villager villager = null;
     public static BlockPos lecternPos = null;
 
@@ -61,6 +67,31 @@ public class TradeFinder {
     private static boolean finishedPlaceLook = false;
     private static boolean finishedCheckLook = false;
 
+    // Track whether we have already fired the once-per-cycle interact() in CHECK.
+    // Only re-armed when state is set back to CHECK (after PLACE). Prevents the
+    // every-tick interact spam that was happening previously while in WAITING_FOR_PACKET.
+    private static boolean checkInteractFired = false;
+
+    // Watchdog for the WAITING_FOR_PACKET state. If the villager grunts (busy / refused)
+    // or the offer packet otherwise never arrives, we'd be stuck forever. Count ticks
+    // since we entered WAITING_FOR_PACKET and retry the interact when a threshold elapses.
+    private static int waitTicks = 0;
+    private static final int WAIT_FOR_PACKET_TIMEOUT_TICKS = 40; // ~2s at 20 TPS
+
+    // Per-interact epoch queue. Each interact records the search epoch it was sent in;
+    // when the matching offers packet arrives, the mixin pops the head and processes it
+    // only when the epoch still matches. The epoch bumps on every BREAK transition (and
+    // on stop), so any late packet from before a break/place cycle is recognised as stale
+    // and dropped — preventing false-positive "found" matches against offers that no
+    // longer exist on the post-break librarian.
+    //
+    // Concurrent collection + atomic counter because both the main thread (tick adds
+    // entries, stop clears) and the netty thread (mixin pops + bumps epoch on no-match)
+    // mutate them. AtomicInteger.incrementAndGet() is also needed so a netty bump and a
+    // main-thread bump in stop() can't lose each other.
+    public static final AtomicInteger currentEpoch = new AtomicInteger(0);
+    public static final ConcurrentLinkedDeque<Integer> pendingPacketEpochs = new ConcurrentLinkedDeque<>();
+
     public static void stop() {
         state = TradeState.IDLE;
 
@@ -68,8 +99,22 @@ public class TradeFinder {
         maxBookPrice = 0;
         minLevel = 0;
         tries = 0;
+        checkInteractFired = false;
+        waitTicks = 0;
 
-        Minecraft.getInstance().gui.setOverlayMessage(Component.literal(""), false);
+        currentEpoch.incrementAndGet();
+        pendingPacketEpochs.clear();
+
+        // Anything that touches MultiPlayerGameMode or the HUD must run on the main thread.
+        // stop() is called from both threads (mixin foundEnchantment from netty, tick / commands
+        // from main); deferring these calls to mc.execute() makes both call sites safe.
+        Minecraft mc = Minecraft.getInstance();
+        mc.execute(() -> {
+            if (mc.gameMode != null) {
+                mc.gameMode.stopDestroyBlock();
+            }
+            mc.gui.setOverlayMessage(Component.literal(""), false);
+        });
     }
 
     public static int searchList() {
@@ -109,22 +154,21 @@ public class TradeFinder {
 
     public static boolean select() {
         Minecraft mc = Minecraft.getInstance();
-        HitResult hitResult = null;
-        if (Minecraft.getInstance().player != null) {
-            hitResult = Minecraft.getInstance().player.pick(3.0, 0.0F, false);
+        if (mc.player == null || mc.level == null) {
+            return false;
         }
-        if (hitResult != null && (!(hitResult.getType().equals(HitResult.Type.BLOCK)) || hitResult.getType().equals(HitResult.Type.ENTITY))) {
+
+        // Single early-return covers all the "you're not aiming at a lectern block" cases:
+        // miss, entity, or null result. Previously the null-pick path fell through to
+        // getBlockState(null) and NPEd.
+        HitResult hitResult = mc.player.pick(3.0, 0.0F, false);
+        if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
             HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
             return false;
         }
-        BlockPos blockPos = null;
-        if (hitResult != null) {
-            blockPos = ((BlockHitResult) hitResult).getBlockPos();
-        }
-        Block block = null;
-        if (Minecraft.getInstance().level != null) {
-            block = Minecraft.getInstance().level.getBlockState(blockPos).getBlock();
-        }
+
+        BlockPos blockPos = ((BlockHitResult) hitResult).getBlockPos();
+        Block block = mc.level.getBlockState(blockPos).getBlock();
         if(!(block instanceof LecternBlock)) {
             HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
             return false;
@@ -133,10 +177,9 @@ public class TradeFinder {
         double closestDistance = Double.POSITIVE_INFINITY;
         Entity closestEntity = null;
 
-        assert Minecraft.getInstance().level != null;
-        for(Entity entity : Minecraft.getInstance().level.entitiesForRendering()) {
+        for(Entity entity : mc.level.entitiesForRendering()) {
             Vec3 entityPos = entity.position();
-            if (blockPos != null && entity instanceof Villager && ((Villager) entity).getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.getCenter()) < closestDistance) {
+            if (entity instanceof Villager && ((Villager) entity).getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.getCenter()) < closestDistance) {
                 closestDistance = entityPos.distanceTo(blockPos.getCenter());
                 closestEntity = entity;
             }
@@ -169,18 +212,49 @@ public class TradeFinder {
         if(player == null) return;
 
         if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && state != TradeState.SELECT_MANUAL) {
+            // Selection lost mid-search (villager despawned, world unloaded, etc.). Stop the
+            // search entirely instead of just returning — without this, tick() spams the
+            // "not selected" chat message at 20 Hz forever.
             HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.RED, "commands.tradefinder.start.not-selected"));
+            stop();
             return;
         }
         
         switch (state) {
             case CHECK -> HudUtils.overlayMessage(HudUtils.textTranslatable(ChatFormatting.GRAY, "librarian-trade-finder.actionbar.status.check", tries), false);
+            case WAITING_FOR_PACKET -> HudUtils.overlayMessage(HudUtils.textTranslatable(ChatFormatting.GRAY, "librarian-trade-finder.actionbar.status.waiting", tries), false);
             case BREAK -> HudUtils.overlayMessage(HudUtils.textTranslatable(ChatFormatting.GRAY, "librarian-trade-finder.actionbar.status.break", tries), false);
             case PLACE -> HudUtils.overlayMessage(HudUtils.textTranslatable(ChatFormatting.GRAY, "librarian-trade-finder.actionbar.status.place", tries), false);
             case SELECT_MANUAL -> HudUtils.overlayMessage(HudUtils.textTranslatable(ChatFormatting.GRAY, "librarian-trade-finder.actionbar.status.select-manual"), false);
         }
 
-        if((state == TradeState.CHECK || state == TradeState.WAITING_FOR_PACKET) && villager.getVillagerData().profession().is(VillagerProfession.LIBRARIAN)) {
+        // Watchdog: if we've been waiting on the offer packet for too long (villager grunted /
+        // refused / packet lost / desync), retry by going back to CHECK so we can re-fire interact.
+        //
+        // Clear the queue and bump the epoch BEFORE re-arming. Empirically the server only
+        // sends one offers packet per "open trade screen" interaction, so a watchdog re-interact
+        // that the server ignores leaves a stale entry in the queue forever — every subsequent
+        // cycle then pops that stale entry instead of the real current response, drops the real
+        // response by epoch mismatch, and burns another full watchdog timeout. Treat the lost
+        // interact as abandoned: the response isn't coming, and even if it arrives late, the
+        // epoch bump invalidates it on pop.
+        if (state == TradeState.WAITING_FOR_PACKET) {
+            waitTicks++;
+            if (waitTicks > WAIT_FOR_PACKET_TIMEOUT_TICKS) {
+                waitTicks = 0;
+                checkInteractFired = false;
+                pendingPacketEpochs.clear();
+                currentEpoch.incrementAndGet();
+                state = TradeState.CHECK;
+                return;
+            }
+        }
+
+        // Only fire the interact() in CHECK, and only once per cycle. WAITING_FOR_PACKET
+        // intentionally has no tick handler — the response packet drives the next transition
+        // (handled in ClientConnectionMixin). This eliminates the duplicate-interact spam.
+        if(state == TradeState.CHECK && !checkInteractFired
+                && villager.getVillagerData().profession().is(VillagerProfession.LIBRARIAN)) {
             Vec3 villagerPosition = new Vec3(villager.getX(), villager.getY() + (double) villager.getEyeHeight(Pose.STANDING), villager.getZ());
 
             if(LibrarianTradeFinder.getConfig().legitMode && LibrarianTradeFinder.getConfig().slowMode) {
@@ -218,6 +292,9 @@ public class TradeFinder {
             }
             if(result == InteractionResult.SUCCESS) {
                 finishedBreakLook = false;
+                checkInteractFired = true;
+                waitTicks = 0;
+                pendingPacketEpochs.addLast(currentEpoch.get());
                 state = TradeState.WAITING_FOR_PACKET;
             }else {
                 HudUtils.chatMessage(HudUtils.textTranslatable("librarian-trade-finder.check.interact.failed", ChatFormatting.RED));
@@ -337,6 +414,10 @@ public class TradeFinder {
             }
 
             finishedCheckLook = false;
+            // Re-arm the once-per-cycle interact gate so the next CHECK can fire interact()
+            // exactly once (gated also on profession.is(LIBRARIAN), so it waits for the
+            // villager to actually claim the lectern).
+            checkInteractFired = false;
             state = TradeState.CHECK;
         }
         else if (state == TradeState.SELECT_MANUAL) {

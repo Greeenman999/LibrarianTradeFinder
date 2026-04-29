@@ -126,6 +126,26 @@ public class ControlUi extends Screen {
                 .id(5)
                 .tooltip(Tooltip.create(Component.translatable("tradefinderui.options.slow-mode.tooltip")))
                 .build());
+        this.addRenderableWidget(GrayButtonWidget.builder(getButtonText("tradefinderui.options.show-cost-range", LibrarianTradeFinder.getConfig().showCostRange), (buttonWidget) -> {
+                    LibrarianTradeFinder.getConfig().showCostRange = !LibrarianTradeFinder.getConfig().showCostRange;
+
+                    updateButtonTexts();
+                })
+                .bounds(this.width / 2 + 6, 125, this.width / 2 - 10, 20)
+                .color(0x4FC7C0C0)
+                .id(6)
+                .tooltip(Tooltip.create(Component.translatable("tradefinderui.options.show-cost-range.tooltip")))
+                .build());
+        this.addRenderableWidget(GrayButtonWidget.builder(getButtonText("tradefinderui.options.debug-log-offers", LibrarianTradeFinder.getConfig().debugLogOffers), (buttonWidget) -> {
+                    LibrarianTradeFinder.getConfig().debugLogOffers = !LibrarianTradeFinder.getConfig().debugLogOffers;
+
+                    updateButtonTexts();
+                })
+                .bounds(this.width / 2 + 6, 150, this.width / 2 - 10, 20)
+                .color(0x4FC7C0C0)
+                .id(7)
+                .tooltip(Tooltip.create(Component.translatable("tradefinderui.options.debug-log-offers.tooltip")))
+                .build());
 
         super.init();
     }
@@ -142,6 +162,10 @@ public class ControlUi extends Screen {
                         buttonWidget.setMessage(getButtonText("tradefinderui.options.legit-mode", LibrarianTradeFinder.getConfig().legitMode));
                 case 5 ->
                         buttonWidget.setMessage(getButtonText("tradefinderui.options.slow-mode", LibrarianTradeFinder.getConfig().slowMode));
+                case 6 ->
+                        buttonWidget.setMessage(getButtonText("tradefinderui.options.show-cost-range", LibrarianTradeFinder.getConfig().showCostRange));
+                case 7 ->
+                        buttonWidget.setMessage(getButtonText("tradefinderui.options.debug-log-offers", LibrarianTradeFinder.getConfig().debugLogOffers));
             }
         }
     }
