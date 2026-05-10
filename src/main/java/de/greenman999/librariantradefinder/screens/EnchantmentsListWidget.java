@@ -2,6 +2,7 @@ package de.greenman999.librariantradefinder.screens;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import de.greenman999.librariantradefinder.LibrarianTradeFinder;
+import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSelectionList;
@@ -10,13 +11,17 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.joml.Matrix3x2fStack;
 
 public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEntry> {
 
     public GrayButtonWidget resetButton;
+    public GrayButtonWidget setMinPricesButton;
     public int top;
 
     public EnchantmentsListWidget(Minecraft client, int width, int height, int top, int itemHeight) {
@@ -39,6 +44,27 @@ public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEnt
                 .tooltip(Tooltip.create(Component.translatable("tradefinderui.reset.tooltip")))
                 .build();
 
+        this.setMinPricesButton = GrayButtonWidget.builder(Component.translatable("tradefinderui.buttons.set-min-prices"), (buttonWidget) -> {
+                    if (Minecraft.getInstance().level == null) return;
+                    Registry<Enchantment> registry = TradeFinderConfig.getEnchantmentRegistry();
+                    for (EnchantmentEntry enchantmentEntry : this.children()) {
+                        Integer minPrice = 2 + Integer.valueOf(enchantmentEntry.levelField.getValue()) * 3;
+                        ResourceKey<Enchantment> key = registry.getResourceKey(enchantmentEntry.enchantment).orElseThrow();
+
+                        boolean doublePrice = registry.getOrThrow(key).is(EnchantmentTags.DOUBLE_TRADE_PRICE);
+                        if (doublePrice) {
+                            minPrice *= 2;
+                        }
+                        if (minPrice > 64) {
+                            minPrice = 64;
+                        }
+                        enchantmentEntry.maxPriceField.setValue(minPrice.toString());
+                    }
+                })
+                .bounds(this.width - 97, 5, 50, 15)
+                .color(0x5FC7C0C0)
+                .tooltip(Tooltip.create(Component.translatable("tradefinderui.options.set-min-prices.tooltip")))
+                .build();
     }
 
     @Override
@@ -90,6 +116,7 @@ public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEnt
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         resetButton.mouseClicked(click, doubled);
+        setMinPricesButton.mouseClicked(click, doubled);
         return super.mouseClicked(click, doubled);
     }
 

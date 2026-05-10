@@ -24,6 +24,8 @@
     "tradefinderui.options.title": "设置",
     "tradefinderui.buttons.save": "保存并退出",
     "tradefinderui.buttons.start": "开始查找",
+    "tradefinderui.buttons.set-min-prices" : "设置最低价",
+    "tradefinderui.options.set-min-prices.tooltip": "按公式设置最低价格：2 + 3 × 等级。宝藏附魔价格翻倍。",
     "tradefinderui.options.tp-to-villager": "tp到村民：%d",
     "tradefinderui.options.tp-to-villager.tooltip": "当讲台破坏后将你传送到村民处，尝试捡起掉落的讲台。",
     "tradefinderui.options.prevent-axe-break": "防止斧子损坏：%d",

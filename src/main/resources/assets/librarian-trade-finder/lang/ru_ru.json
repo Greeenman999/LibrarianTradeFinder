@@ -24,6 +24,8 @@
     "tradefinderui.options.title": "Настройки",
     "tradefinderui.buttons.save": "Сохранить & Выйти",
     "tradefinderui.buttons.start": "Начать поиск",
+    "tradefinderui.buttons.set-min-prices": "Установить мин. цену",
+    "tradefinderui.options.set-min-prices.tooltip": "Устанавливает минимальные цены по формуле: 2 + 3 × уровень. Сокровищные зачарования стоят вдвое дороже.",
     "tradefinderui.options.tp-to-villager": "Телепортироваться к жителю: %d",
     "tradefinderui.options.tp-to-villager.tooltip": "Телепортирует вас к жителю когда кафедра сломалась, чтобы попытаться подобрать её.",
     "tradefinderui.options.prevent-axe-break": "Предотвратить поломку топора: %d",

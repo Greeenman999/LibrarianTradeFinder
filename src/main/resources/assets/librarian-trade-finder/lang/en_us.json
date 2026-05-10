@@ -24,6 +24,8 @@
     "tradefinderui.options.title": "Options",
     "tradefinderui.buttons.save": "Save & Exit",
     "tradefinderui.buttons.start": "Start Search",
+    "tradefinderui.buttons.set-min-prices" : "Set Min Prices",
+    "tradefinderui.options.set-min-prices.tooltip": "Set minimum prices using the formula: 2 + 3 × level. Treasure enchantments cost double.",
     "tradefinderui.options.tp-to-villager": "Teleport to the villager: %d",
     "tradefinderui.options.tp-to-villager.tooltip": "Teleports you to the villager when the lectern is broken to try to pickup the lecterns dropped there.",
     "tradefinderui.options.prevent-axe-break": "Prevent axe breaking: %d",

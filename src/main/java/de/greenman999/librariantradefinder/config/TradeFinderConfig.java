@@ -52,7 +52,7 @@ public class TradeFinderConfig {
         return currentEnchantmentRegistry;
     }
 
-    private static Registry<Enchantment> getEnchantmentRegistry() {
+    public static Registry<Enchantment> getEnchantmentRegistry() {
         return getEnchantmentRegistry(false);
     }
 

@@ -24,6 +24,8 @@
     "tradefinderui.options.title": "Optionen",
     "tradefinderui.buttons.save": "Speichern & Schließen",
     "tradefinderui.buttons.start": "Suche starten",
+    "tradefinderui.buttons.set-min-prices": "Mindestpreise setzen",
+    "tradefinderui.options.set-min-prices.tooltip": "Setzt Mindestpreise nach der Formel: 2 + 3 × Stufe. Schatzverzauberungen kosten das Doppelte.",
     "tradefinderui.options.tp-to-villager": "Teleportieren zum Dorfbewohner: %d",
     "tradefinderui.options.tp-to-villager.tooltip": "Teleportiert Sie zum Dorfbewohner, wenn das Lesepult zerbrochen ist, um zu versuchen, die dort auf dem Boden liegenden Lesepulte aufzusammeln.",
     "tradefinderui.options.prevent-axe-break": "Axtbruch verhindern: %d",

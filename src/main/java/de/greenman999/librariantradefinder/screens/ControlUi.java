@@ -84,6 +84,7 @@ public class ControlUi extends Screen {
         enchantmentsListWidget = new EnchantmentsListWidget(this.minecraft, this.width / 2 - 10, this.height - 30, 25, 20);
         this.addRenderableWidget(enchantmentsListWidget);
         this.addRenderableWidget(enchantmentsListWidget.resetButton);
+        this.addRenderableWidget(enchantmentsListWidget.setMinPricesButton);
 
         this.addRenderableWidget(GrayButtonWidget.builder(getButtonText("tradefinderui.options.tp-to-villager", LibrarianTradeFinder.getConfig().tpToVillager), (buttonWidget) -> {
                     LibrarianTradeFinder.getConfig().tpToVillager = !LibrarianTradeFinder.getConfig().tpToVillager;
