@@ -65,7 +65,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			TradeFinder.tick();
             if (scheduleOpenConfig) {
-                client.setScreen(new ControlUi(client.screen));
+                client.setScreenAndShow(new ControlUi(client.gui.screen()));
                 scheduleOpenConfig = false;
             }
 			LocalPlayer player = client.player;
@@ -89,8 +89,8 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			}
 
 			while (configKeyBinding.consumeClick()) {
-				if(client.screen == null) {
-					client.setScreen(new ControlUi(null));
+				if(client.gui.screen() == null) {
+					client.setScreenAndShow(new ControlUi(null));
 				}
 			}
 		});

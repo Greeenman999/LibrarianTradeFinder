@@ -15,7 +15,7 @@ public class HudUtils {
     // Overlay messaages
     public static void overlayMessage(Component text, boolean tinted){
         if (Minecraft.getInstance() == null) return;
-        Minecraft.getInstance().gui.setOverlayMessage(text, tinted);
+        Minecraft.getInstance().gui.hud.setOverlayMessage(text, tinted);
     }
 
     // Text
