@@ -1,6 +1,7 @@
 package de.greenman999.librariantradefinder;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.arguments.ResourceArgument;
@@ -20,9 +21,13 @@ public class Commands {
         register("tf");
     }
 
+    @SuppressWarnings("unchecked")
+    private static Holder<Enchantment> enchantmentArgument(CommandContext<?> context) {
+        return (Holder<Enchantment>) context.getArgument("enchantment", Holder.class);
+    }
+
     private static void register(String base) {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(literal(base)
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(literal(base)
                     .then(literal("select")
                         .then(literal("manual").executes(context -> {
                             TradeFinder.selectManual();
@@ -31,20 +36,20 @@ public class Commands {
                         .executes(context -> (TradeFinder.select() ? 1 : 0)))
                     .then(literal("search").executes(context -> TradeFinder.searchList())
                         .then(argument("enchantment", ResourceArgument.resource(registryAccess, Registries.ENCHANTMENT)).executes(context -> {
-                            Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
+                            Holder<Enchantment> enchantmentRegistryEntry = enchantmentArgument(context);
                             Enchantment enchantment = enchantmentRegistryEntry.value();
 
                             return TradeFinder.searchSingle(enchantment, 1, 64);
                         })
                             .then(argument("level", IntegerArgumentType.integer(1, 5)).executes(context -> {
-                                Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
+                                Holder<Enchantment> enchantmentRegistryEntry = enchantmentArgument(context);
                                 Enchantment enchantment = enchantmentRegistryEntry.value();
                                 int level = IntegerArgumentType.getInteger(context, "level");
 
                                 return TradeFinder.searchSingle(enchantment, level, 64);
                             })
                                 .then(argument("maxPrice", IntegerArgumentType.integer(1, 64)).executes(context -> {
-                                    Holder<Enchantment> enchantmentRegistryEntry = context.getArgument("enchantment", Holder.class);
+                                    Holder<Enchantment> enchantmentRegistryEntry = enchantmentArgument(context);
                                     Enchantment enchantment = enchantmentRegistryEntry.value();
                                     int level = IntegerArgumentType.getInteger(context, "level");
                                     int bookPrice = IntegerArgumentType.getInteger(context, "maxPrice");
@@ -63,7 +68,6 @@ public class Commands {
                         context.getSource().sendFeedback(Component.translatable("commands.tradefinder.stop.success").withStyle(style -> style.withColor(TextColor.fromLegacyFormat(ChatFormatting.GREEN))));
                         return 1;
                     }))
-            );
-        });
+            ));
     }
 }

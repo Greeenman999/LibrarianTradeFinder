@@ -11,8 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
 public class GrayButtonWidget extends Button {
-    int color;
-    int id;
+    final int color;
+    final int id;
 
     protected GrayButtonWidget(int x, int y, int width, int height, net.minecraft.network.chat.Component message, OnPress onPress, CreateNarration narrationSupplier, int color, int id) {
         super(x, y, width, height, message, onPress, narrationSupplier);

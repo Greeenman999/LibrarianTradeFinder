@@ -12,16 +12,14 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.enchantment.Enchantment;
-import org.joml.Matrix3x2fStack;
 
 public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEntry> {
 
-    public GrayButtonWidget resetButton;
-    public int top;
+    public final GrayButtonWidget resetButton;
 
+    @SuppressWarnings("this-escape")
     public EnchantmentsListWidget(Minecraft client, int width, int height, int top, int itemHeight) {
         super(client, width, height, top, itemHeight);
-        this.top = top;
 
         for(Enchantment enchantment : LibrarianTradeFinder.getConfig().enchantments.keySet()) {
             this.addEntry(new EnchantmentEntry(enchantment));
@@ -66,11 +64,6 @@ public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEnt
     public int getRight() {
         return this.width + 7;
     }
-
-    //@Override
-    //protected int getScrollbarPositionX() {
-    //    return this.width - 10;
-    //}
 
     @Override
     protected int scrollBarX() {
