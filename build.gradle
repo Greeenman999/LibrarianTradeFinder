@@ -36,6 +36,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
+	it.options.compilerArgs += ["-Xlint:all", "-Xlint:-processing", "-Xlint:-classfile"]
 }
 
 java {

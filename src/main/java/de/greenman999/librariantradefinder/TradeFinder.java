@@ -17,13 +17,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -35,7 +33,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 
-@SuppressWarnings("DuplicatedCode")
 public class TradeFinder {
 
     public static TradeState state = TradeState.IDLE;
@@ -71,7 +68,7 @@ public class TradeFinder {
         minLevel = 0;
         tries = 0;
 
-        Minecraft.getInstance().gui.setOverlayMessage(Component.literal(""), false);
+        Minecraft.getInstance().gui.hud.setOverlayMessage(Component.literal(""), false);
     }
 
     public static int searchList() {
@@ -112,20 +109,17 @@ public class TradeFinder {
     public static boolean select() {
         Minecraft mc = Minecraft.getInstance();
         HitResult hitResult = null;
-        if (Minecraft.getInstance().player != null) {
-            hitResult = Minecraft.getInstance().player.pick(3.0, 0.0F, false);
+        if (mc.player != null) {
+            hitResult = mc.player.pick(3.0, 0.0F, false);
         }
-        if (hitResult != null && (!(hitResult.getType().equals(HitResult.Type.BLOCK)) || hitResult.getType().equals(HitResult.Type.ENTITY))) {
+        if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
             HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
             return false;
         }
-        BlockPos blockPos = null;
-        if (hitResult != null) {
-            blockPos = ((BlockHitResult) hitResult).getBlockPos();
-        }
+        BlockPos blockPos = ((BlockHitResult) hitResult).getBlockPos();
         Block block = null;
-        if (Minecraft.getInstance().level != null) {
-            block = Minecraft.getInstance().level.getBlockState(blockPos).getBlock();
+        if (mc.level != null) {
+            block = mc.level.getBlockState(blockPos).getBlock();
         }
         if(!(block instanceof LecternBlock)) {
             HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.RED, "commands.tradefinder.select.not-looking-at-lectern"));
@@ -135,11 +129,11 @@ public class TradeFinder {
         double closestDistance = Double.POSITIVE_INFINITY;
         Entity closestEntity = null;
 
-        assert Minecraft.getInstance().level != null;
-        for(Entity entity : Minecraft.getInstance().level.entitiesForRendering()) {
+        assert mc.level != null;
+        for(Entity entity : mc.level.entitiesForRendering()) {
             Vec3 entityPos = entity.position();
-            if (blockPos != null && entity instanceof Villager && ((Villager) entity).getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.getCenter()) < closestDistance) {
-                closestDistance = entityPos.distanceTo(blockPos.getCenter());
+            if (entity instanceof Villager && ((Villager) entity).getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(Vec3.atCenterOf(blockPos)) < closestDistance) {
+                closestDistance = entityPos.distanceTo(Vec3.atCenterOf(blockPos));
                 closestEntity = entity;
             }
         }

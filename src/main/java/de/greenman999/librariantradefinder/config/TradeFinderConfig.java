@@ -15,8 +15,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -58,8 +60,6 @@ public class TradeFinderConfig {
 
     public void save() {
         try {
-            Files.deleteIfExists(configFile);
-
             JsonObject json = new JsonObject();
             json.addProperty("configVersion", 1);
             json.addProperty("preventAxeBreaking", preventAxeBreaking);
@@ -81,7 +81,13 @@ public class TradeFinderConfig {
                 json.add("enchantments", enchantmentsJson);
             }
 
-            Files.writeString(configFile, gson.toJson(json));
+            Path tempFile = configFile.resolveSibling(configFile.getFileName() + ".tmp");
+            Files.writeString(tempFile, gson.toJson(json));
+            try {
+                Files.move(tempFile, configFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tempFile, configFile, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (IOException e) {
             LibrarianTradeFinder.LOGGER.error("Failed to save config file", e);
         }
@@ -99,6 +105,8 @@ public class TradeFinderConfig {
 
             enchantments.clear();
             enchantmentConfigs.clear();
+
+            boolean dirty = !(json.has("configVersion") && json.get("configVersion").getAsInt() == 1);
 
             if(!(!json.has("configVersion") || json.get("configVersion").getAsInt() != 1)) {
                 if (json.has("preventAxeBreaking"))
@@ -131,12 +139,17 @@ public class TradeFinderConfig {
                         enchantmentConfigs.containsKey(resLocation)
                                 ? enchantmentConfigs.get(resLocation)
                                 : new EnchantmentOption(enchantment, false);
+                if (!enchantmentConfigs.containsKey(resLocation)) {
+                    dirty = true;
+                }
                 enchantments.put(enchantment, enchantmentOption);
             }
 
             sortEnchantmentsMap();
 
-            save();
+            if (dirty) {
+                save();
+            }
             LibrarianTradeFinder.LOGGER.info("Config file loaded successfully. Enchantments size: {}", enchantments.size());
         } catch (IOException e) {
             LibrarianTradeFinder.LOGGER.error("Failed to load config file", e);
@@ -151,7 +164,7 @@ public class TradeFinderConfig {
 
     public static class EnchantmentOption {
 
-        public Enchantment enchantment;
+        public final Enchantment enchantment;
         public boolean enabled;
         public int level;
         public int maxPrice;
@@ -168,7 +181,9 @@ public class TradeFinderConfig {
         }
 
         public static EnchantmentOption fromJson(JsonObject json) {
-            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, Identifier.tryParse(json.getAsJsonPrimitive("enchantment").getAsString()));
+            Identifier identifier = Identifier.tryParse(json.getAsJsonPrimitive("enchantment").getAsString());
+            if (identifier == null) return null;
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, identifier);
             Enchantment enchantment = getEnchantmentRegistry().getValue(enchantmentKey);
             if (enchantment == null) return null;
             return new EnchantmentOption(enchantment, json.getAsJsonPrimitive("enabled").getAsBoolean(), json.getAsJsonPrimitive("level").getAsInt(), json.getAsJsonPrimitive("maxPrice").getAsInt());
@@ -205,10 +220,6 @@ public class TradeFinderConfig {
 
         public int getMaxPrice() {
             return maxPrice;
-        }
-
-        public String getName() {
-            return Enchantment.getFullname(Holder.direct(enchantment), level).copy().withStyle(ChatFormatting.WHITE).getString();
         }
     }
 

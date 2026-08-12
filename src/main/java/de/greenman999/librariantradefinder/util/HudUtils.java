@@ -7,15 +7,14 @@ import net.minecraft.network.chat.Component;
 public class HudUtils {
     // Chat messages
     public static void chatMessage(Component text){
-        if (Minecraft.getInstance() == null) return;
-        Minecraft.getInstance().player.sendSystemMessage(text);
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+        mc.player.sendSystemMessage(text);
     }
 
-
-    // Overlay messaages
+    // Overlay messages
     public static void overlayMessage(Component text, boolean tinted){
-        if (Minecraft.getInstance() == null) return;
-        Minecraft.getInstance().gui.setOverlayMessage(text, tinted);
+        Minecraft.getInstance().gui.hud.setOverlayMessage(text, tinted);
     }
 
     // Text
@@ -25,10 +24,6 @@ public class HudUtils {
 
     public static Component textTranslatable(String messageKey, Object... args){
         return Component.translatable(messageKey, args);
-    }
-
-    public static Component text(String message, ChatFormatting color){
-        return Component.literal(message).withStyle(style -> style.withColor(color));
     }
 
 }

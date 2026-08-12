@@ -65,7 +65,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			TradeFinder.tick();
             if (scheduleOpenConfig) {
-                client.setScreen(new ControlUi(client.screen));
+                client.gui.setScreen(new ControlUi(client.gui.screen()));
                 scheduleOpenConfig = false;
             }
 			LocalPlayer player = client.player;
@@ -89,8 +89,8 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 			}
 
 			while (configKeyBinding.consumeClick()) {
-				if(client.screen == null) {
-					client.setScreen(new ControlUi(null));
+				if(client.gui.screen() == null) {
+					client.gui.setScreen(new ControlUi(null));
 				}
 			}
 		});
@@ -110,7 +110,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 		});
 
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if (hand == InteractionHand.OFF_HAND || hitResult == null || !world.isClientSide())
+            if (hand == InteractionHand.OFF_HAND || !world.isClientSide())
                 return InteractionResult.PASS;
             if (hitResult.getEntity() instanceof Villager villager && villager.getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.villager == null) {
                 TradeFinder.villager = villager;
@@ -121,7 +121,7 @@ public class LibrarianTradeFinder implements ClientModInitializer {
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (hand == InteractionHand.OFF_HAND || hitResult == null || !world.isClientSide())
+            if (hand == InteractionHand.OFF_HAND || !world.isClientSide())
                 return InteractionResult.PASS;
             BlockPos blockPos = hitResult.getBlockPos();
             if (world.getBlockState(blockPos).getBlock() == Blocks.LECTERN && TradeFinder.state == TradeState.SELECT_MANUAL && TradeFinder.lecternPos == null) {

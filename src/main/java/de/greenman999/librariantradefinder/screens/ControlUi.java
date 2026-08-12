@@ -13,7 +13,6 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextColor;
 
 public class ControlUi extends Screen {
 
@@ -39,7 +38,7 @@ public class ControlUi extends Screen {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
-        if (this.minecraft != null && this.minecraft.level == null) {
+        if (this.minecraft.level == null) {
             this.extractPanorama(context, deltaTicks);
         } else {
             context.fill(0, 0, this.width, this.height, 0x90202020);
@@ -51,9 +50,7 @@ public class ControlUi extends Screen {
     @Override
     protected void init() {
         this.addRenderableWidget(GrayButtonWidget.builder(Component.translatable("tradefinderui.buttons.save"), (buttonWidget) -> {
-                    if (this.minecraft != null) {
-                        this.minecraft.setScreen(this.parent);
-                    }
+                    this.minecraft.gui.setScreen(this.parent);
                     LibrarianTradeFinder.getConfig().save();
                 })
                         .bounds(this.width / 2 + 6, this.height - 25, width / 2 / 2 - 6 - 3, 20)
@@ -61,18 +58,16 @@ public class ControlUi extends Screen {
                         .id(0)
                 .build());
         this.addRenderableWidget(GrayButtonWidget.builder(Component.translatable("tradefinderui.buttons.start").withStyle(ChatFormatting.GREEN), (buttonWidget) -> {
-                            if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && minecraft != null) {
+                            if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && minecraft.player != null) {
                                 minecraft.player.sendSystemMessage(
                                         Component.translatable("commands.tradefinder.start.not-selected")
                                                 .withStyle(ChatFormatting.RED)
                                 );
 
-                                minecraft.setScreen(this.parent);
+                                minecraft.gui.setScreen(this.parent);
                             }else {
                                 TradeFinder.searchList();
-                                if (this.minecraft != null) {
-                                    this.minecraft.setScreen(this.parent);
-                                }
+                                this.minecraft.gui.setScreen(this.parent);
                                 LibrarianTradeFinder.getConfig().save();
                             }
                         })
