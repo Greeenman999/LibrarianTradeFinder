@@ -1,5 +1,6 @@
 package de.greenman999.librariantradefinder;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import de.greenman999.librariantradefinder.screens.ControlUi;
 import de.greenman999.librariantradefinder.util.HudUtils;
@@ -24,7 +25,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.level.block.Blocks;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,19 +44,19 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 	public void onInitializeClient() {
 		selectKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.librarian-trade-finder.select",
-				GLFW.GLFW_KEY_I,
+				InputConstants.KEY_I,
 				CATEGORY
 		));
 
 		toggleKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.librarian-trade-finder.toggle",
-				GLFW.GLFW_KEY_O,
+				InputConstants.KEY_O,
 				CATEGORY
 		));
 
 		configKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 				"key.librarian-trade-finder.config",
-				GLFW.GLFW_KEY_C,
+				InputConstants.KEY_C,
 				CATEGORY
 		));
 

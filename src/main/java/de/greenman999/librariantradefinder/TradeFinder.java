@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.HashedStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.inventory.ContainerInput;
@@ -23,15 +24,14 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 
 
 @SuppressWarnings("DuplicatedCode")
@@ -54,6 +54,7 @@ public class TradeFinder {
 
     private static int placeDelay = 3;
     private static int interactDelay = 2;
+    private static int placeCooldown = 0;
 
     private static boolean startedBreakLook = false;
     private static boolean startedPlaceLook = false;
@@ -69,6 +70,7 @@ public class TradeFinder {
         maxBookPrice = 0;
         minLevel = 0;
         tries = 0;
+        placeCooldown = 0;
 
         Minecraft.getInstance().gui.hud.setOverlayMessage(Component.literal(""), false);
     }
@@ -104,7 +106,7 @@ public class TradeFinder {
             stop();
             return 0;
         }
-        HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.GREEN, "commands.tradefinder.start.success-single"));
+        HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.GREEN, "commands.tradefinder.start.success-single", enchantment.description(), maxBookPrice));
         return 1;
     }
 
@@ -213,8 +215,7 @@ public class TradeFinder {
                 EntityHitResult hitResult = new EntityHitResult(villager);
                 result = mc.gameMode.interact(mc.player, villager, hitResult, InteractionHand.MAIN_HAND);
 
-                mc.player.swing(InteractionHand.MAIN_HAND, true);
-                mc.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
+                mc.player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 
                 mc.player.connection.send(new ServerboundInteractPacket(
                         villager.getId(),
@@ -250,7 +251,7 @@ public class TradeFinder {
             }
             Inventory inventory = player.getInventory();
             ItemStack mainHand = inventory.getSelectedItem();
-            if(mainHand.getItem() instanceof AxeItem) {
+            if(mainHand.is(ItemTags.AXES)) {
                 int remainingDurability = mainHand.getMaxDamage() - mainHand.getDamageValue();
                 if(remainingDurability <= 5 && LibrarianTradeFinder.getConfig().preventAxeBreaking) {
                     stop();
@@ -259,10 +260,9 @@ public class TradeFinder {
                 }
             }
             if (mc.level != null && mc.level.getBlockState(lecternPos).getBlock() instanceof LecternBlock && mc.gameMode != null) {
-                player.swing(InteractionHand.MAIN_HAND, true);
+                player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+                player.connection.send(new ServerboundPunchPacket());
                 mc.gameMode.continueDestroyBlock(lecternPos, Direction.UP);
-                player.connection
-                        .send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
             }else {
                 finishedPlaceLook = false;
                 state = TradeState.PLACE;
@@ -273,6 +273,11 @@ public class TradeFinder {
             }
 
         } else if (state == TradeState.PLACE) {
+            if (placeCooldown > 0) {
+                placeCooldown--;
+                return;
+            }
+
             if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getConnection() != null) {
                 mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(prevPos.x, prevPos.y, prevPos.z, true, false));
             }
@@ -371,13 +376,15 @@ public class TradeFinder {
                     lecternPos.getZ()), Direction.UP, lecternPos.below(), false);
             if (mc.gameMode != null) {
                 mc.gameMode.useItemOn(mc.player, InteractionHand.OFF_HAND, hit);
-                player.swing(InteractionHand.OFF_HAND, true);
-                player.connection
-                        .send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
+                player.swing(InteractionHand.OFF_HAND, SwingAnimation.DEFAULT, false);
             }
 
-            finishedCheckLook = false;
-            state = TradeState.CHECK;
+            if (mc.level != null && mc.level.getBlockState(lecternPos).getBlock() instanceof LecternBlock) {
+                finishedCheckLook = false;
+                state = TradeState.CHECK;
+            } else {
+                placeCooldown = 5;
+            }
         }
         else if (state == TradeState.SELECT_MANUAL) {
             if (villager != null && lecternPos != null) {

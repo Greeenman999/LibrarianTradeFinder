@@ -19,7 +19,7 @@
     "librarian-trade-finder.actionbar.status.select-manual": "Щелкните правой кнопкой мыши по кафедре и библиотекарю, чтобы выбрать их.",
     "librarian-trade-finder.check.interact.failed": "Ошибка взаимодействия с жителем. Попробуйте снова.",
     "librarian-trade-finder.break.axe.breaking": "Поиск остановлен в связи с поломкой вашего топора.",
-    "librarian-trade-finder.found": "Найдено зачарование %d за %d изумрудов!",
+    "librarian-trade-finder.found": "Найдено зачарование %d за %d изумрудов после %d попыток!",
     "tradefinderui.screen.title": "Искатель нужного библиотекаря",
     "tradefinderui.options.title": "Настройки",
     "tradefinderui.buttons.save": "Сохранить & Выйти",
