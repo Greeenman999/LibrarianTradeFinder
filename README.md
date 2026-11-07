@@ -12,8 +12,9 @@ Download the jar from [modrinth](https://modrinth.com/mod/librarian-trade-finder
 
 [![](https://github.com/Prospector/badges/blob/master/modrinth-badge-72h-padded.png?raw=true)](https://modrinth.com/mod/librarian-trade-finder)
 
-Or clone the repository and run `./gradlew build`.
-The compiled jar should be under build/libs/.
+For Minecraft 26.2 or 26.3, use the JAR whose filename matches your game version. Install Fabric Loader 0.19.5 or newer and Fabric API for that same Minecraft version.
+
+To build from source with Java 25, run `./gradlew build -Pminecraft_version=26.2` or `./gradlew build -Pminecraft_version=26.3`. The compiled JAR is in `build/libs/`.
 
 ## Usage
 

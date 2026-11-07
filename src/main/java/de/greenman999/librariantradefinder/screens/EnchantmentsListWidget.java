@@ -96,7 +96,7 @@ public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEnt
     @Override
     public boolean keyPressed(KeyEvent input) {
         int keyCode = input.input();
-        if(!(keyCode == InputConstants.KEY_BACKSPACE || (keyCode >= InputConstants.KEY_0 && keyCode <= InputConstants.KEY_9) || keyCode == InputConstants.KEY_LEFT || keyCode == InputConstants.KEY_RIGHT)) return false;
+        if (!isFieldKey(keyCode)) return false;
         for(EnchantmentEntry enchantmentEntry : children()) {
             if(enchantmentEntry.maxPriceField.isFocused()) return enchantmentEntry.maxPriceField.keyPressed(input);
             if(enchantmentEntry.levelField.isFocused()) return enchantmentEntry.levelField.keyPressed(input);
@@ -107,7 +107,7 @@ public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEnt
     @Override
     public boolean keyReleased(KeyEvent input) {
         int keyCode = input.input();
-        if(!(keyCode == InputConstants.KEY_BACKSPACE || (keyCode >= InputConstants.KEY_0 && keyCode <= InputConstants.KEY_9) || keyCode == InputConstants.KEY_LEFT || keyCode == InputConstants.KEY_RIGHT)) return false;
+        if (!isFieldKey(keyCode)) return false;
         for (EnchantmentEntry enchantmentEntry : this.children()) {
             enchantmentEntry.maxPriceField.keyReleased(input);
             enchantmentEntry.levelField.keyReleased(input);
@@ -115,9 +115,19 @@ public class EnchantmentsListWidget extends AbstractSelectionList<EnchantmentEnt
         return super.keyReleased(input);
     }
 
+    private static boolean isFieldKey(int keyCode) {
+        return switch (keyCode) {
+            case InputConstants.KEY_BACKSPACE, InputConstants.KEY_LEFT, InputConstants.KEY_RIGHT,
+                    InputConstants.KEY_0, InputConstants.KEY_1, InputConstants.KEY_2, InputConstants.KEY_3,
+                    InputConstants.KEY_4, InputConstants.KEY_5, InputConstants.KEY_6, InputConstants.KEY_7,
+                    InputConstants.KEY_8, InputConstants.KEY_9 -> true;
+            default -> false;
+        };
+    }
+
     @Override
     public boolean charTyped(CharacterEvent input) {
-        if(!input.isAllowedChatCharacter()) return false;
+        if (input.codepoint() < '0' || input.codepoint() > '9') return false;
         for (EnchantmentEntry enchantmentEntry : this.children()) {
             enchantmentEntry.maxPriceField.charTyped(input);
             enchantmentEntry.levelField.charTyped(input);

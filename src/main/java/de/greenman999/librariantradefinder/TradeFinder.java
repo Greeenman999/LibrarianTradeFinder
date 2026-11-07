@@ -1,5 +1,6 @@
 package de.greenman999.librariantradefinder;
 
+import de.greenman999.librariantradefinder.compat.SwingCompat;
 import de.greenman999.librariantradefinder.config.TradeFinderConfig;
 import de.greenman999.librariantradefinder.util.HudUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -13,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.HashedStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.inventory.ContainerInput;
@@ -24,7 +26,6 @@ import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -71,7 +72,7 @@ public class TradeFinder {
         minLevel = 0;
         tries = 0;
 
-        Minecraft.getInstance().gui.setOverlayMessage(Component.literal(""), false);
+        HudUtils.overlayMessage(Component.empty(), false);
     }
 
     public static int searchList() {
@@ -138,8 +139,8 @@ public class TradeFinder {
         assert Minecraft.getInstance().level != null;
         for(Entity entity : Minecraft.getInstance().level.entitiesForRendering()) {
             Vec3 entityPos = entity.position();
-            if (blockPos != null && entity instanceof Villager && ((Villager) entity).getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(blockPos.getCenter()) < closestDistance) {
-                closestDistance = entityPos.distanceTo(blockPos.getCenter());
+            if (blockPos != null && entity instanceof Villager && ((Villager) entity).getVillagerData().profession().is(VillagerProfession.LIBRARIAN) && entityPos.distanceTo(Vec3.atCenterOf(blockPos)) < closestDistance) {
+                closestDistance = entityPos.distanceTo(Vec3.atCenterOf(blockPos));
                 closestEntity = entity;
             }
         }
@@ -209,28 +210,18 @@ public class TradeFinder {
                 interactDelay = 2;
             }
 
-            InteractionResult result = null;
             if (mc.gameMode != null) {
-                EntityHitResult hitResult = new EntityHitResult(villager);
-                result = mc.gameMode.interact(mc.player, villager, hitResult, InteractionHand.MAIN_HAND);
-
-                mc.player.swing(InteractionHand.MAIN_HAND, true);
-                mc.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
-
-                mc.player.connection.send(new ServerboundInteractPacket(
-                        villager.getId(),
-                        InteractionHand.MAIN_HAND,
-                        villager.getEyePosition(),
-                        false
-                ));
-            }
-            if(result == InteractionResult.SUCCESS) {
                 finishedBreakLook = false;
                 state = TradeState.WAITING_FOR_PACKET;
-            }else {
-                HudUtils.chatMessage(HudUtils.textTranslatable("librarian-trade-finder.check.interact.failed", ChatFormatting.RED));
-                stop();
+                EntityHitResult hitResult = new EntityHitResult(villager, villager.getEyePosition());
+                InteractionResult result = mc.gameMode.interact(player, villager, hitResult, InteractionHand.MAIN_HAND);
+                if (result.consumesAction()) {
+                    SwingCompat.interact(player, InteractionHand.MAIN_HAND);
+                    return;
+                }
             }
+            HudUtils.chatMessage(HudUtils.textTranslatable("librarian-trade-finder.check.interact.failed", ChatFormatting.RED));
+            stop();
 
         } else if(state == TradeState.BREAK) {
             BlockPos toPlace = lecternPos.below();
@@ -251,7 +242,7 @@ public class TradeFinder {
             }
             Inventory inventory = player.getInventory();
             ItemStack mainHand = inventory.getSelectedItem();
-            if(mainHand.getItem() instanceof AxeItem) {
+            if(mainHand.is(ItemTags.AXES)) {
                 int remainingDurability = mainHand.getMaxDamage() - mainHand.getDamageValue();
                 if(remainingDurability <= 5 && LibrarianTradeFinder.getConfig().preventAxeBreaking) {
                     stop();
@@ -260,10 +251,8 @@ public class TradeFinder {
                 }
             }
             if (mc.level != null && mc.level.getBlockState(lecternPos).getBlock() instanceof LecternBlock && mc.gameMode != null) {
-                player.swing(InteractionHand.MAIN_HAND, true);
                 mc.gameMode.continueDestroyBlock(lecternPos, Direction.UP);
-                player.connection
-                        .send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
+                SwingCompat.attack(player);
             }else {
                 finishedPlaceLook = false;
                 state = TradeState.PLACE;
@@ -372,9 +361,7 @@ public class TradeFinder {
                     lecternPos.getZ()), Direction.UP, lecternPos.below(), false);
             if (mc.gameMode != null) {
                 mc.gameMode.useItemOn(mc.player, InteractionHand.OFF_HAND, hit);
-                player.swing(InteractionHand.OFF_HAND, true);
-                player.connection
-                        .send(new ServerboundSwingPacket(InteractionHand.OFF_HAND));
+                SwingCompat.interact(player, InteractionHand.OFF_HAND);
             }
 
             finishedCheckLook = false;

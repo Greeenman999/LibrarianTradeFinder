@@ -52,7 +52,7 @@ public class ControlUi extends Screen {
     protected void init() {
         this.addRenderableWidget(GrayButtonWidget.builder(Component.translatable("tradefinderui.buttons.save"), (buttonWidget) -> {
                     if (this.minecraft != null) {
-                        this.minecraft.setScreen(this.parent);
+                        this.minecraft.gui.setScreen(this.parent);
                     }
                     LibrarianTradeFinder.getConfig().save();
                 })
@@ -67,11 +67,11 @@ public class ControlUi extends Screen {
                                                 .withStyle(ChatFormatting.RED)
                                 );
 
-                                minecraft.setScreen(this.parent);
+                                minecraft.gui.setScreen(this.parent);
                             }else {
                                 TradeFinder.searchList();
                                 if (this.minecraft != null) {
-                                    this.minecraft.setScreen(this.parent);
+                                    this.minecraft.gui.setScreen(this.parent);
                                 }
                                 LibrarianTradeFinder.getConfig().save();
                             }

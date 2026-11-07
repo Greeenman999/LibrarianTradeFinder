@@ -12,7 +12,7 @@
 	},
 	"license": "GPL-3.0",
 	"icon": "assets/librarian-trade-finder/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"client": [
 			"de.greenman999.librariantradefinder.LibrarianTradeFinder"
@@ -26,8 +26,8 @@
 	],
 	"accessWidener" : "librarian-trade-finder.accesswidener",
 	"depends": {
-		"fabricloader": ">=0.19.2",
-		"minecraft": ">=26.1",
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "${minecraft_version}",
 		"java": ">=25",
 		"fabric-api": "*"
 	}

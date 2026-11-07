@@ -10,26 +10,22 @@ jobs:
   build:
     strategy:
       matrix:
-        # Use these Java versions
-        java: [25,]    # Current Java LTS & minimum supported by Minecraft 26.1
-        # and run on both Linux and Windows
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+        minecraft: ['26.2', '26.3']
+    runs-on: ubuntu-latest
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
-      - name: setup jdk ${{ matrix.java }}
+      - name: setup jdk 25
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java }}
+          java-version: '25'
           distribution: 'microsoft'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: build
-        run: ./gradlew build
+        run: ./gradlew build -Pminecraft_version=${{ matrix.minecraft }}
       - name: capture build artifacts
-        if: ${{ runner.os == 'Linux' && matrix.java == 25 }} # Only upload artifacts built from latest java on one OS
         uses: actions/upload-artifact@v6
         with:
-          name: Artifacts
+          name: Artifacts-mc${{ matrix.minecraft }}
           path: build/libs/
