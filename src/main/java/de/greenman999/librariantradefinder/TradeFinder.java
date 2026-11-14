@@ -75,6 +75,25 @@ public class TradeFinder {
         Minecraft.getInstance().gui.hud.setOverlayMessage(Component.literal(""), false);
     }
 
+    public static void reset() {
+        stop();
+
+        villager = null;
+        lecternPos = null;
+        prevPos = null;
+        interactDelay = 2;
+        placeDelay = 3;
+
+        startedBreakLook = false;
+        startedPlaceLook = false;
+        startedCheckLook = false;
+        finishedBreakLook = false;
+        finishedPlaceLook = false;
+        finishedCheckLook = false;
+
+        RotationTools.isRotated = false;
+    }
+
     public static int searchList() {
         if(TradeFinderConfig.INSTANCE.enchantments.values().stream().noneMatch(e -> e.enabled)) {
             HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.RED, "commands.tradefinder.search.no-enchantments"));
@@ -171,8 +190,9 @@ public class TradeFinder {
         LocalPlayer player = mc.player;
         if(player == null) return;
 
-        if((TradeFinder.villager == null || TradeFinder.lecternPos == null) && state != TradeState.SELECT_MANUAL) {
+        if(state != TradeState.SELECT_MANUAL && (villager == null || lecternPos == null || mc.level == null || villager.level() != mc.level || !villager.isAlive())) {
             HudUtils.chatMessage(HudUtils.textTranslatable(ChatFormatting.RED, "commands.tradefinder.start.not-selected"));
+            stop();
             return;
         }
         
@@ -266,9 +286,9 @@ public class TradeFinder {
             }else {
                 finishedPlaceLook = false;
                 state = TradeState.PLACE;
-                if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getConnection() != null) {
+                if(LibrarianTradeFinder.getConfig().tpToVillager) {
                     prevPos = mc.player.position();
-                    mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(villager.getX(), villager.getY(), villager.getZ(), true, false));
+                    mc.player.setPos(villager.getX(), villager.getY(), villager.getZ());
                 }
             }
 
@@ -278,8 +298,8 @@ public class TradeFinder {
                 return;
             }
 
-            if(LibrarianTradeFinder.getConfig().tpToVillager && mc.getConnection() != null) {
-                mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(prevPos.x, prevPos.y, prevPos.z, true, false));
+            if(LibrarianTradeFinder.getConfig().tpToVillager && prevPos != null) {
+                mc.player.setPos(prevPos.x, prevPos.y, prevPos.z);
             }
 
             BlockPos toPlace = lecternPos.below();

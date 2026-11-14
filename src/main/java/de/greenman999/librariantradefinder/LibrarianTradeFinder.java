@@ -100,7 +100,11 @@ public class LibrarianTradeFinder implements ClientModInitializer {
 				(guiGraphics, deltaTracker) -> RotationTools.render()
 		);
 
-		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> getConfig().load());
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+			TradeFinder.reset();
+			getConfig().load();
+		});
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> TradeFinder.reset());
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> {
 			if (Minecraft.getInstance().level != null) {
 				getConfig().load();
