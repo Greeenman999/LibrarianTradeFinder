@@ -19,7 +19,7 @@
     "librarian-trade-finder.actionbar.status.select-manual": "右键选择讲台和图书管理员",
     "librarian-trade-finder.check.interact.failed": "未能与村民互动。重试一次。",
     "librarian-trade-finder.break.axe.breaking": "查找已停止，因为斧子耐久即将耗尽。",
-    "librarian-trade-finder.found": "已找到附魔%d，价格%d绿宝石！",
+    "librarian-trade-finder.found": "已找到附魔%d，价格%d绿宝石！共尝试%d次。",
     "tradefinderui.screen.title": "自动附魔书交易查找",
     "tradefinderui.options.title": "设置",
     "tradefinderui.buttons.save": "保存并退出",
